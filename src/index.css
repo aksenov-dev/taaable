@@ -1,5 +1,46 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Manrope&display=swap');
+@import 'tailwindcss';
+
+:root {
+  font-family: 'Manrope', sans-serif;
+  line-height: 1.35;
+
+  --black-color: #000000;
+  --gray-1-color: #F5F6F8;
+  --gray-2-color: #EBEDF0;
+  --gray-3-color: #DCE1E6;
+  --gray-4-color: #B5BBC3;
+  --gray-5-color: #9AA2AD;
+  --gray-6-color: #707C8C;
+  --accent-1-color: #1A9FFF;
+  --accent-2-color: #1AB3FF
+}
+
+[data-theme="dark"] {
+  --black-color: #161922;
+  --gray-1-color: #1A1E28;
+  --gray-2-color: #242938;
+  --gray-3-color: #2E3342;
+  --gray-4-color: #474E66;
+  --gray-5-color: #5F6781;
+  --gray-6-color: #7B8A9D;
+}
 
 @theme {
+  --text-small: 12px;
+  --text-small--font-weight: 500;
+  --text-medium: 14px;
+  --text-medium--font-weight: 500;
+  --text-large: 17px;
+  --text-large--font-weight: 500;
+  --text-extra-large: 21px;
+  --text-extra-large--font-weight: 700;
 
+  --color-black: var(--black-color);
+  --color-gray-1: var(--gray-1-color);
+  --color-gray-2: var(--gray-2-color);
+  --color-gray-3: var(--gray-3-color);
+  --color-gray-4: var(--gray-4-color);
+  --color-gray-5: var(--gray-5-color);
+  --color-gray-6: var(--gray-6-color);
 }
