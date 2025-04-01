@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { BREAKPOINTS } from '@/shared/constants/Breackpoints'
+import { BREAKPOINTS } from '@/shared/constants/Breakpoints'
 
 export const useBreakpoints = () => {
   const viewportWidth = ref(window.innerWidth)
