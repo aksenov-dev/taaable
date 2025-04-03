@@ -1,10 +1,10 @@
 <script setup lang="ts">
-
+import TheHeader from '@/components/Home/Header/TheHeader.vue'
 </script>
 
 <template>
-  <div class="bg-gray-1 m-0 grid h-screen w-screen grid-rows-[150px_1fr_104px] p-8">
-    <header>Header</header>
+  <div class="bg-gray-1 m-0 grid h-screen w-screen grid-rows-[123px_1fr_72px] p-8 transition-colors">
+    <TheHeader />
 
     <div class="content">
       <main>
