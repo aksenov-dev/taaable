@@ -1,12 +1,14 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 
-import type { Settings } from '@/shared/types'
+import type { MainViewVariant, Settings } from '@/shared/types'
 import { setHtmlDark } from '@/shared/utils'
 
 const createDefaultSettings = (): Settings => {
   return {
-    isDarkTheme: false
+    isDarkTheme: false,
+    sortVariant: 'title',
+    viewVariant: 'list'
   }
 }
 
@@ -18,10 +20,15 @@ export const useMainStore = defineStore('main', () => {
     setHtmlDark(value)
   }
 
+  const setViewVariant = (value: MainViewVariant) => {
+    settings.value.viewVariant = value
+  }
+
   setHtmlDark(settings.value.isDarkTheme)
 
   return {
     settings,
-    setDarkTheme
+    setDarkTheme,
+    setViewVariant
   }
 })

@@ -3,6 +3,7 @@ import { useMainStore } from '@/stores/main'
 
 import { DarkThemeToggle, IconGrid } from '@/shared/ui'
 import HeaderSearch from '@/components/Home/Header/HeaderSearch.vue'
+import HeaderFilters from '@/components/Home/Header/HeaderFilters/HeaderFilters.vue'
 
 const { settings, setDarkTheme } = useMainStore()
 </script>
@@ -16,6 +17,7 @@ const { settings, setDarkTheme } = useMainStore()
 
     <div class="w-[680px]">
       <HeaderSearch />
+      <HeaderFilters />
     </div>
 
     <div class="flex w-30 justify-end">
