@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+html {
+  color-scheme: dark light;
+}
+
 :root {
   font-family: 'Manrope', sans-serif;
   line-height: 1.35;

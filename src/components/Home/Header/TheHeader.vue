@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { DarkThemeToggle, IconGrid } from '@/shared/ui'
+import { useMainStore } from '@/stores/main'
 
+import { DarkThemeToggle, IconGrid } from '@/shared/ui'
 import HeaderSearch from '@/components/Home/Header/HeaderSearch.vue'
+
+const { settings, setDarkTheme } = useMainStore()
 </script>
 
 <template>
@@ -15,6 +18,8 @@ import HeaderSearch from '@/components/Home/Header/HeaderSearch.vue'
       <HeaderSearch />
     </div>
 
-    <DarkThemeToggle :isDark="false" />
+    <div class="flex w-30 justify-end">
+      <DarkThemeToggle :is-dark="settings.isDarkTheme" @toggle="setDarkTheme" />
+    </div>
   </header>
 </template>
