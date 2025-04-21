@@ -1,0 +1,92 @@
+<script setup lang="ts">
+import type { MainViewVariant } from '@/shared/types'
+import { type DropdownMenuOffset } from '@/shared/ui'
+
+import { computed, ref, useTemplateRef, watch } from 'vue'
+import { useElementBounding, useThrottleFn } from '@vueuse/core'
+
+import { IconDelete, IconEdit, IconFile, IconFileBig, IconMoreVertical } from '@/shared/ui'
+import { DropdownMenu, DropdownMenuItem } from '@/shared/ui'
+
+interface Props {
+  title: string
+  date: string
+  variant: MainViewVariant
+}
+
+const { title, date, variant } = defineProps<Props>()
+
+const tableItemRef = useTemplateRef('table-item')
+const { width, height, top, left } = useElementBounding(tableItemRef)
+
+const isMenuOpen = ref(false)
+
+const menuOffset = computed<DropdownMenuOffset>(() => {
+  if (variant === 'list') {
+    return { offsetX: left.value + width.value + 4, offsetY: top.value - 2 }
+  }
+
+  return { offsetX: left.value + width.value - 54, offsetY: top.value + height.value + 4 }
+})
+
+watch(top, () => isMenuOpen.value = false)
+
+const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
+</script>
+
+<template>
+  <div
+    ref="table-item"
+    class="group/item hover:bg-gray-1 flex min-w-0 rounded-sm p-5 transition-colors select-none
+    hover:cursor-pointer"
+    :class="{
+      'h-15 gap-3': variant === 'list',
+      'h-67.5 basis-1/3 flex-col gap-1': variant === 'grid'
+    }"
+  >
+    <div
+      class="flex min-w-0 grow gap-2"
+      :class="{
+        'items-center': variant === 'list',
+        'flex-col': variant === 'grid'
+      }"
+    >
+      <div
+        class="border-gray-2 border-0 transition-colors"
+        :class="{
+          'flex grow items-center justify-center rounded-xs border-1 bg-white dark:bg-black': variant === 'grid'
+        }"
+      >
+        <component
+          :is="variant === 'list' ? IconFile : IconFileBig"
+          class="group-hover/item:text-accent-1 transition-colors"
+          :class="{
+            'text-gray-6': variant === 'list',
+            'text-gray-3': variant === 'grid'
+          }"
+        />
+      </div>
+
+      <span
+        class="text-medium truncate px-1 text-black transition-colors dark:text-white"
+        :class="{ '-mx-1 h-5': variant === 'grid' }"
+      >
+        {{ title }}
+      </span>
+    </div>
+
+    <div class="flex h-5 items-center justify-between gap-3">
+      <span class="text-medium text-gray-6 w-36">{{ date }}</span>
+      <IconMoreVertical class="text-gray-6 hover:text-accent-1 transition-colors" @click="toggleMenu" />
+    </div>
+
+    <DropdownMenu
+      :is-open="isMenuOpen"
+      :offset="menuOffset"
+      @close="toggleMenu"
+    >
+      <DropdownMenuItem title="Переименовать" :icon="IconEdit" />
+      <DropdownMenuItem title="Удалить" :icon="IconDelete" />
+    </DropdownMenu>
+  </div>
+</template>
