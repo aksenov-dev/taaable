@@ -23,6 +23,7 @@ import IconDelete from './IconDelete.vue'
 import IconCancel from './IconCancel.vue'
 import IconCheck from './IconCheck.vue'
 import IconFile from './IconFile.vue'
+import IconFileBig from './IconFileBig.vue'
 import IconList from './IconList.vue'
 import IconGrid from './IconGrid.vue'
 import IconMoreHorizontal from './IconMoreHorizontal.vue'
@@ -54,6 +55,7 @@ export {
   IconCancel,
   IconCheck,
   IconFile,
+  IconFileBig,
   IconList,
   IconGrid,
   IconMoreHorizontal,

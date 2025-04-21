@@ -7,6 +7,11 @@ html {
   color-scheme: dark light;
 }
 
+.scrollbar {
+  scrollbar-color: var(--color-gray-3) transparent;
+  scrollbar-width: thin;
+}
+
 :root {
   font-family: 'Manrope', sans-serif;
   line-height: 1.35;
