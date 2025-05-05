@@ -1,25 +1,41 @@
 <script setup lang="ts">
+import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { useElementBounding, useThrottleFn, useFocus } from '@vueuse/core'
+
 import type { MainViewVariant } from '@/shared/types'
 import { type DropdownMenuOffset } from '@/shared/ui'
 
-import { computed, ref, useTemplateRef, watch } from 'vue'
-import { useElementBounding, useThrottleFn } from '@vueuse/core'
+import { useTableListStore } from '@/stores/tableList'
+import { formatTimestampToStringDate } from '@/shared/utils'
 
 import { IconDelete, IconEdit, IconFile, IconFileBig, IconMoreVertical } from '@/shared/ui'
-import { DropdownMenu, DropdownMenuItem } from '@/shared/ui'
+import { DropdownMenu, DropdownMenuItem, TextInput } from '@/shared/ui'
 
 interface Props {
   title: string
-  date: string
+  date: number
   variant: MainViewVariant
 }
 
+const emit = defineEmits<{
+  rename: [value: string]
+  remove: []
+}>()
+
 const { title, date, variant } = defineProps<Props>()
 
+const tableListStore = useTableListStore()
+
 const tableItemRef = useTemplateRef('table-item')
-const { width, height, top, left } = useElementBounding(tableItemRef)
+const { width, height, top, left, update } = useElementBounding(tableItemRef)
+
+const input = shallowRef()
+const { focused } = useFocus(input, { initialValue: true })
 
 const isMenuOpen = ref(false)
+const isEditMode = ref(false)
+
+const stringDate = computed(() => formatTimestampToStringDate(date))
 
 const menuOffset = computed<DropdownMenuOffset>(() => {
   if (variant === 'list') {
@@ -29,16 +45,33 @@ const menuOffset = computed<DropdownMenuOffset>(() => {
   return { offsetX: left.value + width.value - 54, offsetY: top.value + height.value + 4 }
 })
 
-watch(top, () => isMenuOpen.value = false)
+watch(top, () => (isMenuOpen.value = false))
+watch(() => tableListStore.filteredTableList, () => nextTick(() => update()))
 
 const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
+
+const setEditMode = () => {
+  isEditMode.value = true
+  toggleMenu()
+  nextTick(() => (focused.value = true))
+}
+
+const renameTable = (value: string) => {
+  emit('rename', value)
+  isEditMode.value = false
+}
+
+const removeTable = () => {
+  emit('remove')
+  isEditMode.value = false
+  toggleMenu()
+}
 </script>
 
 <template>
   <div
     ref="table-item"
-    class="group/item hover:bg-gray-1 flex min-w-0 rounded-sm p-5 transition-colors select-none
-    hover:cursor-pointer"
+    class="group/item hover:bg-gray-1 flex min-w-0 rounded-sm p-5 transition-colors select-none hover:cursor-pointer"
     :class="{
       'h-15 gap-3': variant === 'list',
       'h-67.5 basis-1/3 flex-col gap-1': variant === 'grid'
@@ -67,16 +100,21 @@ const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 2
         />
       </div>
 
-      <span
-        class="text-medium truncate px-1 text-black transition-colors dark:text-white"
-        :class="{ '-mx-1 h-5': variant === 'grid' }"
-      >
-        {{ title }}
-      </span>
+      <TextInput
+        ref="input"
+        :model-value="title"
+        :disabled="!isEditMode"
+        :class="{
+          '-mr-0.25 -ml-0.25': variant === 'list',
+          '-mr-1.25 -ml-1.25 w-auto!': variant === 'grid'
+        }"
+        @blur="isEditMode = false"
+        @change="renameTable"
+      />
     </div>
 
     <div class="flex h-5 items-center justify-between gap-3">
-      <span class="text-medium text-gray-6 w-36">{{ date }}</span>
+      <span class="text-medium text-gray-6 w-36">{{ stringDate }}</span>
       <IconMoreVertical class="text-gray-6 hover:text-accent-1 transition-colors" @click="toggleMenu" />
     </div>
 
@@ -85,8 +123,17 @@ const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 2
       :offset="menuOffset"
       @close="toggleMenu"
     >
-      <DropdownMenuItem title="Переименовать" :icon="IconEdit" />
-      <DropdownMenuItem title="Удалить" :icon="IconDelete" />
+      <DropdownMenuItem
+        title="Переименовать"
+        :icon="IconEdit"
+        @click="setEditMode"
+      />
+
+      <DropdownMenuItem
+        title="Удалить"
+        :icon="IconDelete"
+        @click="removeTable"
+      />
     </DropdownMenu>
   </div>
 </template>

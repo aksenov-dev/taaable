@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useMainStore } from '@/stores/main'
+import { useSettingsStore } from '@/stores/settings'
 
 import { DarkThemeToggle, IconGrid } from '@/shared/ui'
 import HeaderSearch from '@/components/Home/Header/HeaderSearch.vue'
 import HeaderFilters from '@/components/Home/Header/HeaderFilters/HeaderFilters.vue'
 
-const { settings, setDarkTheme } = useMainStore()
+const settingsStore = useSettingsStore()
 </script>
 
 <template>
@@ -21,7 +21,10 @@ const { settings, setDarkTheme } = useMainStore()
     </div>
 
     <div class="flex w-30 justify-end">
-      <DarkThemeToggle :is-dark="settings.isDarkTheme" @toggle="setDarkTheme" />
+      <DarkThemeToggle
+        :is-dark="settingsStore.settings.isDarkTheme"
+        @toggle="settingsStore.setDarkTheme"
+      />
     </div>
   </header>
 </template>

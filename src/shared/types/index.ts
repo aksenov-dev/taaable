@@ -6,3 +6,17 @@ export interface Settings {
   sortVariant: MainSortVariant
   viewVariant: MainViewVariant
 }
+
+export interface TablePreview {
+  tableId: string
+  title: string
+  viewedAt: number
+}
+
+export interface Table extends TablePreview {
+  sheets: Sheet[]
+}
+
+interface Sheet {
+  sheetId: string
+}

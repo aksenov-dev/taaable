@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useMainStore } from '@/stores/main'
+import { useSettingsStore } from '@/stores/settings'
 
 import SortType from '@/components/Home/Header/HeaderFilters/SortType.vue'
 import ViewType from '@/components/Home/Header/HeaderFilters/ViewType.vue'
 
-const { settings, setViewVariant } = useMainStore()
+const settingsStore = useSettingsStore()
 </script>
 
 <template>
@@ -12,21 +12,30 @@ const { settings, setViewVariant } = useMainStore()
     <div class="flex gap-3">
       <span class="text-medium text-gray-6">Сортировка:</span>
 
-      <SortType title="По названию" :is-active="true" />
-      <SortType title="По дате просмотра" :is-active="false" />
+      <SortType
+        variant="title"
+        :is-active="settingsStore.settings.sortVariant === 'title'"
+        @click="settingsStore.setSortVariant"
+      />
+
+      <SortType
+        variant="date"
+        :is-active="settingsStore.settings.sortVariant === 'date'"
+        @click="settingsStore.setSortVariant"
+      />
     </div>
 
     <div class="flex items-center gap-3">
       <ViewType
         variant="list"
-        :is-active="settings.viewVariant === 'list'"
-        @click="setViewVariant"
+        :is-active="settingsStore.settings.viewVariant === 'list'"
+        @click="settingsStore.setViewVariant"
       />
 
       <ViewType
         variant="grid"
-        :is-active="settings.viewVariant === 'grid'"
-        @click="setViewVariant"
+        :is-active="settingsStore.settings.viewVariant === 'grid'"
+        @click="settingsStore.setViewVariant"
       />
     </div>
   </div>
