@@ -42,4 +42,9 @@ input {
   bg-[right_15px_top_9px] bg-no-repeat pr-12 pl-4 focus:text-black dark:bg-[url(@/assets/search-dark.svg)]
   dark:focus:text-white;
 }
+
+.table-title {
+  @apply text-large hover:border-gray-4 focus:border-accent-1 field-sizing-content h-7 truncate rounded-sm
+  border-transparent pr-1.25 pl-1.25 hover:bg-white focus:bg-white dark:hover:bg-black dark:focus:bg-black;
+}
 </style>
