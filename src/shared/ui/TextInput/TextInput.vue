@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { type Props } from './types'
 
-const model = defineModel<string>({ default: '' })
+const emit = defineEmits<{
+  blur: []
+  input: [value: string]
+  change: [value: string]
+}>()
 
 const { type = 'text', disabled = false, placeholder = '', variant = 'default' } = defineProps<Props>()
+
+const model = defineModel<string>({ default: '' })
 </script>
 
 <template>
@@ -13,6 +19,9 @@ const { type = 'text', disabled = false, placeholder = '', variant = 'default' }
     :placeholder="placeholder"
     :type="type"
     :class="variant"
+    @blur="emit('blur')"
+    @input="emit('input', model)"
+    @change="emit('change', model)"
   />
 </template>
 
@@ -25,7 +34,7 @@ input {
 }
 
 .default {
-  @apply hover:border-gray-1 h-5 rounded-xs border-transparent px-1;
+  @apply h-5 rounded-xs border-transparent px-1 disabled:pointer-events-none disabled:truncate;
 }
 
 .search {

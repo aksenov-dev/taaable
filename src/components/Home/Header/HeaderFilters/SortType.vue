@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import type { MainSortVariant } from '@/shared/types'
 import { IconChevronDown } from '@/shared/ui'
 
 interface Props {
-  title: string
+  variant: MainSortVariant
   isActive: boolean
 }
 
-const { title, isActive } = defineProps<Props>()
+const emit = defineEmits(['click'])
+
+const { variant, isActive } = defineProps<Props>()
 </script>
 
 <template>
@@ -16,8 +19,11 @@ const { title, isActive } = defineProps<Props>()
       'cursor-default text-black dark:text-white': isActive,
       'text-gray-6 hover:text-accent-1 active:text-gray-6 cursor-pointer': !isActive
     }"
+    @click="!isActive && emit('click', variant)"
   >
-    <span class="text-medium">{{ title }}</span>
+    <span class="text-medium">
+      {{ variant === 'title' ? 'По названию' : 'По дате просмотра' }}
+    </span>
     <IconChevronDown />
   </div>
 </template>
