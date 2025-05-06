@@ -47,4 +47,9 @@ input {
   @apply text-large hover:border-gray-4 focus:border-accent-1 field-sizing-content h-7 truncate rounded-sm
   border-transparent pr-1.25 pl-1.25 hover:bg-white focus:bg-white dark:hover:bg-black dark:focus:bg-black;
 }
+
+.font-size {
+  @apply text-medium border-gray-3 hover:border-gray-4 focus:border-accent-1 w-10 rounded-sm text-center text-black
+  dark:text-white;
+}
 </style>

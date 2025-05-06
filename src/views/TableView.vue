@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TableHeader from '@/components/Table/TableHeader.vue'
-import TheToolbar from '@/components/Table/TheToolbar.vue'
+import TheToolbar from '@/components/Table/Toolbar/TheToolbar.vue'
 import TheFormula from '@/components/Table/TheFormula.vue'
 import TheTable from '@/components/Table/TheTable.vue'
 import TableFooter from '@/components/Table/TableFooter.vue'
