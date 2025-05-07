@@ -13,7 +13,7 @@ const settingsStore = useSettingsStore()
 
       <TextInput
         variant="table-title"
-        :model-value="'Новая таблица'"
+        model-value="Новая таблица"
         class="min-w-25"
       />
     </div>

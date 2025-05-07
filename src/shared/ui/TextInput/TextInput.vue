@@ -50,6 +50,14 @@ input {
 
 .font-size {
   @apply text-medium border-gray-3 hover:border-gray-4 focus:border-accent-1 w-10 rounded-sm text-center text-black
-  dark:text-white;
+  dark:text-white bg-white dark:bg-black;
+}
+
+.range, .formula {
+  @apply h-7 border-none pr-2 pl-2 bg-white dark:bg-black;
+}
+
+.range {
+  @apply w-20;
 }
 </style>
