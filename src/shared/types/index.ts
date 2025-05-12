@@ -7,16 +7,15 @@ export interface Settings {
   viewVariant: MainViewVariant
 }
 
-export interface TablePreview {
+export interface Table {
   tableId: string
   title: string
   viewedAt: number
-}
-
-export interface Table extends TablePreview {
   sheets: Sheet[]
 }
 
 interface Sheet {
   sheetId: string
 }
+
+export type TablePreview = Pick<Table, 'tableId' | 'title' | 'viewedAt'>
