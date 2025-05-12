@@ -2,8 +2,8 @@
 import { useSettingsStore } from '@/stores/settings'
 
 import { DarkThemeToggle, IconGrid } from '@/shared/ui'
-import HeaderSearch from '@/components/Home/Header/HeaderSearch.vue'
-import HeaderFilters from '@/components/Home/Header/HeaderFilters/HeaderFilters.vue'
+import HeaderSearch from '@/components/HomeView/Header/HeaderSearch.vue'
+import HeaderFilters from '@/components/HomeView/Header/HeaderFilters/HeaderFilters.vue'
 
 const settingsStore = useSettingsStore()
 </script>

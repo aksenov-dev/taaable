@@ -18,7 +18,7 @@ const { variant, isActive } = defineProps<Props>()
     class="transition-colors select-none"
     :class="{
       'cursor-default text-black select-none dark:text-white': isActive,
-      'text-gray-6 hover:text-accent-1 active:text-gray-6 cursor-pointer': !isActive
+      'text-gray-6 hover:text-accent-1 cursor-pointer': !isActive
     }"
     @click="!isActive && emit('click', variant)"
   />

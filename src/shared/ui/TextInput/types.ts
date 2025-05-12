@@ -2,5 +2,5 @@ export interface Props {
   disabled?: boolean
   placeholder?: string
   type?: 'text' | 'number' | 'password'
-  variant?: 'default' | 'search' | 'table-title'
+  variant?: 'default' | 'search' | 'table-title' | 'font-size' | 'range' | 'formula'
 }
