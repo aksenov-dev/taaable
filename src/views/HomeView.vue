@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import HomeHeader from '@/components/Home/Header/HomeHeader.vue'
-import TableList from '@/components/Home/TableList/TableList.vue'
-import HomeFooter from '@/components/Home/HomeFooter.vue'
+import HomeHeader from '@/components/HomeView/Header/HomeHeader.vue'
+import TableList from '@/components/HomeView/TableList/TableList.vue'
+import HomeFooter from '@/components/HomeView/HomeFooter.vue'
 </script>
 
 <template>

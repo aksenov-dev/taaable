@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useSettingsStore } from '@/stores/settings'
 
-import SortType from '@/components/Home/Header/HeaderFilters/SortType.vue'
-import ViewType from '@/components/Home/Header/HeaderFilters/ViewType.vue'
+import SortType from '@/components/HomeView/Header/HeaderFilters/SortType.vue'
+import ViewType from '@/components/HomeView/Header/HeaderFilters/ViewType.vue'
 
 const settingsStore = useSettingsStore()
 </script>

@@ -2,7 +2,7 @@
 import { useSettingsStore } from '@/stores/settings'
 import { useTableListStore } from '@/stores/tableList'
 
-import TableItem from '@/components/Home/TableList/TableItem.vue'
+import TableItem from '@/components/HomeView/TableList/TableItem.vue'
 
 const settingsStore = useSettingsStore()
 const tableListStore = useTableListStore()
@@ -10,8 +10,7 @@ const tableListStore = useTableListStore()
 
 <template>
   <div
-    class="scrollbar mx-auto h-full max-h-max w-[680px] overflow-y-auto rounded-lg bg-white transition-all
-    dark:bg-black"
+    class="scrollbar mx-auto h-full max-h-max w-[680px] overflow-y-auto rounded-lg bg-white dark:bg-black"
   >
     <main
       class="min-h-21 bg-white p-3 transition-colors dark:bg-black"

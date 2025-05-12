@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ToolbarIconContainer from '@/components/Table/Toolbar/ToolbarIconContainer.vue'
-import ToolbarVerticalDivider from '@/components/Table/Toolbar/ToolbarVerticalDivider.vue'
+import ToolbarIconContainer from '@/components/TableView/Toolbar/ToolbarIconContainer.vue'
+import ToolbarVerticalDivider from '@/components/TableView/Toolbar/ToolbarVerticalDivider.vue'
 
 import {
   IconUndo,
