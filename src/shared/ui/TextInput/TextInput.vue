@@ -30,7 +30,7 @@ const model = defineModel<string>({ default: '' })
 
 input {
   @apply text-medium placeholder:text-gray-5 focus:border-accent-1 w-full appearance-none border text-black
-  transition-colors outline-none placeholder:transition-colors dark:text-white;
+  transition-colors outline-none dark:text-white;
 }
 
 .default {

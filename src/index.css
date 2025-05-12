@@ -7,6 +7,10 @@ html {
   color-scheme: dark light;
 }
 
+html.theme-switching * {
+  transition: none !important;
+}
+
 .scrollbar {
   scrollbar-color: var(--color-gray-3) transparent;
   scrollbar-width: thin;
