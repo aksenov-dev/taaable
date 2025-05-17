@@ -3,7 +3,7 @@ import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useElementBounding, useThrottleFn, useFocus } from '@vueuse/core'
 
 import type { MainViewVariant } from '@/shared/types'
-import { type DropdownMenuOffset } from '@/shared/ui'
+import type { DropdownMenuOffset } from '@/shared/ui'
 
 import { useTableListStore } from '@/stores/tableList'
 import { formatTimestampToStringDate } from '@/shared/utils'
@@ -45,9 +45,6 @@ const menuOffset = computed<DropdownMenuOffset>(() => {
   return { offsetX: left.value + width.value - 54, offsetY: top.value + height.value + 4 }
 })
 
-watch(top, () => (isMenuOpen.value = false))
-watch(() => tableListStore.filteredTableList, () => nextTick(() => update()))
-
 const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
 
 const setEditMode = () => {
@@ -66,6 +63,9 @@ const removeTable = () => {
   isEditMode.value = false
   toggleMenu()
 }
+
+watch(top, () => (isMenuOpen.value = false))
+watch(() => tableListStore.filteredTableList, () => nextTick(() => update()))
 </script>
 
 <template>
@@ -102,8 +102,10 @@ const removeTable = () => {
 
       <TextInput
         ref="input"
+        variant="title-preview"
         :model-value="title"
         :disabled="!isEditMode"
+        class="text-black dark:text-white"
         :class="{
           '-mr-0.25 -ml-0.25': variant === 'list',
           '-mr-1.25 -ml-1.25 w-auto!': variant === 'grid'
