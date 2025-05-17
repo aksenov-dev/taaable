@@ -1,6 +1,8 @@
 export interface Props {
+  variant: 'search' | 'title' | 'title-preview' | 'sheet' | 'font-size' | 'range' | 'formula'
+  type?: 'text' | 'number' | 'password'
   disabled?: boolean
   placeholder?: string
-  type?: 'text' | 'number' | 'password'
-  variant?: 'default' | 'search' | 'table-title' | 'font-size' | 'range' | 'formula'
+  maxLength?: number
+  autoWidth?: boolean
 }
