@@ -25,8 +25,8 @@ onClickOutside(menuRef, () => emit('close'))
     <div
       v-if="isOpen"
       ref="menu"
-      class="shadow-brand-1 absolute top-0 left-0 z-1000 min-h-19.5 min-w-42 rounded-sm bg-white p-1
-      transition-colors dark:bg-black"
+      class="shadow-brand-1 absolute top-0 left-0 z-1000 min-h-10 min-w-42 rounded-sm bg-white p-1 transition-colors
+      dark:bg-black"
       :style="{ transform: `translate3d(${offset.offsetX}px, ${offset.offsetY}px, 0)` }"
     >
       <slot />
