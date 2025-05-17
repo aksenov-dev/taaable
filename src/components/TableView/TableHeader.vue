@@ -12,17 +12,16 @@ const settingsStore = useSettingsStore()
       <IconGrid class="text-accent-1 mr-1.5 h-5 w-5 shrink-0" />
 
       <TextInput
-        variant="table-title"
         model-value="Новая таблица"
+        variant="title"
+        auto-width
         class="min-w-25"
       />
     </div>
 
-    <div>
       <DarkThemeToggle
         :is-dark="settingsStore.settings.isDarkTheme"
         @toggle="settingsStore.setDarkTheme"
       />
-    </div>
   </header>
 </template>

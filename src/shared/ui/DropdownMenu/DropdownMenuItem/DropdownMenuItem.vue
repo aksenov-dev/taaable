@@ -8,8 +8,8 @@ const { icon, title } = defineProps<Props>()
 
 <template>
   <div
-    class="group hover:bg-gray-1 flex h-8.75 items-center gap-2.5 rounded-xs bg-white px-3 py-2 transition-colors
-    dark:bg-black"
+    class="group hover:bg-gray-1 flex h-8.75 cursor-pointer items-center gap-2.5 rounded-xs bg-white px-3 py-2
+    transition-colors select-none dark:bg-black"
     @click="emit('click')"
   >
     <component :is="icon" class="text-gray-6 group-hover:text-accent-1 transition-colors" />
