@@ -1,10 +1,11 @@
-import BaseButton from '@/shared/ui/BaseButton/BaseButton.vue'
+import BaseButton from './BaseButton/BaseButton.vue'
 import DarkThemeToggle from './DarkThemeToggle/DarkThemeToggle.vue'
-import DropdownMenu from '@/shared/ui/DropdownMenu/DropdownMenu/DropdownMenu.vue'
-import DropdownMenuItem from '@/shared/ui/DropdownMenu/DropdownMenuItem/DropdownMenuItem.vue'
+import DropdownMenu from './DropdownMenu/DropdownMenu/DropdownMenu.vue'
+import DropdownMenuItem from './DropdownMenu/DropdownMenuItem/DropdownMenuItem.vue'
+import LoadingOverlay from './LoadingOverlay/LoadingOverlay.vue'
 import TextInput from './TextInput/TextInput.vue'
 
-import type { DropdownMenuOffset } from '@/shared/ui/DropdownMenu/DropdownMenu/types'
+import type { DropdownMenuOffset } from './DropdownMenu/DropdownMenu/types'
 
 export * from './Icons'
 
@@ -13,6 +14,7 @@ export {
   DarkThemeToggle,
   DropdownMenu,
   DropdownMenuItem,
+  LoadingOverlay,
   TextInput
 }
 
