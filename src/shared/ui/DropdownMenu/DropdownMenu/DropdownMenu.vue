@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Props } from './types'
+import type { Props } from './types'
 
 import { useTemplateRef } from 'vue'
 import { onClickOutside } from '@vueuse/core'
