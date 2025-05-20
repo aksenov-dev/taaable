@@ -1,21 +1,20 @@
-export type MainSortVariant = 'title' | 'date'
-export type MainViewVariant = 'list' | 'grid'
+import type { Settings, MainSortVariant, MainViewVariant } from './settings'
+import type { Table, TableDto } from './table'
+import type { Sheet } from './sheet'
+import type { Column } from './column'
+import type { Row } from './row'
+import type { Cell } from './cell'
+import type { CellStyle } from './cellStyle'
 
-export interface Settings {
-  isDarkTheme: boolean
-  sortVariant: MainSortVariant
-  viewVariant: MainViewVariant
+export type {
+  Settings,
+  MainSortVariant,
+  MainViewVariant,
+  Table,
+  TableDto,
+  Sheet,
+  Column,
+  Row,
+  Cell,
+  CellStyle
 }
-
-export interface Table {
-  tableId: string
-  title: string
-  viewedAt: number
-  sheets: Sheet[]
-}
-
-interface Sheet {
-  sheetId: string
-}
-
-export type TablePreview = Pick<Table, 'tableId' | 'title' | 'viewedAt'>

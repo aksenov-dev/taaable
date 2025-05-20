@@ -1,11 +1,12 @@
-import { formatTimestampToStringDate } from '@/shared/utils/formatTimestampToStringDate'
-import { getKeysFromLocalStorage } from '@/shared/utils/getKeysFromLocalStorage'
-import { getFromLocalStorage } from '@/shared/utils/getFromLocalStorage'
-import { setHtmlDark } from '@/shared/utils/setHtmlDark'
+import { formatTimestampToStringDate } from './formatTimestampToStringDate'
+import { setHtmlDark } from './setHtmlDark'
+
+import { createTable, fromTableDto, toTableDto } from './tableFactory'
 
 export {
   formatTimestampToStringDate,
-  getKeysFromLocalStorage,
-  getFromLocalStorage,
-  setHtmlDark
+  setHtmlDark,
+  createTable,
+  fromTableDto,
+  toTableDto
 }

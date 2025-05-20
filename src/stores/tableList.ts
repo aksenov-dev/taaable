@@ -1,30 +1,34 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
-import type { Table, TablePreview } from '@/shared/types'
-import { getFromLocalStorage, getKeysFromLocalStorage } from '@/shared/utils'
+import type { Table } from '@/shared/types'
+
 import { useSettingsStore } from '@/stores/settings'
-
-const createTablePreview = (table: Table): TablePreview => ({
-  tableId: table.tableId,
-  title: table.title,
-  viewedAt: table.viewedAt
-})
-
-const getTablesFromStorage = () => {
-  const keys = getKeysFromLocalStorage('taaableID')
-
-  return keys.reduce((acc: TablePreview[], key) => {
-    const table = getFromLocalStorage<Table>(key)
-    return table ? acc.concat(createTablePreview(table)) : acc
-  }, [])
-}
+import { createTableStorage } from '@/db/tableStorage'
 
 export const useTableListStore = defineStore('tableList', () => {
   const settingsStore = useSettingsStore()
+  const tableStorage = createTableStorage()
 
-  const tableList = ref(getTablesFromStorage())
+  const tableList = ref<Table[]>([])
+  const isInitialized = ref(false)
+  const isLoading = ref(false)
   const filterText = ref('')
+
+  const getTablesFromStorage = async () => {
+    if (isInitialized.value) return
+
+    isLoading.value = true
+
+    try {
+      tableList.value = await tableStorage.getAllTables()
+      isInitialized.value = true
+    } catch (error) {
+      console.error('Ошибка при загрузке таблиц из IndexedDB:', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
 
   const sortedTableList = computed(() => {
     if (settingsStore.settings.sortVariant === 'title') {
@@ -38,29 +42,29 @@ export const useTableListStore = defineStore('tableList', () => {
     return sortedTableList.value.filter(t => t.title.toLowerCase().includes(filterText.value.toLowerCase()))
   })
 
-  const renameTable = (tableId: string, value: string) => {
+  const renameTable = async (tableId: string, value: string): Promise<void> => {
     const table = tableList.value.find(t => t.tableId === tableId)
 
     if (table) {
       table.title = value
-
-      // ToDo: Логика переименования в localStorage
+      await tableStorage.saveTable(table)
     }
   }
 
-  const removeTable = (tableId: string) => {
+  const removeTable = async (tableId: string): Promise<void> => {
     const tableIndex = tableList.value.findIndex(t => t.tableId === tableId)
 
     if (tableIndex !== -1) {
       tableList.value.splice(tableIndex, 1)
+      await tableStorage.deleteTableById(tableId)
     }
-
-    // ToDo: Логика удаления в localStorage
   }
 
   return {
     filterText,
+    isLoading,
     filteredTableList,
+    getTablesFromStorage,
     renameTable,
     removeTable
   }
