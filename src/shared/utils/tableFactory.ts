@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid'
 
 import type { Table, TableDto } from '@/shared/types'
 
-export function createTable(): Table {
+export function createTableObject(): Table {
   return {
     tableId: nanoid(),
     title: 'Новая таблица',

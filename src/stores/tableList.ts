@@ -11,24 +11,8 @@ export const useTableListStore = defineStore('tableList', () => {
   const tableStorage = createTableStorage()
 
   const tableList = ref<Table[]>([])
-  const isInitialized = ref(false)
   const isLoading = ref(false)
   const filterText = ref('')
-
-  const getTablesFromStorage = async () => {
-    if (isInitialized.value) return
-
-    isLoading.value = true
-
-    try {
-      tableList.value = await tableStorage.getAllTables()
-      isInitialized.value = true
-    } catch (error) {
-      console.error('Ошибка при загрузке таблиц из IndexedDB:', error)
-    } finally {
-      isLoading.value = false
-    }
-  }
 
   const sortedTableList = computed(() => {
     if (settingsStore.settings.sortVariant === 'title') {
@@ -42,6 +26,18 @@ export const useTableListStore = defineStore('tableList', () => {
     return sortedTableList.value.filter(t => t.title.toLowerCase().includes(filterText.value.toLowerCase()))
   })
 
+  const getTables = async () => {
+    isLoading.value = true
+
+    try {
+      tableList.value = await tableStorage.getAllTables()
+    } catch (error) {
+      console.error('Ошибка при загрузке таблиц из IndexedDB:', error)
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const renameTable = async (tableId: string, value: string): Promise<void> => {
     const table = tableList.value.find(t => t.tableId === tableId)
 
@@ -51,7 +47,7 @@ export const useTableListStore = defineStore('tableList', () => {
     }
   }
 
-  const removeTable = async (tableId: string): Promise<void> => {
+  const deleteTable = async (tableId: string): Promise<void> => {
     const tableIndex = tableList.value.findIndex(t => t.tableId === tableId)
 
     if (tableIndex !== -1) {
@@ -64,8 +60,8 @@ export const useTableListStore = defineStore('tableList', () => {
     filterText,
     isLoading,
     filteredTableList,
-    getTablesFromStorage,
+    getTables,
     renameTable,
-    removeTable
+    deleteTable
   }
 })

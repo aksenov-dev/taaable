@@ -1,55 +1,34 @@
-import { openDB } from 'idb'
-
-import type { IDBPDatabase, DBSchema } from 'idb'
-import type { Table, TableDto } from '@/shared/types'
-
+import { getDB } from './database'
 import { fromTableDto, toTableDto } from '@/shared/utils'
+import { createSheetStorage } from '@/db/sheetStorage'
 
-interface TableDB extends DBSchema {
-  tables: {
-    key: TableDto['tableId']
-    value: TableDto
-  }
-}
-
-let dbPromise: Promise<IDBPDatabase<TableDB>>
-
-async function initDB() {
-  if (!dbPromise) {
-    dbPromise = openDB('taaableDb', 1, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains('tables')) {
-          db.createObjectStore('tables', { keyPath: 'tableId' })
-        }
-      }
-    })
-  }
-
-  return dbPromise
-}
+import type { Table } from '@/shared/types'
 
 export function createTableStorage() {
   const getAllTables = async (): Promise<Table[]> => {
-    const db = await initDB()
+    const db = await getDB()
     const dtoList = await db.getAll('tables')
 
     return dtoList.map(fromTableDto)
   }
 
-  const getTableById = async (tableId: string): Promise<Table | undefined> => {
-    const db = await initDB()
+  const getTableById = async (tableId: string): Promise<Table | null> => {
+    const db = await getDB()
     const dto = await db.get('tables', tableId)
 
-    return dto ? fromTableDto(dto) : undefined
+    return dto ? fromTableDto(dto) : null
   }
 
   const saveTable = async (table: Table): Promise<void> => {
-    const db = await initDB()
+    const db = await getDB()
     await db.put('tables', toTableDto(table))
   }
 
   const deleteTableById = async (tableId: string): Promise<void> => {
-    const db = await initDB()
+    const sheetStorage = createSheetStorage()
+
+    const db = await getDB()
+    await sheetStorage.deleteSheetsByTableId(tableId)
     await db.delete('tables', tableId)
   }
 

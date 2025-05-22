@@ -20,11 +20,15 @@ const {
 } = defineProps<Props>()
 
 const model = defineModel<string>({ default: '' })
-const input = useTemplateRef('input')
+const inputRef = useTemplateRef('input')
 
-const { updateWidth } = useAutoInputWidth(input, () => autoWidth)
+const onEnter = () => inputRef.value?.blur()
 
-watch(() => disabled, () => autoWidth && nextTick(() => updateWidth()))
+const { updateWidth } = useAutoInputWidth(inputRef, () => autoWidth)
+
+watch([model, () => disabled], () => {
+  if (autoWidth) nextTick(() => updateWidth())
+})
 </script>
 
 <template>
@@ -39,6 +43,7 @@ watch(() => disabled, () => autoWidth && nextTick(() => updateWidth()))
     @blur="emit('blur')"
     @input="emit('input', model)"
     @change="emit('change', model)"
+    @keydown.enter="onEnter"
   />
 </template>
 
@@ -63,7 +68,7 @@ input {
 }
 
 .title-preview {
-  @apply h-5 rounded-xs border-transparent pr-1 pl-1 disabled:pointer-events-none disabled:truncate;
+  @apply h-5 rounded-xs border-transparent pr-1 pl-1 disabled:pointer-events-none disabled:truncate transition-none;
 }
 
 .sheet {
