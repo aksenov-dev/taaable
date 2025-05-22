@@ -10,9 +10,10 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/table',
+    path: '/table/:tableId/:sheetId?',
     name: 'Table',
-    component: TableView
+    component: TableView,
+    props: true
   }
 ]
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useElementBounding, useThrottleFn } from '@vueuse/core'
+import { useTableStore } from '@/stores/table'
 
 import type { DropdownMenuOffset } from '@/shared/ui'
 
@@ -12,14 +13,17 @@ const { top, right } = useElementBounding(tableMenuRef)
 
 const isMenuOpen = ref(false)
 
+const tableStore = useTableStore()
+
 const menuOffset = computed<DropdownMenuOffset>(() => {
   return { offsetX: right.value - 174, offsetY: top.value - 46 }
 })
 
 const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
 
-const removeTable = () => {
-  toggleMenu()
+const removeTable = async () => {
+  await tableStore.deleteTable()
+  await toggleMenu()
 }
 </script>
 

@@ -1,7 +1,6 @@
 export interface Row {
-  rowId: string   // row-uuid (unique)
+  rowId: string
   sheetId: string
-  index: number
-  order: number   // Позиция (0, 1, 2...), он же текст
-  height?: number // px
+  order: number
+  height?: number
 }

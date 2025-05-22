@@ -5,7 +5,11 @@ export interface Sheet {
   tableId: string
   title: string
   order: number
-  columns: Column[] // colId ("col-1", "col-2")
-  rows: Record<string, Row>       // rowId ("row-1", "row-2")
-  cells: Record<string, Cell>     // "row-1:col-2"
+  rows: Record<string, Row>
+  columns: Column[]
+  cells: Record<string, Cell>
 }
+
+export type SheetDto = Pick<Sheet, 'sheetId' | 'tableId' | 'title' | 'order'>
+export type SheetMeta = Pick<Sheet, 'sheetId' | 'title' | 'order'>
+export type SheetData = Pick<Sheet, 'rows' | 'columns' | 'cells'>

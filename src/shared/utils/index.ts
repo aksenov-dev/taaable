@@ -1,12 +1,16 @@
 import { formatTimestampToStringDate } from './formatTimestampToStringDate'
 import { setHtmlDark } from './setHtmlDark'
 
-import { createTable, fromTableDto, toTableDto } from './tableFactory'
+import { createTableObject, fromTableDto, toTableDto } from './tableFactory'
+import { createSheetObject, fromSheetDto, toSheetDto } from './sheetFactory'
 
 export {
   formatTimestampToStringDate,
   setHtmlDark,
-  createTable,
+  createTableObject,
   fromTableDto,
-  toTableDto
+  toTableDto,
+  createSheetObject,
+  fromSheetDto,
+  toSheetDto
 }
