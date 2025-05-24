@@ -52,7 +52,7 @@ watch([model, () => disabled], () => {
 
 input {
   @apply text-medium placeholder:text-gray-5 focus:border-accent-1 w-full appearance-none border transition-colors
-  outline-none;
+  outline-none placeholder:select-none;
 }
 
 .search {
@@ -63,12 +63,12 @@ input {
 
 .title {
   @apply text-large hover:border-gray-4 focus:border-accent-1 field-sizing-content h-7 truncate rounded-sm
-  border-transparent pr-1.25 pl-1.25 text-black hover:bg-white focus:bg-white dark:text-white dark:hover:bg-black
-  dark:focus:bg-black;
+  border-transparent pr-1.25 pl-1.25 text-black hover:bg-white focus:bg-white dark:text-white
+  dark:hover:bg-black dark:focus:bg-black;
 }
 
 .title-preview {
-  @apply h-5 rounded-xs border-transparent pr-1 pl-1 disabled:pointer-events-none disabled:truncate transition-none;
+  @apply h-5 rounded-xs border-transparent pr-1 pl-1 transition-none disabled:pointer-events-none disabled:truncate;
 }
 
 .sheet {

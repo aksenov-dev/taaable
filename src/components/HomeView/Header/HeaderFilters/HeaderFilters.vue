@@ -10,7 +10,7 @@ const settingsStore = useSettingsStore()
 <template>
   <div class="mt-8 flex justify-between">
     <div class="flex gap-3">
-      <span class="text-medium text-gray-6">Сортировка:</span>
+      <span class="text-medium text-gray-6 select-none">Сортировка:</span>
 
       <HeaderFiltersSortType
         variant="title"

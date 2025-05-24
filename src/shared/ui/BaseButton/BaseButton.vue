@@ -13,6 +13,6 @@ const { icon, text } = defineProps<Props>()
     @click="emit('click')"
   >
     <component :is="icon" />
-    <span>{{ text }}</span>
+    <span class="select-none">{{ text }}</span>
   </button>
 </template>
