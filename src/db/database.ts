@@ -3,6 +3,13 @@ import { openDB } from 'idb'
 import type { IDBPDatabase, DBSchema } from 'idb'
 import type { SheetDto, TableDto } from '@/shared/types'
 
+interface MetaDB extends DBSchema {
+  meta: {
+    key: string
+    value: number | string
+  }
+}
+
 interface TableDB extends DBSchema {
   tables: {
     key: TableDto['tableId']
@@ -20,12 +27,16 @@ interface SheetDB extends DBSchema {
   }
 }
 
-let dbPromise: Promise<IDBPDatabase<TableDB & SheetDB>>
+let dbPromise: Promise<IDBPDatabase<MetaDB & TableDB & SheetDB>>
 
 export function getDB() {
   if (!dbPromise) {
-    dbPromise = openDB('taaableDb', 1, {
+    dbPromise = openDB('TaaableDB', 1, {
       upgrade(db) {
+        if (!db.objectStoreNames.contains('meta')) {
+          db.createObjectStore('meta')
+        }
+
         if (!db.objectStoreNames.contains('tables')) {
           db.createObjectStore('tables', { keyPath: 'tableId' })
         }
