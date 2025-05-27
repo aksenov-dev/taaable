@@ -4,7 +4,7 @@ import router from '@/router'
 
 import type { Table } from '@/shared/types'
 
-import { useSheetStore } from '@/stores/sheet'
+import { useSheetsStore } from '@/stores/sheets'
 import { createTableStorage } from '@/db/tableStorage'
 import { createTableObject } from '@/shared/utils'
 
@@ -13,13 +13,13 @@ export const useTableStore = defineStore('table', () => {
   const currentTable = ref<Table | null>(null)
 
   const tableStorage = createTableStorage()
-  const sheetStore = useSheetStore()
+  const sheetsStore = useSheetsStore()
 
   const createTable = async (): Promise<void> => {
     currentTable.value = createTableObject()
 
     await tableStorage.saveTable(currentTable.value)
-    await sheetStore.createSheet()
+    await sheetsStore.createSheet()
   }
 
   const getTable = async (tableId: string, sheetId?: string): Promise<void> => {
@@ -27,7 +27,7 @@ export const useTableStore = defineStore('table', () => {
 
     try {
       currentTable.value = await tableStorage.getTableById(tableId)
-      await sheetStore.getSheets(sheetId)
+      await sheetsStore.getSheets(sheetId)
     } catch (error) {
       console.error('Ошибка при загрузке таблицы из IndexedDB:', error)
     } finally {
@@ -52,7 +52,7 @@ export const useTableStore = defineStore('table', () => {
   const clear = (): void => {
     isLoading.value = false
     currentTable.value = null
-    sheetStore.clear()
+    sheetsStore.clear()
   }
 
   return {

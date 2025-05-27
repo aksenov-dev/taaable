@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useSettingsStore } from '@/stores/settings'
-import { useTableListStore } from '@/stores/tableList'
+import { useTablesStore } from '@/stores/tables'
 
 import TableItem from '@/components/HomeView/TableList/TableItem.vue'
 
 const settingsStore = useSettingsStore()
-const tableListStore = useTableListStore()
+const tablesStore = useTablesStore()
 </script>
 
 <template>
@@ -14,21 +14,21 @@ const tableListStore = useTableListStore()
       class="min-h-21 bg-white p-3 transition-colors dark:bg-black"
       :class="{ 'flex flex-wrap': settingsStore.settings.viewVariant === 'grid' }"
     >
-      <template v-if="tableListStore.filteredTableList.length">
+      <template v-if="tablesStore.filteredTableList.length">
         <TableItem
-          v-for="table in tableListStore.filteredTableList"
+          v-for="table in tablesStore.filteredTableList"
           :key="table.tableId"
           :table-id="table.tableId"
           :title="table.title"
           :date="table.viewedAt"
           :variant="settingsStore.settings.viewVariant"
-          @rename="tableListStore.renameTable(table.tableId, $event)"
-          @delete="tableListStore.deleteTable(table.tableId)"
+          @rename="tablesStore.renameTable(table.tableId, $event)"
+          @delete="tablesStore.deleteTable(table.tableId)"
         />
       </template>
 
       <p v-else class="text-medium text-gray-6 p-5">
-        {{ tableListStore.filterText ? 'Ничего не найдено' : 'Нет таблиц' }}
+        {{ tablesStore.filterText ? 'Ничего не найдено' : 'Нет таблиц' }}
       </p>
     </main>
   </div>

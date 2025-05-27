@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useTableListStore } from '@/stores/tableList'
+import { useTablesStore } from '@/stores/tables'
 import { TextInput } from '@/shared/ui'
 
-const tableListStore = useTableListStore()
+const tablesStore = useTablesStore()
 </script>
 
 <template>
   <TextInput
-    v-model.trim="tableListStore.filterText"
+    v-model.trim="tablesStore.filterText"
     variant="search"
     placeholder="Название таблицы"
   />
