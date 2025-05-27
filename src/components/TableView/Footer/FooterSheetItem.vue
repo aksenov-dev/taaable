@@ -9,10 +9,17 @@ import { DropdownMenu, DropdownMenuItem, TextInput } from '@/shared/ui'
 
 interface Props {
   title: string
-  isActive?: boolean
+  isActive: boolean
+  isSingleSheet: boolean
 }
 
-const { title, isActive = false } = defineProps<Props>()
+const emit = defineEmits<{
+  rename: [value: string]
+  delete: []
+  click: []
+}>()
+
+const { title, isActive, isSingleSheet } = defineProps<Props>()
 
 const sheetItemRef = useTemplateRef('sheet-item')
 const { left, top, update } = useElementBounding(sheetItemRef)
@@ -36,10 +43,12 @@ const setEditMode = () => {
 }
 
 const renameSheet = (value: string) => {
+  emit('rename', value)
   isEditMode.value = false
 }
 
 const removeSheet = () => {
+  emit('delete')
   isEditMode.value = false
   toggleMenu()
 }
@@ -50,11 +59,12 @@ watch(isMenuOpen, () => nextTick(() => update()))
 <template>
   <div
     ref="sheet-item"
-    class="flex min-w-0 items-center gap-0.5 rounded-b-sm px-1 select-none"
+    class="flex min-w-0 items-center gap-0.5 rounded-b-sm px-1 select-none transition"
     :class="{
       'shadow-brand-1 bg-white text-black dark:bg-black dark:text-white': isActive,
       'bg-gray-2 text-gray-6 cursor-pointer hover:text-black dark:hover:text-white': !isActive
     }"
+    @click="emit('click')"
   >
     <TextInput
       ref="input"
@@ -67,6 +77,7 @@ watch(isMenuOpen, () => nextTick(() => update()))
         'ml-1.25 border-none': !isEditMode,
         'pr-5.75 pl-1': isEditMode
       }"
+      @click.stop
       @blur="isEditMode = false"
       @change="renameSheet"
     />
@@ -74,7 +85,7 @@ watch(isMenuOpen, () => nextTick(() => update()))
     <IconChevronDown
       v-if="!isEditMode"
       class="mr-1 shrink-0 cursor-pointer transition-colors"
-      @click="toggleMenu"
+      @click.stop="toggleMenu"
     />
 
     <DropdownMenu
@@ -91,6 +102,7 @@ watch(isMenuOpen, () => nextTick(() => update()))
       <DropdownMenuItem
         title="Удалить"
         :icon="IconDelete"
+        :disabled="isSingleSheet"
         @click="removeSheet"
       />
     </DropdownMenu>

@@ -16,6 +16,11 @@ export function createSheetStorage() {
     await db.put('sheets', toSheetDto(sheet))
   }
 
+  const deleteSheetById = async (sheetId: string): Promise<void> => {
+    const db = await getDB()
+    await db.delete('sheets', sheetId)
+  }
+
   const deleteSheetsByTableId = async (tableId: string): Promise<void> => {
     const db = await getDB()
 
@@ -35,6 +40,7 @@ export function createSheetStorage() {
   return {
     getSheetsByTableId,
     saveSheet,
+    deleteSheetById,
     deleteSheetsByTableId
   }
 }
