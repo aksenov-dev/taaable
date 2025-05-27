@@ -6,7 +6,7 @@ import type { Table } from '@/shared/types'
 import { useSettingsStore } from '@/stores/settings'
 import { createTableStorage } from '@/db/tableStorage'
 
-export const useTableListStore = defineStore('tableList', () => {
+export const useTablesStore = defineStore('tables', () => {
   const settingsStore = useSettingsStore()
   const tableStorage = createTableStorage()
 

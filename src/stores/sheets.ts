@@ -9,7 +9,7 @@ import { createMetaStorage } from '@/db/metaStorage'
 import { createSheetStorage } from '@/db/sheetStorage'
 import { createSheetObject } from '@/shared/utils'
 
-export const useSheetStore = defineStore('sheet', () => {
+export const useSheetsStore = defineStore('sheets', () => {
   const sheets = ref<Sheet[]>([])
   const currentSheetId = ref<string | null>(null)
 

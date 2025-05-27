@@ -7,7 +7,7 @@ import { useElementBounding, useThrottleFn, useFocus } from '@vueuse/core'
 import type { MainViewVariant } from '@/shared/types'
 import type { DropdownMenuOffset } from '@/shared/ui'
 
-import { useTableListStore } from '@/stores/tableList'
+import { useTablesStore } from '@/stores/tables'
 import { formatTimestampToStringDate } from '@/shared/utils'
 
 import { IconDelete, IconEdit, IconFile, IconFileBig, IconMoreVertical } from '@/shared/ui'
@@ -28,7 +28,7 @@ const emit = defineEmits<{
 const { tableId, title, date, variant } = defineProps<Props>()
 
 const router = useRouter()
-const tableListStore = useTableListStore()
+const tablesStore = useTablesStore()
 
 const tableItemRef = useTemplateRef('table-item')
 const { width, height, top, left, update } = useElementBounding(tableItemRef)
@@ -71,7 +71,7 @@ const removeTable = () => {
 const goToTable = () => router.push({ name: 'Table', params: { tableId } })
 
 watch(top, () => (isMenuOpen.value = false))
-watch(() => tableListStore.filteredTableList, () => nextTick(() => update()))
+watch(() => tablesStore.filteredTableList, () => nextTick(() => update()))
 </script>
 
 <template>
