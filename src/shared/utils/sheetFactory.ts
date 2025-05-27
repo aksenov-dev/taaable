@@ -2,15 +2,12 @@ import { nanoid } from 'nanoid'
 
 import type { Sheet, SheetDto } from '@/shared/types'
 
-export function createSheetObject(tableId: string, order: number): Sheet {
+export function createSheetObject(tableId: string, order: number, titleNumber: number): Sheet {
   return {
     sheetId: nanoid(),
     tableId,
-    title: `Лист ${order + 1}`,
-    order,
-    columns: [],
-    rows: {},
-    cells: {}
+    title: `Лист ${titleNumber}`,
+    order
   }
 }
 
@@ -21,9 +18,6 @@ export function toSheetDto(sheet: Sheet): SheetDto {
 
 export function fromSheetDto(dto: SheetDto): Sheet {
   return {
-    ...dto,
-    columns: [],
-    rows: {},
-    cells: {}
+    ...dto
   }
 }

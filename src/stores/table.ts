@@ -19,12 +19,7 @@ export const useTableStore = defineStore('table', () => {
     currentTable.value = createTableObject()
 
     await tableStorage.saveTable(currentTable.value)
-    const sheetId = await sheetStore.createSheet(currentTable.value.tableId)
-
-    await router.push({
-      name: 'Table',
-      params: { tableId: currentTable.value.tableId, sheetId }
-    })
+    await sheetStore.createSheet()
   }
 
   const getTable = async (tableId: string, sheetId?: string): Promise<void> => {
@@ -32,7 +27,7 @@ export const useTableStore = defineStore('table', () => {
 
     try {
       currentTable.value = await tableStorage.getTableById(tableId)
-      await sheetStore.getSheets(tableId)
+      await sheetStore.getSheets(sheetId)
     } catch (error) {
       console.error('Ошибка при загрузке таблицы из IndexedDB:', error)
     } finally {
@@ -41,27 +36,27 @@ export const useTableStore = defineStore('table', () => {
   }
 
   const renameTable = async (value: string): Promise<void> => {
-    if (currentTable.value) {
-      currentTable.value.title = value
-      await tableStorage.saveTable(currentTable.value)
-    }
+    if (!currentTable.value) return
+
+    currentTable.value.title = value
+    await tableStorage.saveTable(currentTable.value)
   }
 
   const deleteTable = async (): Promise<void> => {
-    if (currentTable.value) {
-      await tableStorage.deleteTableById(currentTable.value.tableId)
-      await router.push({ name: 'Home' })
-    }
+    if (!currentTable.value) return
+
+    await tableStorage.deleteTableById(currentTable.value.tableId)
+    await router.push({ name: 'Home' })
   }
 
-  const clear = () => {
+  const clear = (): void => {
     isLoading.value = false
     currentTable.value = null
     sheetStore.clear()
   }
 
   return {
-    isLoading,
+    isLoading: readonly(isLoading),
     currentTable: readonly(currentTable),
     createTable,
     getTable,
