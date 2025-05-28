@@ -8,8 +8,8 @@ export interface Sheet {
 }
 
 export interface SheetData {
-  rows: Record<string, Row>
   columns: Column[]
+  rows: Record<string, Row>
   cells: Record<string, Cell>
 }
 

@@ -4,3 +4,5 @@ export interface Row {
   order: number
   height?: number
 }
+
+export type RowDto = Pick<Row, 'rowId' | 'sheetId' | 'order' | 'height'>

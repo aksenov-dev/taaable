@@ -1,7 +1,8 @@
 export interface Column {
   columnId: string
   sheetId: string
-  title: string
   order: number
   width?: number
 }
+
+export type ColumnDto = Pick<Column, 'columnId' | 'sheetId' | 'order' | 'width'>
