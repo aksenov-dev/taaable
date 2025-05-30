@@ -5,15 +5,19 @@ import router from '@/router'
 import type { Sheet } from '@/shared/types'
 
 import { useTableStore } from '@/stores/table'
+import { useSheetsDataStore } from '@/stores/sheetsData'
+
 import { createMetaStorage } from '@/db/metaStorage'
 import { createSheetStorage } from '@/db/sheetStorage'
-import { createSheetObject } from '@/shared/utils'
+
+import { generateSheet } from '@/shared/utils'
 
 export const useSheetsStore = defineStore('sheets', () => {
   const sheets = ref<Sheet[]>([])
   const currentSheetId = ref<string | null>(null)
 
   const tableStore = useTableStore()
+  const sheetsDataStore = useSheetsDataStore()
   const metaStorage = createMetaStorage()
   const sheetStorage = createSheetStorage()
 
@@ -21,10 +25,12 @@ export const useSheetsStore = defineStore('sheets', () => {
     if (!tableStore.currentTable) return
 
     const nextSheetNumber = await metaStorage.getNextSheetNumber(tableStore.currentTable.tableId)
-    const sheet = createSheetObject(tableStore.currentTable.tableId, sheets.value.length, nextSheetNumber)
+    const sheet = generateSheet(tableStore.currentTable.tableId, sheets.value.length, nextSheetNumber)
 
     await metaStorage.setNextSheetNumber(tableStore.currentTable.tableId, nextSheetNumber + 1)
     await sheetStorage.saveSheet(sheet)
+
+    await sheetsDataStore.createSheetData(sheet.sheetId)
 
     sheets.value.push(sheet)
     currentSheetId.value = sheet.sheetId

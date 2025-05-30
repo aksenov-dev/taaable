@@ -6,7 +6,7 @@ import type { Table } from '@/shared/types'
 
 import { useSheetsStore } from '@/stores/sheets'
 import { createTableStorage } from '@/db/tableStorage'
-import { createTableObject } from '@/shared/utils'
+import { generateTable } from '@/shared/utils'
 
 export const useTableStore = defineStore('table', () => {
   const isLoading = ref(false)
@@ -16,7 +16,7 @@ export const useTableStore = defineStore('table', () => {
   const sheetsStore = useSheetsStore()
 
   const createTable = async (): Promise<void> => {
-    currentTable.value = createTableObject()
+    currentTable.value = generateTable()
 
     await tableStorage.saveTable(currentTable.value)
     await sheetsStore.createSheet()

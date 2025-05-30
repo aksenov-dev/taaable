@@ -31,7 +31,7 @@ export function createSheetStorage() {
     const sheetIdKeys = await index.getAllKeys(tableId)
 
     for (const sheetId of sheetIdKeys) {
-      await store.delete(sheetId)
+      store.delete(sheetId)
     }
 
     await tx.done
