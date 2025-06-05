@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid'
 
-import type { Column, ColumnsData } from '@/shared/types'
+import type { Column, ColumnsData, ColumnDto } from '@/shared/types'
 
 import { CELL_SIZE } from '@/shared/constants'
 import { numberToColumnLetter } from '@/shared/utils/numberToColumnLetter'
@@ -16,10 +16,10 @@ const generateColumn = (sheetId: string, order: number): Column => {
 
 export const generateColumns = (sheetId: string, count: number): ColumnsData => {
   const columnsArr = Array.from({ length: count }, (_, i) => generateColumn(sheetId, i))
-  return transformColumnsFromArray(columnsArr)
+  return columnsArrayToColumnsData(columnsArr)
 }
 
-export const transformColumnsFromArray = (columns: Column[]): ColumnsData => {
+export const columnsArrayToColumnsData = (columns: Column[]): ColumnsData => {
   const columnsRecord: ColumnsData['columns'] = {}
   const columnOrder: ColumnsData['columnOrder'] = []
 
@@ -35,5 +35,30 @@ export const transformColumnsFromArray = (columns: Column[]): ColumnsData => {
   return {
     columns: columnsRecord,
     columnOrder
+  }
+}
+
+export const columnsRecordToArray = (columns: ColumnsData['columns']): Column[] => {
+  return Object.values(columns)
+}
+
+export const toColumnDto = (column: Column): ColumnDto => {
+  const dto: ColumnDto = {
+    columnId: column.columnId,
+    sheetId: column.sheetId,
+    order: column.order
+  }
+
+  if (column.width !== CELL_SIZE.DEFAULT_WIDTH) {
+    dto.width = column.width
+  }
+
+  return dto
+}
+
+export const fromColumnDto = (dto: ColumnDto): Column => {
+  return {
+    ...dto,
+    width: dto.width ?? CELL_SIZE.DEFAULT_WIDTH
   }
 }

@@ -10,10 +10,11 @@ export const generateTable = (): Table => {
   }
 }
 
-export const toTableDto = (table: Table): TableDto => {
-  const { tableId, title, viewedAt } = table
-  return { tableId, title, viewedAt }
-}
+export const toTableDto = (table: Table): TableDto => ({
+  tableId: table.tableId,
+  title: table.title,
+  viewedAt: table.viewedAt
+})
 
 export const fromTableDto = (dto: TableDto): Table => {
   return {

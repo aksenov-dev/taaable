@@ -1,4 +1,4 @@
-import type { Cell, CellsData, ColumnsData, RowsData } from '@/shared/types'
+import type { Cell, CellDto, CellsData, ColumnsData, RowsData } from '@/shared/types'
 
 const generateCell = (cellId: string, sheetId: string, columnId: string, rowId: string): Cell => {
   return {
@@ -7,7 +7,8 @@ const generateCell = (cellId: string, sheetId: string, columnId: string, rowId: 
     columnId,
     rowId,
     value: '',
-    type: 'text'
+    type: 'text',
+    style: {}
   }
 }
 
@@ -31,5 +32,27 @@ export const generateCells = (sheetId: string, columns: ColumnsData['columns'], 
 
   return {
     cells
+  }
+}
+
+export const toCellDto = (cell: Cell): CellDto => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { cellId, style, ...rest } = cell
+
+  return {
+    ...rest,
+    ...(Object.keys(style).length > 0 ? { style } : {})
+  }
+}
+
+export const fromCellDto = (dto: CellDto, columns: ColumnsData['columns'], rows: RowsData['rows']): Cell => {
+  const columnKey = Object.keys(columns).find(key => columns[key].columnId === dto.columnId)
+  const rowKey = Object.keys(rows).find(key => rows[key].rowId === dto.rowId)
+  const cellId = `${columnKey}:${rowKey}`
+
+  return {
+    cellId,
+    ...dto,
+    style: dto.style ?? {}
   }
 }

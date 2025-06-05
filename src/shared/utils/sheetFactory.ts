@@ -11,10 +11,12 @@ export const generateSheet = (tableId: string, order: number, titleNumber: numbe
   }
 }
 
-export const toSheetDto = (sheet: Sheet): SheetDto => {
-  const { sheetId, tableId, title, order } = sheet
-  return { sheetId, tableId, title, order }
-}
+export const toSheetDto = (sheet: Sheet): SheetDto => ({
+  sheetId: sheet.sheetId,
+  tableId: sheet.tableId,
+  title: sheet.title,
+  order: sheet.order
+})
 
 export const fromSheetDto = (dto: SheetDto): Sheet => {
   return {

@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid'
 
-import type { Row, RowsData } from '@/shared/types'
+import type { Row, RowsData, RowDto } from '@/shared/types'
 
 import { CELL_SIZE } from '@/shared/constants'
 
@@ -15,10 +15,10 @@ const generateRow = (sheetId: string, order: number): Row => {
 
 export const generateRows = (sheetId: string, count: number): RowsData => {
   const rowsArr = Array.from({ length: count }, (_, i) => generateRow(sheetId, i))
-  return transformRowsFromArray(rowsArr)
+  return rowsArrayToRowsData(rowsArr)
 }
 
-export const transformRowsFromArray = (rows: Row[]): RowsData => {
+export const rowsArrayToRowsData = (rows: Row[]): RowsData => {
   const rowsRecord: RowsData['rows'] = {}
   const rowOrder: RowsData['rowOrder'] = []
 
@@ -34,5 +34,30 @@ export const transformRowsFromArray = (rows: Row[]): RowsData => {
   return {
     rows: rowsRecord,
     rowOrder
+  }
+}
+
+export const rowsRecordToArray = (rows: RowsData['rows']): Row[] => {
+  return Object.values(rows)
+}
+
+export const toRowDto = (row: Row): RowDto => {
+  const dto: RowDto = {
+    rowId: row.rowId,
+    sheetId: row.sheetId,
+    order: row.order
+  }
+
+  if (row.height !== CELL_SIZE.DEFAULT_HEIGHT) {
+    dto.height = row.height
+  }
+
+  return dto
+}
+
+export const fromRowDto = (dto: RowDto): Row => {
+  return {
+    ...dto,
+    height: dto.height ?? CELL_SIZE.DEFAULT_HEIGHT
   }
 }

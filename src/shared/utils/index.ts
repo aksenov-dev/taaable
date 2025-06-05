@@ -4,10 +4,16 @@ import { setHtmlDark } from './setHtmlDark'
 
 import { generateTable, fromTableDto, toTableDto } from './tableFactory'
 import { generateSheet, fromSheetDto, toSheetDto } from './sheetFactory'
-import { generateSheetData } from './sheetDataFactory'
-import { generateColumns, transformColumnsFromArray } from './columnFactory'
-import { generateRows, transformRowsFromArray } from './rowFactory'
-import { generateCells } from './cellFactory'
+import { generateSheetData, fromSheetDataDto, toSheetDataDto } from './sheetDataFactory'
+import {
+  generateColumns,
+  columnsArrayToColumnsData,
+  columnsRecordToArray,
+  fromColumnDto,
+  toColumnDto
+} from './columnFactory'
+import { generateRows, rowsArrayToRowsData, rowsRecordToArray, fromRowDto, toRowDto } from './rowFactory'
+import { generateCells, fromCellDto, toCellDto } from './cellFactory'
 
 export {
   formatTimestampToStringDate,
@@ -20,9 +26,19 @@ export {
   fromSheetDto,
   toSheetDto,
   generateSheetData,
+  fromSheetDataDto,
+  toSheetDataDto,
   generateColumns,
-  transformColumnsFromArray,
+  columnsArrayToColumnsData,
+  columnsRecordToArray,
+  fromColumnDto,
+  toColumnDto,
   generateRows,
-  transformRowsFromArray,
-  generateCells
+  rowsArrayToRowsData,
+  rowsRecordToArray,
+  fromRowDto,
+  toRowDto,
+  generateCells,
+  fromCellDto,
+  toCellDto
 }
