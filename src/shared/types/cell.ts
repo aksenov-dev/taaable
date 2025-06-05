@@ -5,7 +5,7 @@ interface BaseCell {
   sheetId: string
   columnId: string
   rowId: string
-  style?: CellStyle
+  style: CellStyle
 }
 
 interface TextCell extends BaseCell {
@@ -19,12 +19,14 @@ interface FormulaCell extends BaseCell {
   value?: number
 }
 
-type TextCellDto = Omit<TextCell, 'cellId'>
-type FormulaCellDto = Omit<FormulaCell, 'cellId'>
-
-export type Cell = TextCell | FormulaCell
-export type CellDto = TextCellDto | FormulaCellDto
-
 export interface CellsData {
   cells: Record<string, Cell>
 }
+
+type ToCellDto<T extends BaseCell> = Omit<T, 'cellId' | 'style'> & { style?: CellStyle }
+
+type TextCellDto = ToCellDto<TextCell>
+type FormulaCellDto = ToCellDto<FormulaCell>
+
+export type Cell = TextCell | FormulaCell
+export type CellDto = TextCellDto | FormulaCellDto

@@ -4,4 +4,4 @@ export interface Table {
   viewedAt: number
 }
 
-export type TableDto = Pick<Table, 'tableId' | 'title' | 'viewedAt'>
+export type TableDto = Table

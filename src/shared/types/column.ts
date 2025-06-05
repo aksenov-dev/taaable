@@ -1,8 +1,10 @@
+import type { Optional } from '@/shared/types'
+
 export interface Column {
   columnId: string
   sheetId: string
   order: number
-  width?: number
+  width: number
 }
 
 export interface ColumnsData {
@@ -10,4 +12,4 @@ export interface ColumnsData {
   columnOrder: string[]
 }
 
-export type ColumnDto = Pick<Column, 'columnId' | 'sheetId' | 'order' | 'width'>
+export type ColumnDto = Optional<Column, 'width'>

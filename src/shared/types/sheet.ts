@@ -5,4 +5,4 @@ export interface Sheet {
   order: number
 }
 
-export type SheetDto = Pick<Sheet, 'sheetId' | 'tableId' | 'title' | 'order'>
+export type SheetDto = Sheet
