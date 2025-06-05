@@ -1,36 +1,38 @@
-import { computed, ref } from 'vue'
+import { computed, readonly, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import type { Table } from '@/shared/types'
 
+import { fromTableDto, toTableDto } from '@/shared/utils'
 import { useSettingsStore } from '@/stores/settings'
 import { createTableStorage } from '@/db/tableStorage'
 
 export const useTablesStore = defineStore('tables', () => {
-  const settingsStore = useSettingsStore()
-  const tableStorage = createTableStorage()
-
-  const tableList = ref<Table[]>([])
+  const tables = ref<Table[]>([])
   const isLoading = ref(false)
   const filterText = ref('')
 
-  const sortedTableList = computed(() => {
+  const settingsStore = useSettingsStore()
+  const tableStorage = createTableStorage()
+
+  const sortedTables = computed<Table[]>(() => {
     if (settingsStore.settings.sortVariant === 'title') {
-      return [...tableList.value].sort((a, b) => a.title.localeCompare(b.title))
+      return [...tables.value].sort((a, b) => a.title.localeCompare(b.title))
     }
 
-    return [...tableList.value].sort((a, b) => b.viewedAt - a.viewedAt)
+    return [...tables.value].sort((a, b) => b.viewedAt - a.viewedAt)
   })
 
-  const filteredTableList = computed(() => {
-    return sortedTableList.value.filter(t => t.title.toLowerCase().includes(filterText.value.toLowerCase()))
+  const filteredTables = computed<Table[]>(() => {
+    return sortedTables.value.filter(t => t.title.toLowerCase().includes(filterText.value.toLowerCase()))
   })
 
-  const getTables = async () => {
+  const getTables = async (): Promise<void> => {
     isLoading.value = true
 
     try {
-      tableList.value = await tableStorage.getAllTables()
+      const tablesDto = await tableStorage.getAllTables()
+      tables.value = tablesDto.map(fromTableDto)
     } catch (error) {
       console.error('Ошибка при загрузке таблиц из IndexedDB:', error)
     } finally {
@@ -39,27 +41,27 @@ export const useTablesStore = defineStore('tables', () => {
   }
 
   const renameTable = async (tableId: string, value: string): Promise<void> => {
-    const table = tableList.value.find(t => t.tableId === tableId)
+    const table = tables.value.find(t => t.tableId === tableId)
 
     if (table) {
       table.title = value
-      await tableStorage.saveTable(table)
+      await tableStorage.saveTable(toTableDto(table))
     }
   }
 
   const deleteTable = async (tableId: string): Promise<void> => {
-    const tableIndex = tableList.value.findIndex(t => t.tableId === tableId)
+    const tableIndex = tables.value.findIndex(t => t.tableId === tableId)
 
-    if (tableIndex !== -1) {
-      tableList.value.splice(tableIndex, 1)
-      await tableStorage.deleteTableById(tableId)
-    }
+    if (tableIndex === -1) return
+
+    tables.value.splice(tableIndex, 1)
+    await tableStorage.deleteTableById(tableId)
   }
 
   return {
     filterText,
-    isLoading,
-    filteredTableList,
+    isLoading: readonly(isLoading),
+    filteredTables: readonly(filteredTables),
     getTables,
     renameTable,
     deleteTable

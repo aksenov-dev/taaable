@@ -1,12 +1,13 @@
 import { readonly, ref } from 'vue'
 import { defineStore } from 'pinia'
+
 import router from '@/router'
 
 import type { Table } from '@/shared/types'
 
+import { generateTable, fromTableDto, toTableDto } from '@/shared/utils'
 import { useSheetsStore } from '@/stores/sheets'
 import { createTableStorage } from '@/db/tableStorage'
-import { generateTable } from '@/shared/utils'
 
 export const useTableStore = defineStore('table', () => {
   const isLoading = ref(false)
@@ -18,16 +19,22 @@ export const useTableStore = defineStore('table', () => {
   const createTable = async (): Promise<void> => {
     currentTable.value = generateTable()
 
-    await tableStorage.saveTable(currentTable.value)
+    await tableStorage.saveTable(toTableDto(currentTable.value))
     await sheetsStore.createSheet()
   }
 
   const getTable = async (tableId: string, sheetId?: string): Promise<void> => {
+    if (tableId === currentTable.value?.tableId) return
+
     isLoading.value = true
 
     try {
-      currentTable.value = await tableStorage.getTableById(tableId)
-      await sheetsStore.getSheets(sheetId)
+      const tableDto = await tableStorage.getTableById(tableId)
+
+      if (tableDto) {
+        currentTable.value = fromTableDto(tableDto)
+        await sheetsStore.getSheets(sheetId)
+      }
     } catch (error) {
       console.error('Ошибка при загрузке таблицы из IndexedDB:', error)
     } finally {
@@ -39,7 +46,7 @@ export const useTableStore = defineStore('table', () => {
     if (!currentTable.value) return
 
     currentTable.value.title = value
-    await tableStorage.saveTable(currentTable.value)
+    await tableStorage.saveTable(toTableDto(currentTable.value))
   }
 
   const deleteTable = async (): Promise<void> => {

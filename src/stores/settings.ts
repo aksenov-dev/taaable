@@ -2,16 +2,9 @@ import { readonly } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 
-import type { MainSortVariant, MainViewVariant, Settings } from '@/shared/types'
-import { setHtmlDark } from '@/shared/utils'
+import type { MainSortVariant, MainViewVariant } from '@/shared/types'
 
-const createDefaultSettings = (): Settings => {
-  return {
-    isDarkTheme: false,
-    sortVariant: 'title',
-    viewVariant: 'list'
-  }
-}
+import { createDefaultSettings, setHtmlDark } from '@/shared/utils'
 
 export const useSettingsStore = defineStore('settings', () => {
   const settings = useStorage('taaable', createDefaultSettings(), localStorage, { mergeDefaults: true })

@@ -14,9 +14,9 @@ const tablesStore = useTablesStore()
       class="min-h-21 bg-white p-3 transition-colors dark:bg-black"
       :class="{ 'flex flex-wrap': settingsStore.settings.viewVariant === 'grid' }"
     >
-      <template v-if="tablesStore.filteredTableList.length">
+      <template v-if="tablesStore.filteredTables.length">
         <TableItem
-          v-for="table in tablesStore.filteredTableList"
+          v-for="table in tablesStore.filteredTables"
           :key="table.tableId"
           :table-id="table.tableId"
           :title="table.title"

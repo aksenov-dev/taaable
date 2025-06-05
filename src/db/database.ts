@@ -59,9 +59,11 @@ interface CellDB extends DBSchema {
   }
 }
 
-let dbPromise: Promise<IDBPDatabase<MetaDB & TableDB & SheetDB & ColumnDB & RowDB & CellDB>>
+export type AppDBSchema = MetaDB & TableDB & SheetDB & ColumnDB & RowDB & CellDB
 
-export function getDB() {
+let dbPromise: Promise<IDBPDatabase<AppDBSchema>>
+
+export const getDB = () => {
   if (!dbPromise) {
     dbPromise = openDB('TaaableDB', 1, {
       upgrade(db) {

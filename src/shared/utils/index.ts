@@ -1,3 +1,4 @@
+import { createDefaultSettings } from './createDefaultSettings'
 import { formatTimestampToStringDate } from './formatTimestampToStringDate'
 import { numberToColumnLetter } from './numberToColumnLetter'
 import { setHtmlDark } from './setHtmlDark'
@@ -16,6 +17,7 @@ import { generateRows, rowsArrayToRowsData, rowsRecordToArray, fromRowDto, toRow
 import { generateCells, fromCellDto, toCellDto } from './cellFactory'
 
 export {
+  createDefaultSettings,
   formatTimestampToStringDate,
   numberToColumnLetter,
   setHtmlDark,

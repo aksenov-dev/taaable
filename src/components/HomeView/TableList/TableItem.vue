@@ -71,7 +71,7 @@ const removeTable = () => {
 const goToTable = () => router.push({ name: 'Table', params: { tableId } })
 
 watch(top, () => (isMenuOpen.value = false))
-watch(() => tablesStore.filteredTableList, () => nextTick(() => update()))
+watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
 </script>
 
 <template>
