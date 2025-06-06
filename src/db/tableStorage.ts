@@ -1,36 +1,35 @@
+import type { TableDto } from '@/shared/types'
+
 import { getDB } from './database'
-import { fromTableDto, toTableDto } from '@/shared/utils'
 import { createMetaStorage } from '@/db/metaStorage'
 import { createSheetStorage } from '@/db/sheetStorage'
+import { createSheetDataStorage } from '@/db/sheetDataStorage'
 
-import type { Table } from '@/shared/types'
+export const createTableStorage = () => {
+  const metaStorage = createMetaStorage()
+  const sheetStorage = createSheetStorage()
+  const sheetDataStorage = createSheetDataStorage()
 
-export function createTableStorage() {
-  const getAllTables = async (): Promise<Table[]> => {
+  const getAllTables = async (): Promise<TableDto[]> => {
     const db = await getDB()
-    const dtoList = await db.getAll('tables')
-
-    return dtoList.map(fromTableDto)
+    return await db.getAll('tables')
   }
 
-  const getTableById = async (tableId: string): Promise<Table | null> => {
+  const getTableById = async (tableId: string): Promise<TableDto | null> => {
     const db = await getDB()
-    const dto = await db.get('tables', tableId)
-
-    return dto ? fromTableDto(dto) : null
+    return await db.get('tables', tableId) ?? null
   }
 
-  const saveTable = async (table: Table): Promise<void> => {
+  const saveTable = async (table: TableDto): Promise<void> => {
     const db = await getDB()
-    await db.put('tables', toTableDto(table))
+    await db.put('tables', table)
   }
 
   const deleteTableById = async (tableId: string): Promise<void> => {
-    const metaStorage = createMetaStorage()
-    const sheetStorage = createSheetStorage()
-
     const db = await getDB()
+
     await metaStorage.deleteNextSheetId(tableId)
+    await sheetDataStorage.deleteSheetsDataByTableId(tableId)
     await sheetStorage.deleteSheetsByTableId(tableId)
     await db.delete('tables', tableId)
   }

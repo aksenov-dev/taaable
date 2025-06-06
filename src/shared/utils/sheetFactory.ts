@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid'
 
 import type { Sheet, SheetDto } from '@/shared/types'
 
-export function createSheetObject(tableId: string, order: number, titleNumber: number): Sheet {
+export const generateSheet = (tableId: string, order: number, titleNumber: number): Sheet => {
   return {
     sheetId: nanoid(),
     tableId,
@@ -11,12 +11,14 @@ export function createSheetObject(tableId: string, order: number, titleNumber: n
   }
 }
 
-export function toSheetDto(sheet: Sheet): SheetDto {
-  const { sheetId, tableId, title, order } = sheet
-  return { sheetId, tableId, title, order }
-}
+export const toSheetDto = (sheet: Sheet): SheetDto => ({
+  sheetId: sheet.sheetId,
+  tableId: sheet.tableId,
+  title: sheet.title,
+  order: sheet.order
+})
 
-export function fromSheetDto(dto: SheetDto): Sheet {
+export const fromSheetDto = (dto: SheetDto): Sheet => {
   return {
     ...dto
   }

@@ -2,23 +2,22 @@ import { nanoid } from 'nanoid'
 
 import type { Table, TableDto } from '@/shared/types'
 
-export function createTableObject(): Table {
+export const generateTable = (): Table => {
   return {
     tableId: nanoid(),
     title: 'Новая таблица',
-    viewedAt: Date.now(),
-    sheets: []
+    viewedAt: Date.now()
   }
 }
 
-export function toTableDto(table: Table): TableDto {
-  const { tableId, title, viewedAt } = table
-  return { tableId, title, viewedAt }
-}
+export const toTableDto = (table: Table): TableDto => ({
+  tableId: table.tableId,
+  title: table.title,
+  viewedAt: table.viewedAt
+})
 
-export function fromTableDto(dto: TableDto): Table {
+export const fromTableDto = (dto: TableDto): Table => {
   return {
-    ...dto,
-    sheets: []
+    ...dto
   }
 }

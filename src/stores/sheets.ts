@@ -1,19 +1,22 @@
 import { readonly, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
+
 import router from '@/router'
 
 import type { Sheet } from '@/shared/types'
 
+import { generateSheet, fromSheetDto, toSheetDto } from '@/shared/utils'
 import { useTableStore } from '@/stores/table'
+import { useSheetsDataStore } from '@/stores/sheetsData'
 import { createMetaStorage } from '@/db/metaStorage'
 import { createSheetStorage } from '@/db/sheetStorage'
-import { createSheetObject } from '@/shared/utils'
 
 export const useSheetsStore = defineStore('sheets', () => {
   const sheets = ref<Sheet[]>([])
   const currentSheetId = ref<string | null>(null)
 
   const tableStore = useTableStore()
+  const sheetsDataStore = useSheetsDataStore()
   const metaStorage = createMetaStorage()
   const sheetStorage = createSheetStorage()
 
@@ -21,10 +24,12 @@ export const useSheetsStore = defineStore('sheets', () => {
     if (!tableStore.currentTable) return
 
     const nextSheetNumber = await metaStorage.getNextSheetNumber(tableStore.currentTable.tableId)
-    const sheet = createSheetObject(tableStore.currentTable.tableId, sheets.value.length, nextSheetNumber)
+    const sheet = generateSheet(tableStore.currentTable.tableId, sheets.value.length, nextSheetNumber)
 
     await metaStorage.setNextSheetNumber(tableStore.currentTable.tableId, nextSheetNumber + 1)
-    await sheetStorage.saveSheet(sheet)
+    await sheetStorage.saveSheet(toSheetDto(sheet))
+
+    await sheetsDataStore.createSheetData(sheet.sheetId)
 
     sheets.value.push(sheet)
     currentSheetId.value = sheet.sheetId
@@ -36,11 +41,12 @@ export const useSheetsStore = defineStore('sheets', () => {
     if (!tableStore.currentTable) return
 
     try {
-      const sheetsList = await sheetStorage.getSheetsByTableId(tableStore.currentTable.tableId)
+      const sheetsDto = await sheetStorage.getSheetsByTableId(tableStore.currentTable.tableId)
 
-      sheets.value = sheetsList.sort((a, b) => a.order - b.order)
+      sheets.value = sheetsDto.map(fromSheetDto).sort((a, b) => a.order - b.order)
       currentSheetId.value = activeSheetId || sheets.value[0].sheetId
 
+      await sheetsDataStore.getSheetsData()
       await goToSheet(tableStore.currentTable.tableId, currentSheetId.value)
     } catch (error) {
       console.error('Ошибка при загрузке листов таблицы из IndexedDB:', error)
@@ -59,7 +65,7 @@ export const useSheetsStore = defineStore('sheets', () => {
 
     if (sheet) {
       sheet.title = value
-      await sheetStorage.saveSheet(sheet)
+      await sheetStorage.saveSheet(toSheetDto(sheet))
     }
   }
 
@@ -75,6 +81,7 @@ export const useSheetsStore = defineStore('sheets', () => {
       await setCurrentSheet(sheets.value[prevIndex].sheetId)
     }
 
+    await sheetsDataStore.deleteSheetData(sheetId)
     await sheetStorage.deleteSheetById(sheetId)
     await reorderSheets()
   }
@@ -85,7 +92,7 @@ export const useSheetsStore = defineStore('sheets', () => {
     if (!isOrderBroken) return
 
     const reorderedSheets = sheets.value.map((sheet, index) => ({ ...sheet, order: index }))
-    await Promise.all(reorderedSheets.map(sheet => sheetStorage.saveSheet(sheet)))
+    await sheetStorage.saveSheets(reorderedSheets.map(toSheetDto))
 
     sheets.value = reorderedSheets
   }
@@ -100,9 +107,10 @@ export const useSheetsStore = defineStore('sheets', () => {
   const clear = (): void => {
     sheets.value = []
     currentSheetId.value = null
+    sheetsDataStore.clear()
   }
 
-  watch(() => router.currentRoute.value.params.sheetId, async (newSheetId) => {
+  watch(() => router.currentRoute.value.params.sheetId, async newSheetId => {
     if (newSheetId !== currentSheetId.value && typeof newSheetId === 'string')
       await setCurrentSheet(newSheetId)
     }

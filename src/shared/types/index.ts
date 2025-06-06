@@ -1,12 +1,15 @@
+import type { Optional } from './utils'
 import type { Settings, MainSortVariant, MainViewVariant } from './settings'
 import type { Table, TableDto } from './table'
-import type { Sheet, SheetDto, SheetData } from './sheet'
-import type { Column } from './column'
-import type { Row } from './row'
-import type { Cell } from './cell'
+import type { Sheet, SheetDto } from './sheet'
+import type { SheetData, SheetDataDto } from './sheetData'
+import type { Column, ColumnsData, ColumnDto } from './column'
+import type { Row, RowsData, RowDto } from './row'
+import type { Cell, CellsData, CellDto } from './cell'
 import type { CellStyle } from './cellStyle'
 
 export type {
+  Optional,
   Settings,
   MainSortVariant,
   MainViewVariant,
@@ -15,8 +18,15 @@ export type {
   Sheet,
   SheetDto,
   SheetData,
+  SheetDataDto,
   Column,
+  ColumnsData,
+  ColumnDto,
   Row,
+  RowsData,
+  RowDto,
   Cell,
+  CellsData,
+  CellDto,
   CellStyle
 }

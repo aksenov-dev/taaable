@@ -1,7 +1,7 @@
 import { openDB } from 'idb'
 
 import type { IDBPDatabase, DBSchema } from 'idb'
-import type { SheetDto, TableDto } from '@/shared/types'
+import type { CellDto, ColumnDto, RowDto, SheetDto, TableDto } from '@/shared/types'
 
 interface MetaDB extends DBSchema {
   meta: {
@@ -27,9 +27,43 @@ interface SheetDB extends DBSchema {
   }
 }
 
-let dbPromise: Promise<IDBPDatabase<MetaDB & TableDB & SheetDB>>
+interface ColumnDB extends DBSchema {
+  columns: {
+    key: ColumnDto['columnId']
+    value: ColumnDto
+    indexes: {
+      'bySheetId': SheetDto['sheetId']
+    }
+  }
+}
 
-export function getDB() {
+interface RowDB extends DBSchema {
+  rows: {
+    key: RowDto['rowId']
+    value: RowDto
+    indexes: {
+      'bySheetId': SheetDto['sheetId']
+    }
+  }
+}
+
+interface CellDB extends DBSchema {
+  cells: {
+    key: [SheetDto['sheetId'], ColumnDto['columnId'], RowDto['rowId']]
+    value: CellDto
+    indexes: {
+      'bySheetId': string
+      'byColumnId': string
+      'byRowId': string
+    }
+  }
+}
+
+export type AppDBSchema = MetaDB & TableDB & SheetDB & ColumnDB & RowDB & CellDB
+
+let dbPromise: Promise<IDBPDatabase<AppDBSchema>>
+
+export const getDB = () => {
   if (!dbPromise) {
     dbPromise = openDB('TaaableDB', 1, {
       upgrade(db) {
@@ -44,6 +78,23 @@ export function getDB() {
         if (!db.objectStoreNames.contains('sheets')) {
           const store = db.createObjectStore('sheets', { keyPath: 'sheetId' })
           store.createIndex('byTableId', 'tableId')
+        }
+
+        if (!db.objectStoreNames.contains('columns')) {
+          const store = db.createObjectStore('columns', { keyPath: 'columnId' })
+          store.createIndex('bySheetId', 'sheetId')
+        }
+
+        if (!db.objectStoreNames.contains('rows')) {
+          const store = db.createObjectStore('rows', { keyPath: 'rowId' })
+          store.createIndex('bySheetId', 'sheetId')
+        }
+
+        if (!db.objectStoreNames.contains('cells')) {
+          const store = db.createObjectStore('cells', { keyPath: ['sheetId', 'columnId', 'rowId'] })
+          store.createIndex('bySheetId', 'sheetId')
+          store.createIndex('byColumnId', 'columnId')
+          store.createIndex('byRowId', 'rowId')
         }
       }
     })
