@@ -16,7 +16,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <LoadingOverlay v-if="tablesStore.isLoading" />
+  <LoadingOverlay :is-visible="tablesStore.isLoading" />
 
   <div class="bg-gray-1 grid h-screen w-screen grid-rows-[123px_1fr_72px] p-8 transition-colors">
     <HomeHeader />
