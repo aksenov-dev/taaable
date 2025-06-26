@@ -14,7 +14,7 @@ import {
   toColumnDto
 } from './columnFactory'
 import { generateRows, rowsArrayToRowsData, rowsRecordToArray, fromRowDto, toRowDto } from './rowFactory'
-import { generateCells, fromCellDto, toCellDto } from './cellFactory'
+import { generateCells, getCellId, parseCellId, fromCellDto, toCellDto } from './cellFactory'
 
 export {
   createDefaultSettings,
@@ -41,6 +41,8 @@ export {
   fromRowDto,
   toRowDto,
   generateCells,
+  getCellId,
+  parseCellId,
   fromCellDto,
   toCellDto
 }

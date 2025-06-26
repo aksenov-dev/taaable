@@ -1,27 +1,45 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { nextTick, useTemplateRef, watch } from 'vue'
+
+import type { Cell } from '@/shared/types'
 
 interface Props {
-  row: number
-  col: number
+  cell: Cell
+  isActive: boolean
+  isEditing: boolean
 }
 
-const { row, col } = defineProps<Props>()
+const emit = defineEmits<{
+  mousedown: []
+  dblclick: []
+  blur: []
+}>()
 
-// ToDo: just for test
-// click - set active cell
-// dblclick - set editable cell
-const isActiveCell = computed(() => row === 2 && col === 2)
+const { cell, isActive, isEditing } = defineProps<Props>()
+
+const cellRef = useTemplateRef('cell')
+
+watch(() => isEditing, async editing => {
+    if (editing) {
+      await nextTick()
+      cellRef.value?.focus()
+    }
+  }
+)
 </script>
 
 <template>
   <div
+    ref="cell"
     role="gridcell"
-    :contenteditable="false"
-    class="border-gray-3 text-small flex h-6 min-h-6 w-25 min-w-7 cursor-default items-center justify-start
-    overflow-hidden border-r border-b bg-white p-1 text-black focus:cursor-text dark:bg-black dark:text-white"
-    :class="{ 'outline-accent-1 z-1 rounded-xs outline-2 -outline-offset-1': isActiveCell }"
+    :data-cell-id="cell.cellId"
+    :contenteditable="isEditing"
+    class="border-gray-3 text-small flex cursor-default items-center justify-start overflow-hidden border-r border-b
+    bg-white p-1 leading-3.75 text-black focus:cursor-text dark:bg-black dark:text-white"
+    :class="{ 'outline-accent-1 z-1 rounded-xs outline-2 -outline-offset-1': isActive }"
+    @mousedown="emit('mousedown')"
+    @dblclick="emit('dblclick')"
+    @blur="emit('blur')"
   >
-    <!--    {{ `${col}:${row}` }}-->
   </div>
 </template>

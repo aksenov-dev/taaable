@@ -23,7 +23,7 @@ onUnmounted(() => tableStore.clear())
 </script>
 
 <template>
-  <LoadingOverlay v-if="tableStore.isLoading" />
+  <LoadingOverlay :is-visible="tableStore.isLoading" />
 
   <div class="bg-gray-1 grid h-screen w-screen grid-rows-[100px_28px_1fr_43px] transition-colors">
     <div class="border-b-gray-3 flex flex-col justify-between border-b p-4 transition-colors">

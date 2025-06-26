@@ -23,7 +23,7 @@ export const useTablesStore = defineStore('tables', () => {
     return [...tables.value].sort((a, b) => b.viewedAt - a.viewedAt)
   })
 
-  const filteredTables = computed<Table[]>(() => {
+  const filteredTables = computed(() => {
     return sortedTables.value.filter(t => t.title.toLowerCase().includes(filterText.value.toLowerCase()))
   })
 

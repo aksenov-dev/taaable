@@ -1,17 +1,24 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import type { SheetData } from '@/shared/types'
 
 import { generateSheetData, fromSheetDataDto, toSheetDataDto } from '@/shared/utils'
 import { useTableStore } from '@/stores/table'
+import { useSheetsStore } from '@/stores/sheets'
 import { createSheetDataStorage } from '@/db/sheetDataStorage'
 
 export const useSheetsDataStore = defineStore('sheetsData', () => {
   const sheetsData = ref<Record<string, SheetData>>({})
 
   const tableStore = useTableStore()
+  const sheetsStore = useSheetsStore()
   const sheetDataStorage = createSheetDataStorage()
+
+  const currentSheetData = computed(() => {
+    if (!sheetsStore.currentSheetId) return
+    return sheetsData.value[sheetsStore.currentSheetId]
+  })
 
   const createSheetData = async (sheetId: string): Promise<void> => {
     const sheetData = generateSheetData(sheetId)
@@ -44,6 +51,7 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
   }
 
   return {
+    currentSheetData,
     createSheetData,
     getSheetsData,
     deleteSheetData,

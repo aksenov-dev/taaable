@@ -17,8 +17,8 @@ import {
 } from '@/shared/utils'
 
 export const generateSheetData = (sheetId: string): SheetData => {
-  const { columns, columnOrder } = generateColumns(sheetId, TABLE_SIZE.DEFAULT_COLUMN_COUNT)
-  const { rows, rowOrder } = generateRows(sheetId, TABLE_SIZE.DEFAULT_ROW_COUNT)
+  const { columns, columnOrder } = generateColumns(sheetId, TABLE_SIZE.DEFAULT.COLUMN_COUNT)
+  const { rows, rowOrder } = generateRows(sheetId, TABLE_SIZE.DEFAULT.ROW_COUNT)
   const { cells } = generateCells(sheetId, columns, rows)
 
   return { columns, columnOrder, rows, rowOrder, cells }
