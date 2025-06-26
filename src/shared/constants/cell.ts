@@ -1,7 +1,14 @@
 export const CELL_SIZE = {
-  ROW_HEADER_WIDTH: 44,
-  DEFAULT_WIDTH: 100,
-  DEFAULT_HEIGHT: 24,
-  MIN_WIDTH: 40,
-  MIN_HEIGHT: 24
-}
+  HEADER: {
+    ROW_WIDTH: 44,
+    COL_HEIGHT: 24
+  },
+  DEFAULT: {
+    WIDTH: 100,
+    HEIGHT: 24
+  },
+  MIN: {
+    WIDTH: 40,
+    HEIGHT: 24
+  }
+} as const

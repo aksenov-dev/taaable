@@ -10,7 +10,7 @@ const generateColumn = (sheetId: string, order: number): Column => {
     columnId: nanoid(),
     sheetId,
     order,
-    width: CELL_SIZE.DEFAULT_WIDTH
+    width: CELL_SIZE.DEFAULT.WIDTH
   }
 }
 
@@ -49,7 +49,7 @@ export const toColumnDto = (column: Column): ColumnDto => {
     order: column.order
   }
 
-  if (column.width !== CELL_SIZE.DEFAULT_WIDTH) {
+  if (column.width !== CELL_SIZE.DEFAULT.WIDTH) {
     dto.width = column.width
   }
 
@@ -59,6 +59,6 @@ export const toColumnDto = (column: Column): ColumnDto => {
 export const fromColumnDto = (dto: ColumnDto): Column => {
   return {
     ...dto,
-    width: dto.width ?? CELL_SIZE.DEFAULT_WIDTH
+    width: dto.width ?? CELL_SIZE.DEFAULT.WIDTH
   }
 }

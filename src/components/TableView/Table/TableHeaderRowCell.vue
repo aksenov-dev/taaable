@@ -1,17 +1,28 @@
 <script setup lang="ts">
+import type { Row } from '@/shared/types'
+
+import { CELL_SIZE } from '@/shared/constants'
+
 interface Props {
-  row: number
+  rowNumber: string
+  row: Row
+  isActive: boolean
 }
 
-const { row } = defineProps<Props>()
+const { rowNumber, row, isActive } = defineProps<Props>()
 </script>
 
 <template>
   <div
     role="rowheader"
-    class="text-small text-gray-5 bg-gray-1 border-gray-3 sticky left-0 z-2 flex h-6 min-h-6 cursor-default
-    items-center justify-center border-r border-b select-none"
+    class="text-small border-gray-3 sticky left-0 z-2 flex cursor-default items-center justify-center border-r border-b
+    select-none"
+    :class="{
+      'bg-gray-2 text-black dark:text-white': isActive,
+      'text-gray-5 bg-gray-1': !isActive
+    }"
+    :style="{ minHeight: `${CELL_SIZE.MIN.HEIGHT}px`, height: `${row.height}px` }"
   >
-    {{ row }}
+    {{ rowNumber }}
   </div>
 </template>
