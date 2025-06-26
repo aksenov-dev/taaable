@@ -1,12 +1,15 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { BREAKPOINTS } from '@/shared/constants'
 
 export const useBreakpoints = () => {
   const viewportWidth = ref(window.innerWidth)
 
-  window.addEventListener('resize', () => {
+  const onResize = (): void => {
     viewportWidth.value = window.innerWidth
-  })
+  }
+
+  onMounted(() => window.addEventListener('resize', onResize))
+  onUnmounted(() => window.removeEventListener('resize', onResize))
 
   return computed(() => ({
     isXs: viewportWidth.value < BREAKPOINTS.SM,
