@@ -1,6 +1,8 @@
 import { createDefaultSettings } from './createDefaultSettings'
 import { formatTimestampToStringDate } from './formatTimestampToStringDate'
 import { numberToColumnLetter } from './numberToColumnLetter'
+import { handleEditableCellKeydown } from './handleEditableCellKeydown'
+import { placeCursorAtEnd } from './placeCursorAtEnd'
 import { setHtmlDark } from './setHtmlDark'
 
 import { generateTable, fromTableDto, toTableDto } from './tableFactory'
@@ -20,6 +22,8 @@ export {
   createDefaultSettings,
   formatTimestampToStringDate,
   numberToColumnLetter,
+  handleEditableCellKeydown,
+  placeCursorAtEnd,
   setHtmlDark,
   generateTable,
   fromTableDto,

@@ -18,9 +18,10 @@ interface Props {
 }
 
 const emit = defineEmits<{
+  cellKeydown: [e: KeyboardEvent]
   cellMousedown: [value: string]
   cellDblclick: [value: string]
-  cellBlur: [value: string]
+  cellBlur: []
 }>()
 
 const { columnOrder, rowNumber, row, cells, activeCellId } = defineProps<Props>()
@@ -41,8 +42,9 @@ const activeRowNumber = computed(() => parseCellId(activeCellId).rowNumber)
     :cell="cells[getCellId(columnLetter, rowNumber)]"
     :is-active="activeCellId === getCellId(columnLetter, rowNumber)"
     :is-editing="editingCellId === getCellId(columnLetter, rowNumber)"
+    @keydown="emit('cellKeydown', $event)"
     @mousedown="emit('cellMousedown', getCellId(columnLetter, rowNumber))"
     @dblclick="emit('cellDblclick', getCellId(columnLetter, rowNumber))"
-    @blur="emit('cellBlur', getCellId(columnLetter, rowNumber))"
+    @blur="emit('cellBlur')"
   />
 </template>
