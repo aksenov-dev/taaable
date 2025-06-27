@@ -2,6 +2,7 @@
 import { computed, onMounted, useTemplateRef, watch } from 'vue'
 
 import { CELL_SIZE } from '@/shared/constants'
+import { handleEditableCellKeydown } from '@/shared/utils'
 import { useActiveCell } from '@/composables/useActiveCell'
 import { useCellEditing } from '@/composables/useCellEditing'
 import { useSheetScrollPosition } from '@/composables/useSheetScrollPosition'
@@ -77,6 +78,7 @@ onMounted(() => {
         :cells="sheetsDataStore.currentSheetData.cells"
         :active-cell-id="activeCellId"
         :editing-cell-id="editingCellId"
+        @cell-keydown="handleEditableCellKeydown($event)"
         @cell-mousedown="handleCellMouseDown"
         @cell-dblclick="handleCellDblClick"
         @cell-blur="handleCellBlur"

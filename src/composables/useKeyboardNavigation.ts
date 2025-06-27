@@ -72,7 +72,7 @@ export const useKeyboardNavigation = (containerRef: Ref<HTMLDivElement | null>) 
         break
       case 'Escape':
         exitEditingMode()
-        break
+        return
 
       default: handled = false
     }
