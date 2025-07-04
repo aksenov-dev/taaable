@@ -7,6 +7,7 @@ import type { Column, ColumnsData, ColumnDto } from './column'
 import type { Row, RowsData, RowDto } from './row'
 import type { Cell, CellsData, CellDto } from './cell'
 import type { CellStyle } from './cellStyle'
+import type { CellEditorPosition } from './cellEditor'
 
 export type {
   Optional,
@@ -28,5 +29,6 @@ export type {
   Cell,
   CellsData,
   CellDto,
-  CellStyle
+  CellStyle,
+  CellEditorPosition
 }

@@ -9,19 +9,16 @@ import TableHeaderRowCell from '@/components/TableView/Table/TableHeaderRowCell.
 import TableCell from '@/components/TableView/Table/TableCell.vue'
 
 interface Props {
-  columnOrder: ColumnsData['columnOrder']
+  columnOrder: Readonly<ColumnsData['columnOrder']>
   rowNumber: string
   row: Row
   cells: CellsData['cells']
   activeCellId: Cell['cellId']
-  editingCellId: Cell['cellId'] | null
 }
 
 const emit = defineEmits<{
-  cellKeydown: [e: KeyboardEvent]
+  cellDblclick: [{ event: MouseEvent, cellId: string }]
   cellMousedown: [value: string]
-  cellDblclick: [value: string]
-  cellBlur: []
 }>()
 
 const { columnOrder, rowNumber, row, cells, activeCellId } = defineProps<Props>()
@@ -41,10 +38,7 @@ const activeRowNumber = computed(() => parseCellId(activeCellId).rowNumber)
     :key="getCellId(columnLetter, rowNumber)"
     :cell="cells[getCellId(columnLetter, rowNumber)]"
     :is-active="activeCellId === getCellId(columnLetter, rowNumber)"
-    :is-editing="editingCellId === getCellId(columnLetter, rowNumber)"
-    @keydown="emit('cellKeydown', $event)"
+    @dblclick="payload => emit('cellDblclick', payload)"
     @mousedown="emit('cellMousedown', getCellId(columnLetter, rowNumber))"
-    @dblclick="emit('cellDblclick', getCellId(columnLetter, rowNumber))"
-    @blur="emit('cellBlur')"
   />
 </template>

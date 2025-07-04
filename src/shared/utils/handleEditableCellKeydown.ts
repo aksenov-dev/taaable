@@ -9,6 +9,8 @@ export const handleEditableCellKeydown = (e: KeyboardEvent): void => {
     const range = selection.getRangeAt(0)
 
     const br = document.createElement('br')
+
+    // Add zero-width space to ensure cursor stays after <br>
     const space = document.createTextNode('\u200B')
 
     range.insertNode(space)

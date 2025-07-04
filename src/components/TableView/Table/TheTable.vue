@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, useTemplateRef, watch } from 'vue'
+import { computed, useTemplateRef, watch } from 'vue'
 
 import { CELL_SIZE } from '@/shared/constants'
-import { handleEditableCellKeydown } from '@/shared/utils'
 import { useActiveCell } from '@/composables/useActiveCell'
 import { useCellEditing } from '@/composables/useCellEditing'
 import { useSheetScrollPosition } from '@/composables/useSheetScrollPosition'
@@ -13,9 +12,10 @@ import { useSheetsDataStore } from '@/stores/sheetsData'
 
 import TableHeaderRow from '@/components/TableView/Table/TableHeaderRow.vue'
 import TableRow from '@/components/TableView/Table/TableRow.vue'
+import TableCellEditor from '@/components/TableView/Table/TableCellEditor.vue'
 
 const { getActiveCell, setActiveCell } = useActiveCell()
-const { editingCellId, startEditing, stopEditing } = useCellEditing()
+const { editingCellId, activateEditor, stopEditing } = useCellEditing()
 
 const sheetsStore = useSheetsStore()
 const sheetsDataStore = useSheetsDataStore()
@@ -35,29 +35,27 @@ const handleCellMouseDown = (cellId: string) => {
   }
 }
 
-const handleCellDblClick = (cellId: string) => startEditing(cellId)
-const handleCellBlur = () => stopEditing()
+const handleCellEditorBlur = (e: FocusEvent, cellId: string, value: string) => {
+  sheetsDataStore.updateCellValue(cellId, value)
+  stopEditing()
+}
 
 watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
   if (tableContainerRef.value) tableContainerRef.value.focus()
   stopEditing()
-})
-
-onMounted(() => {
-
 })
 </script>
 
 <template>
   <div
     v-if="sheetsDataStore.currentSheetData"
-    ref='table-container'
+    ref="table-container"
     tabindex="0"
-    class="scrollbar border-gray-3 relative overflow-auto border-t border-b outline-none"
+    class="scrollbar border-gray-3 overflow-auto border-t border-b outline-none"
   >
     <div
       role="grid"
-      class="relative grid w-fit"
+      class="grid w-fit"
       :style="{
         gridTemplateColumns: `${CELL_SIZE.HEADER.ROW_WIDTH}px repeat(${columnCount}, 1fr)`,
         gridTemplateRows: `${CELL_SIZE.HEADER.COL_HEIGHT}px repeat(${rowCount}, auto)`
@@ -77,11 +75,14 @@ onMounted(() => {
         :row="sheetsDataStore.currentSheetData.rows[rowNumber]"
         :cells="sheetsDataStore.currentSheetData.cells"
         :active-cell-id="activeCellId"
-        :editing-cell-id="editingCellId"
-        @cell-keydown="handleEditableCellKeydown($event)"
+        @cell-dblclick="({ event, cellId }) => activateEditor(cellId, { event })"
         @cell-mousedown="handleCellMouseDown"
-        @cell-dblclick="handleCellDblClick"
-        @cell-blur="handleCellBlur"
+      />
+
+      <TableCellEditor
+        v-if="editingCellId"
+        :table-container="tableContainerRef"
+        @blur="handleCellEditorBlur"
       />
     </div>
   </div>
