@@ -3,6 +3,7 @@ import { formatTimestampToStringDate } from './formatTimestampToStringDate'
 import { numberToColumnLetter } from './numberToColumnLetter'
 import { handleEditableCellKeydown } from './handleEditableCellKeydown'
 import { placeCursorAtEnd } from './placeCursorAtEnd'
+import { sanitizeHtml } from './sanitizeHtml'
 import { setHtmlDark } from './setHtmlDark'
 
 import { generateTable, fromTableDto, toTableDto } from './tableFactory'
@@ -24,6 +25,7 @@ export {
   numberToColumnLetter,
   handleEditableCellKeydown,
   placeCursorAtEnd,
+  sanitizeHtml,
   setHtmlDark,
   generateTable,
   fromTableDto,
