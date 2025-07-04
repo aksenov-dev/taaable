@@ -8,7 +8,7 @@ import { parseCellId } from '@/shared/utils'
 import TableHeaderColCell from '@/components/TableView/Table/TableHeaderColCell.vue'
 
 interface Props {
-  columnOrder: ColumnsData['columnOrder']
+  columnOrder: Readonly<ColumnsData['columnOrder']>
   columns: ColumnsData['columns']
   activeCellId: Cell['cellId']
 }

@@ -1,52 +1,29 @@
 <script setup lang="ts">
-import { nextTick, useTemplateRef, watch } from 'vue'
-
 import type { Cell } from '@/shared/types'
-
-import { placeCursorAtEnd } from '@/shared/utils'
 
 interface Props {
   cell: Cell
   isActive: boolean
-  isEditing: boolean
 }
 
 const emit = defineEmits<{
-  keydown: [e: KeyboardEvent]
+  dblclick: [{ event: MouseEvent; cellId: string }]
   mousedown: []
-  dblclick: []
-  blur: []
 }>()
 
-const { cell, isActive, isEditing } = defineProps<Props>()
-
-const cellRef = useTemplateRef('cell')
-
-watch(() => isEditing, async editing => {
-  if (editing) {
-    await nextTick()
-
-    if (!cellRef.value) return
-    if (cellRef.value.innerHTML.trim() === '') cellRef.value.innerHTML = '&nbsp;'
-
-    cellRef.value.focus()
-    placeCursorAtEnd(cellRef.value)
-  }
-})
+const { cell, isActive } = defineProps<Props>()
 </script>
 
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <div
-    ref="cell"
     role="gridcell"
     :data-cell-id="cell.cellId"
-    :contenteditable="isEditing"
-    class="text-small border-gray-3 flex cursor-default items-center justify-start overflow-hidden border-r border-b
-    bg-white p-1 leading-3.75 text-black focus:cursor-text dark:bg-black dark:text-white"
+    class="text-small border-gray-3 flex cursor-default items-center justify-start truncate overflow-hidden border-r
+    border-b bg-white p-1 leading-3.75 text-black select-none focus:cursor-text dark:bg-black dark:text-white"
     :class="{ 'outline-accent-1 z-1 rounded-xs outline-2 -outline-offset-1': isActive }"
-    @keydown="event => emit('keydown', event)"
+    @dblclick="event => emit('dblclick', { event, cellId: cell.cellId })"
     @mousedown="emit('mousedown')"
-    @dblclick="emit('dblclick')"
-    @blur="emit('blur')"
+    v-html="cell.value"
   ></div>
 </template>

@@ -13,14 +13,21 @@ export const useKeyboardNavigation = (containerRef: Ref<HTMLDivElement | null>) 
   const sheetsDataStore = useSheetsDataStore()
 
   const { getActiveCell, setActiveCell } = useActiveCell()
-  const { editingCellId, startEditing, stopEditing } = useCellEditing()
+  const { editingCellId, activateEditor, stopEditing } = useCellEditing()
 
-  const exitEditingMode = () => {
+  const startEditingMode = (cellId: string, initialInput?: string) => {
+    const cell = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement | null
+    if (!cell) return
+
+    activateEditor(cellId, { element: cell, initialInput })
+  }
+
+  const stopEditingMode = () => {
     stopEditing()
     containerRef.value?.focus()
   }
 
-  const handleKeydown = (event: KeyboardEvent) => {
+  const handleKeydown = async (event: KeyboardEvent) => {
     if (!sheetsStore.currentSheetId) return
     if (!containerRef.value || !containerRef.value.contains(document.activeElement)) return
 
@@ -59,22 +66,29 @@ export const useKeyboardNavigation = (containerRef: Ref<HTMLDivElement | null>) 
         newColIndex = ctrl ? columnOrder.length - 1 : Math.min(columnOrder.length - 1, colIndex + 1)
         break
       case 'Tab':
-        exitEditingMode()
+        stopEditingMode()
         newColIndex = Math.max(0, Math.min(columnOrder.length - 1, colIndex + (shift ? -1 : 1)))
         break
       case 'Enter':
         if (editingCellId.value) {
-          exitEditingMode()
+          stopEditingMode()
           newRowIndex = Math.min(rowOrder.length - 1, rowIndex + (shift ? -1 : 1))
         } else {
-          startEditing(currentCellId)
+          startEditingMode(currentCellId)
         }
         break
       case 'Escape':
-        exitEditingMode()
+        stopEditingMode()
         return
 
       default: handled = false
+    }
+
+    if (!handled && !editingCellId.value) {
+      if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault()
+        startEditingMode(currentCellId, event.key)
+      }
     }
 
     if (handled) {

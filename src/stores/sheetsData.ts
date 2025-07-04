@@ -1,9 +1,10 @@
-import { computed, ref } from 'vue'
+import { computed, readonly, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import type { SheetData } from '@/shared/types'
 
 import { generateSheetData, fromSheetDataDto, toSheetDataDto } from '@/shared/utils'
+import { useActiveCell } from '@/composables/useActiveCell'
 import { useTableStore } from '@/stores/table'
 import { useSheetsStore } from '@/stores/sheets'
 import { createSheetDataStorage } from '@/db/sheetDataStorage'
@@ -11,6 +12,7 @@ import { createSheetDataStorage } from '@/db/sheetDataStorage'
 export const useSheetsDataStore = defineStore('sheetsData', () => {
   const sheetsData = ref<Record<string, SheetData>>({})
 
+  const { getActiveCell } = useActiveCell()
   const tableStore = useTableStore()
   const sheetsStore = useSheetsStore()
   const sheetDataStorage = createSheetDataStorage()
@@ -18,6 +20,11 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
   const currentSheetData = computed(() => {
     if (!sheetsStore.currentSheetId) return
     return sheetsData.value[sheetsStore.currentSheetId]
+  })
+
+  const currentCell = computed(() => {
+    if (!currentSheetData.value) return
+    return currentSheetData.value.cells[getActiveCell(sheetsStore.currentSheetId)]
   })
 
   const createSheetData = async (sheetId: string): Promise<void> => {
@@ -46,15 +53,26 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
     delete sheetsData.value[sheetId]
   }
 
+  const updateCellValue = async (cellId: string, value: string): Promise<void> => {
+    if (!currentSheetData.value) return
+
+    const currentCell = currentSheetData.value.cells[cellId]
+    if (!currentCell) return
+
+    currentCell.value = value
+  }
+
   const clear = (): void => {
     sheetsData.value = {}
   }
 
   return {
-    currentSheetData,
+    currentSheetData: readonly(currentSheetData),
+    currentCell: readonly(currentCell),
     createSheetData,
     getSheetsData,
     deleteSheetData,
+    updateCellValue,
     clear
   }
 })
