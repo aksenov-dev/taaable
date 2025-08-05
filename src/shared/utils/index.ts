@@ -5,6 +5,8 @@ import { handleEditableCellKeydown } from './handleEditableCellKeydown'
 import { placeCursorAtEnd } from './placeCursorAtEnd'
 import { sanitizeHtml } from './sanitizeHtml'
 import { setHtmlDark } from './setHtmlDark'
+import { createDoubleClickHandler } from './createDoubleClickHandler'
+import { createResizeMask, removeResizeMask } from './resizeMask'
 
 import { generateTable, fromTableDto, toTableDto } from './tableFactory'
 import { generateSheet, fromSheetDto, toSheetDto } from './sheetFactory'
@@ -26,6 +28,9 @@ export {
   handleEditableCellKeydown,
   placeCursorAtEnd,
   sanitizeHtml,
+  createDoubleClickHandler,
+  createResizeMask,
+  removeResizeMask,
   setHtmlDark,
   generateTable,
   fromTableDto,

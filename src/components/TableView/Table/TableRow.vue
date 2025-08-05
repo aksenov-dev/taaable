@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import type { Cell, CellsData, ColumnsData, Row } from '@/shared/types'
+import type { Cell, CellsData, ColumnsData } from '@/shared/types'
 
 import { getCellId, parseCellId } from '@/shared/utils'
 
@@ -9,9 +9,8 @@ import TableHeaderRowCell from '@/components/TableView/Table/TableHeaderRowCell.
 import TableCell from '@/components/TableView/Table/TableCell.vue'
 
 interface Props {
-  columnOrder: Readonly<ColumnsData['columnOrder']>
+  columnOrder: ColumnsData['columnOrder']
   rowNumber: string
-  row: Row
   cells: CellsData['cells']
   activeCellId: Cell['cellId']
 }
@@ -21,7 +20,7 @@ const emit = defineEmits<{
   cellMousedown: [value: string]
 }>()
 
-const { columnOrder, rowNumber, row, cells, activeCellId } = defineProps<Props>()
+const { columnOrder, rowNumber, cells, activeCellId } = defineProps<Props>()
 
 const activeRowNumber = computed(() => parseCellId(activeCellId).rowNumber)
 </script>
@@ -29,7 +28,6 @@ const activeRowNumber = computed(() => parseCellId(activeCellId).rowNumber)
 <template>
   <TableHeaderRowCell
     :row-number="rowNumber"
-    :row="row"
     :is-active="activeRowNumber === rowNumber"
   />
 

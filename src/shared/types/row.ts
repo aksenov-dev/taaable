@@ -5,6 +5,8 @@ export interface Row {
   sheetId: string
   order: number
   height: number
+  isAutoHeight: boolean
+  offsetTop: number
 }
 
 export interface RowsData {
@@ -12,4 +14,4 @@ export interface RowsData {
   rowOrder: string[]
 }
 
-export type RowDto = Optional<Row, 'height'>
+export type RowDto = Optional<Row, 'height' | 'isAutoHeight' | 'offsetTop'>

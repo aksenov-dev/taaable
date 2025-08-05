@@ -9,7 +9,9 @@ const generateRow = (sheetId: string, order: number): Row => {
     rowId: nanoid(),
     sheetId,
     order,
-    height: CELL_SIZE.DEFAULT.HEIGHT
+    height: CELL_SIZE.DEFAULT.HEIGHT,
+    isAutoHeight: true,
+    offsetTop: 0
   }
 }
 
@@ -52,12 +54,18 @@ export const toRowDto = (row: Row): RowDto => {
     dto.height = row.height
   }
 
+  if (!row.isAutoHeight) {
+    dto.isAutoHeight = row.isAutoHeight
+  }
+
   return dto
 }
 
 export const fromRowDto = (dto: RowDto): Row => {
   return {
     ...dto,
-    height: dto.height ?? CELL_SIZE.DEFAULT.HEIGHT
+    height: dto.height ?? CELL_SIZE.DEFAULT.HEIGHT,
+    isAutoHeight: dto.isAutoHeight ?? true,
+    offsetTop: 0
   }
 }

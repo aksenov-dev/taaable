@@ -24,14 +24,14 @@ export const useCellEditing = () => {
     const rect = element.getBoundingClientRect()
 
     cellEditorPosition.value = {
-      top: rect.top + window.scrollY,
-      left: rect.left + window.scrollX,
+      top: rect.top,
+      left: rect.left,
       width: rect.width,
       height: rect.height
     }
   }
 
-  const activateEditor = (cellId: string, options: ActivateEditorOptions) => {
+  const activateEditor = (cellId: string, options: ActivateEditorOptions): void => {
     let element: HTMLElement
 
     if ('event' in options) {
