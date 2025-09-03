@@ -1,4 +1,4 @@
-export const createResizeMask = (direction: 'row' | 'col'): void => {
+export const createResizeMask = (direction: 'row' | 'column'): void => {
   const mask = document.createElement('div')
 
   mask.classList.add(

@@ -1,6 +1,7 @@
 import { createDefaultSettings } from './createDefaultSettings'
 import { formatTimestampToStringDate } from './formatTimestampToStringDate'
 import { numberToColumnLetter } from './numberToColumnLetter'
+import { measureCellContentWidth } from './measureCellContentWidth'
 import { handleEditableCellKeydown } from './handleEditableCellKeydown'
 import { placeCursorAtEnd } from './placeCursorAtEnd'
 import { sanitizeHtml } from './sanitizeHtml'
@@ -25,6 +26,7 @@ export {
   createDefaultSettings,
   formatTimestampToStringDate,
   numberToColumnLetter,
+  measureCellContentWidth,
   handleEditableCellKeydown,
   placeCursorAtEnd,
   sanitizeHtml,

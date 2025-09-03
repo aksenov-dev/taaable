@@ -8,6 +8,7 @@ import { useSheetScrollPosition } from '@/composables/useSheetScrollPosition'
 import { useScrollActiveCell } from '@/composables/useScrollActiveCell'
 import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
 import { useRowResize } from '@/composables/useRowResize'
+import { useColumnResize } from '@/composables/useColumnResize'
 import { useResizeRuler } from '@/composables/useResizeRuler'
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
@@ -16,6 +17,7 @@ import TableHeaderRow from '@/components/TableView/Table/TableHeaderRow.vue'
 import TableRow from '@/components/TableView/Table/TableRow.vue'
 import TableCellEditor from '@/components/TableView/Table/TableCellEditor.vue'
 import TableRowResizer from '@/components/TableView/Table/TableRowResizer.vue'
+import TableColumnResizer from '@/components/TableView/Table/TableColumnResizer.vue'
 
 const { getActiveCell, setActiveCell } = useActiveCell()
 const { editingCellId, activateEditor, stopEditing } = useCellEditing()
@@ -31,6 +33,7 @@ const resizeRuler = useResizeRuler()
 const { isResizeRulerVisible, resizeRulerPosition } = resizeRuler
 
 const { resizingRowNumber, startRowResize } = useRowResize(resizeRuler, tableContainerRef)
+const { resizingColumnLetter, startColumnResize } = useColumnResize(resizeRuler, tableContainerRef)
 
 const sheetsStore = useSheetsStore()
 const sheetsDataStore = useSheetsDataStore()
@@ -90,6 +93,17 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
       :ruler-visible="isResizeRulerVisible && rowNumber === resizingRowNumber"
       @mousedown="startRowResize"
       @dblclick="sheetsDataStore.resetRowAutoHeight"
+    />
+
+    <TableColumnResizer
+      v-for="columnLetter in sheetsDataStore.currentSheetData.columnOrder.slice(0, -1)"
+      :key="columnLetter"
+      :column-letter="columnLetter"
+      :column="sheetsDataStore.currentSheetData.columns[columnLetter]"
+      :position="resizeRulerPosition"
+      :ruler-visible="isResizeRulerVisible && columnLetter === resizingColumnLetter"
+      @mousedown="startColumnResize"
+      @dblclick="sheetsDataStore.fitColumnWidthToContent"
     />
 
     <div

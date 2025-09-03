@@ -3,13 +3,24 @@ import { defineStore } from 'pinia'
 
 import type { SheetData } from '@/shared/types'
 
+import {
+  generateSheetData,
+  fromSheetDataDto,
+  measureCellContentWidth,
+  parseCellId,
+  toCellDto,
+  toColumnDto,
+  toSheetDataDto,
+  toRowDto
+} from '@/shared/utils'
+
 import { CELL_SIZE } from '@/shared/constants'
-import { generateSheetData, fromSheetDataDto, parseCellId, toCellDto, toSheetDataDto, toRowDto } from '@/shared/utils'
 import { useActiveCell } from '@/composables/useActiveCell'
 import { useTableStore } from '@/stores/table'
 import { useSheetsStore } from '@/stores/sheets'
 import { createSheetDataStorage } from '@/db/sheetDataStorage'
 import { createRowStorage } from '@/db/rowStorage'
+import { createColumnStorage } from '@/db/columnStorage'
 import { createCellStorage } from '@/db/cellStorage'
 
 export const useSheetsDataStore = defineStore('sheetsData', () => {
@@ -20,6 +31,7 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
   const sheetsStore = useSheetsStore()
   const sheetDataStorage = createSheetDataStorage()
   const rowStorage = createRowStorage()
+  const columnStorage = createColumnStorage()
   const cellStorage = createCellStorage()
 
   const currentSheetData = computed(() => {
@@ -37,6 +49,7 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
 
     sheetsData.value[sheetId] = sheetData
     calculateRowsOffsets(sheetId)
+    calculateColumnsOffsets(sheetId)
 
     await sheetDataStorage.saveSheetData(toSheetDataDto(sheetId, sheetData))
   }
@@ -50,6 +63,7 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
       for (const sheetDataDto of sheetDataDtos) {
         sheetsData.value[sheetDataDto.sheetId] = fromSheetDataDto(sheetDataDto)
         calculateRowsOffsets(sheetDataDto.sheetId)
+        calculateColumnsOffsets(sheetDataDto.sheetId)
       }
     } catch (error) {
       console.error('Ошибка при загрузке данных таблицы из IndexedDB:', error)
@@ -80,6 +94,7 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
     }
   }
 
+
   const calculateRowsOffsets = (sheetId: string): void => {
     const sheetData = sheetsData.value[sheetId]
     if (!sheetData) return
@@ -95,7 +110,7 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
     }
   }
 
-  const setRowHeight = async (rowNumber: string, options: { auto?: boolean; height?: number }): Promise<void> => {
+  const setRowHeight = async (rowNumber: string, options: { auto?: boolean, height?: number }): Promise<void> => {
     if (!currentSheetData.value) return
 
     const row = currentSheetData.value.rows[rowNumber]
@@ -125,12 +140,87 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
     await rowStorage.saveRow(toRowDto(row))
   }
 
+  const updateRowHeight = async (rowNumber: string, newHeight: number): Promise<void> => {
+    await setRowHeight(rowNumber, { height: newHeight })
+  }
+
   const resetRowAutoHeight = async (rowNumber: string): Promise<void> => {
     await setRowHeight(rowNumber, { auto: true })
   }
 
-  const updateRowHeight = async (rowNumber: string, newHeight: number): Promise<void> => {
-    await setRowHeight(rowNumber, { height: newHeight })
+
+  const calculateColumnsOffsets = (sheetId: string): void => {
+    const sheetData = sheetsData.value[sheetId]
+    if (!sheetData) return
+
+    const { columnOrder, columns } = sheetData
+    let offset = CELL_SIZE.HEADER.ROW_WIDTH
+
+    for (const order of columnOrder) {
+      const column = columns[order]
+
+      offset += column.width
+      column.offsetLeft = offset
+    }
+  }
+
+  const getMaxColumnContentWidth = (columnLetter: string): number | null => {
+    const sheetData = currentSheetData.value
+    if (!sheetData) return null
+
+    const notEmptyCellIds = Object.keys(sheetData.cells).filter(key => {
+      const cell = sheetData.cells[key]
+      const [cellColumnLetter] = key.split(':')
+
+      return cellColumnLetter === columnLetter && cell.value !== ''
+    })
+
+    if (notEmptyCellIds.length === 0) return null
+
+    let maxWidth = 0
+
+    for (const cellId of notEmptyCellIds) {
+      const cellEl = document.querySelector<HTMLElement>(`[data-cell-id="${cellId}"]`)
+      if (!cellEl) continue
+
+      const cellContentWidth = measureCellContentWidth(cellEl)
+      maxWidth = Math.max(maxWidth, cellContentWidth)
+    }
+
+    return Math.max(maxWidth, CELL_SIZE.MIN.WIDTH)
+  }
+
+  const setColumnWidth = async (columnLetter: string, options: { auto?: boolean, width?: number }): Promise<void> => {
+    if (!currentSheetData.value) return
+
+    const column = currentSheetData.value.columns[columnLetter]
+    if (!column) return
+
+    if (options.auto) {
+      await nextTick()
+
+      const maxWidth = getMaxColumnContentWidth(columnLetter)
+      if (!maxWidth || maxWidth === column.width) return
+
+      column.width = maxWidth
+    } else if (typeof options.width === 'number') {
+      if (column.width === options.width) return
+
+      column.width = options.width
+    } else {
+      return
+    }
+
+    calculateColumnsOffsets(sheetsStore.currentSheetId!)
+    await columnStorage.saveColumn(toColumnDto(column))
+  }
+
+  const updateColumnWidth = async (columnLetter: string, newWidth: number): Promise<void> => {
+    await setColumnWidth(columnLetter, { width: newWidth })
+  }
+
+  const fitColumnWidthToContent = async (columnLetter: string): Promise<void> => {
+    await setColumnWidth(columnLetter, { auto: true })
   }
 
   const clear = (): void => {
@@ -146,6 +236,8 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
     updateCellValue,
     updateRowHeight,
     resetRowAutoHeight,
+    updateColumnWidth,
+    fitColumnWidthToContent,
     clear
   }
 })

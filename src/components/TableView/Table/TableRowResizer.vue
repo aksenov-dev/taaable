@@ -14,8 +14,8 @@ interface Props {
 }
 
 const emit = defineEmits<{
-  mousedown: [rowNumber: string, rowHeight: number, offsetTop: number]
   dblclick: [rowNumber: string]
+  mousedown: [rowNumber: string, rowHeight: number, offsetTop: number]
 }>()
 
 const { rowNumber, row, position, tableScrollLeft, rulerVisible } = defineProps<Props>()
