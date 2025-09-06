@@ -4,11 +4,11 @@ import type { Ref } from 'vue'
 
 import { CELL_SIZE } from '@/shared/constants'
 import { createResizeMask, removeResizeMask } from '@/shared/utils'
-import { useSheetsDataStore } from '@/stores/sheetsData'
 import { useResizeRuler } from '@/composables/useResizeRuler'
+import { useSheetsDataColumnsStore } from '@/stores/sheetsData/columns'
 
 export const useColumnResize = (resizeRuler: ReturnType<typeof useResizeRuler>, tableRef: Ref<HTMLElement | null>) => {
-  const sheetsDataStore = useSheetsDataStore()
+  const sheetsDataColumnsStore = useSheetsDataColumnsStore()
 
   let startX = 0
   let startWidth = 0
@@ -56,7 +56,7 @@ export const useColumnResize = (resizeRuler: ReturnType<typeof useResizeRuler>, 
     const finalWidth = startWidth + delta
 
     if (finalWidth >= CELL_SIZE.MIN.WIDTH) {
-      await sheetsDataStore.updateColumnWidth(resizingColumnLetter.value, finalWidth)
+      await sheetsDataColumnsStore.updateColumnWidth(resizingColumnLetter.value, finalWidth)
     }
 
     window.removeEventListener('mousemove', onColumnResize)

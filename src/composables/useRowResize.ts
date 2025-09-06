@@ -4,11 +4,11 @@ import type { Ref } from 'vue'
 
 import { CELL_SIZE } from '@/shared/constants'
 import { createResizeMask, removeResizeMask } from '@/shared/utils'
-import { useSheetsDataStore } from '@/stores/sheetsData'
 import { useResizeRuler } from '@/composables/useResizeRuler'
+import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
 
 export const useRowResize = (resizeRuler: ReturnType<typeof useResizeRuler>, tableRef: Ref<HTMLElement | null>) => {
-  const sheetsDataStore = useSheetsDataStore()
+  const sheetsDataRowsStore = useSheetsDataRowsStore()
 
   let startY = 0
   let startHeight = 0
@@ -59,7 +59,7 @@ export const useRowResize = (resizeRuler: ReturnType<typeof useResizeRuler>, tab
     const finalHeight = startHeight + delta
 
     if (finalHeight >= CELL_SIZE.MIN.HEIGHT) {
-      await sheetsDataStore.updateRowHeight(resizingRowNumber.value, finalHeight)
+      await sheetsDataRowsStore.updateRowHeight(resizingRowNumber.value, finalHeight)
     }
 
     window.removeEventListener('mousemove', onRowResize)
