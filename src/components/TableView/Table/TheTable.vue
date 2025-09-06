@@ -12,6 +12,9 @@ import { useColumnResize } from '@/composables/useColumnResize'
 import { useResizeRuler } from '@/composables/useResizeRuler'
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
+import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
+import { useSheetsDataColumnsStore } from '@/stores/sheetsData/columns'
+import { useSheetsDataCellsStore } from '@/stores/sheetsData/cells'
 
 import TableHeaderRow from '@/components/TableView/Table/TableHeaderRow.vue'
 import TableRow from '@/components/TableView/Table/TableRow.vue'
@@ -37,6 +40,9 @@ const { resizingColumnLetter, startColumnResize } = useColumnResize(resizeRuler,
 
 const sheetsStore = useSheetsStore()
 const sheetsDataStore = useSheetsDataStore()
+const sheetsDataRowsStore = useSheetsDataRowsStore()
+const sheetsDataColumnsStore = useSheetsDataColumnsStore()
+const sheetsDataCellsStore = useSheetsDataCellsStore()
 
 const columnCount = computed(() => sheetsDataStore.currentSheetData?.columnOrder.length ?? 0)
 const rowCount = computed(() => sheetsDataStore.currentSheetData?.rowOrder.length ?? 0)
@@ -52,6 +58,16 @@ const gridTemplateRows = computed(() => {
   return `${header} ${rowOrder.map(order => rows[order].isAutoHeight ? 'auto' : rows[order].height + 'px').join(' ')}`
 })
 
+const gridTemplateColumns = computed(() => {
+  const header = `${CELL_SIZE.HEADER.ROW_WIDTH}px`
+  if (!sheetsDataStore.currentSheetData) return `${header} repeat(${columnCount.value}, 1fr)`
+
+  const columns = sheetsDataStore.currentSheetData.columns
+  const columnOrder = sheetsDataStore.currentSheetData.columnOrder
+
+  return `${header} ${columnOrder.map(order => columns[order].width + 'px').join(' ')}`
+})
+
 const onTableScroll = (e: Event): void => {
   const target = e.target as HTMLElement
   tableScroll.left = target.scrollLeft
@@ -65,7 +81,7 @@ const handleCellMouseDown = (cellId: string): void => {
 }
 
 const handleCellEditorBlur = (e: FocusEvent, cellId: string, value: string): void => {
-  sheetsDataStore.updateCellValue(cellId, value)
+  sheetsDataCellsStore.updateCellValue(cellId, value)
   stopEditing()
 }
 
@@ -92,7 +108,7 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
       :table-scroll-left="tableScroll.left"
       :ruler-visible="isResizeRulerVisible && rowNumber === resizingRowNumber"
       @mousedown="startRowResize"
-      @dblclick="sheetsDataStore.resetRowAutoHeight"
+      @dblclick="sheetsDataRowsStore.resetRowAutoHeight"
     />
 
     <TableColumnResizer
@@ -103,16 +119,13 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
       :position="resizeRulerPosition"
       :ruler-visible="isResizeRulerVisible && columnLetter === resizingColumnLetter"
       @mousedown="startColumnResize"
-      @dblclick="sheetsDataStore.fitColumnWidthToContent"
+      @dblclick="sheetsDataColumnsStore.fitColumnWidthToContent"
     />
 
     <div
       role="grid"
       class="grid w-fit"
-      :style="{
-        gridTemplateColumns: `${CELL_SIZE.HEADER.ROW_WIDTH}px repeat(${columnCount}, 1fr)`,
-        gridTemplateRows
-      }"
+      :style="{ gridTemplateRows, gridTemplateColumns }"
     >
       <TableHeaderRow
         :column-order="sheetsDataStore.currentSheetData.columnOrder"

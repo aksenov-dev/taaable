@@ -4,7 +4,7 @@ import { computed, nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { handleEditableCellKeydown, placeCursorAtEnd, sanitizeHtml } from '@/shared/utils'
 import { useTableWidth } from '@/composables/useTableWidth'
 import { useCellEditing } from '@/composables/useCellEditing'
-import { useSheetsDataStore } from '@/stores/sheetsData'
+import { useSheetsDataCellsStore } from '@/stores/sheetsData/cells'
 
 interface Props {
   tableContainer: HTMLDivElement | null
@@ -20,7 +20,7 @@ const { tableContainer } = defineProps<Props>()
 const { tableWidth } = useTableWidth(tableContainer)
 const { editingCellId, initialInput, cellEditorPosition } = useCellEditing()
 
-const sheetsDataStore = useSheetsDataStore()
+const sheetsDataCellsStore = useSheetsDataCellsStore()
 
 const editorRef = useTemplateRef('editorRef')
 const editorValue = ref('')
@@ -61,7 +61,7 @@ onMounted(async () => {
 
   if (!editorRef.value) return
 
-  const initialHtml = initialInput.value ?? String(sheetsDataStore.currentCell?.value)
+  const initialHtml = initialInput.value ?? String(sheetsDataCellsStore.currentCell?.value)
   editorRef.value.innerHTML = initialHtml || '\u200B'
   editorValue.value = initialHtml || ''
 
