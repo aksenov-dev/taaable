@@ -61,7 +61,7 @@ export const useTablesStore = defineStore('tables', () => {
   return {
     filterText,
     isLoading: readonly(isLoading),
-    filteredTables: readonly(filteredTables),
+    filteredTables,
     getTables,
     renameTable,
     deleteTable

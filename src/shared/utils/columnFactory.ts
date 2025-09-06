@@ -10,7 +10,8 @@ const generateColumn = (sheetId: string, order: number): Column => {
     columnId: nanoid(),
     sheetId,
     order,
-    width: CELL_SIZE.DEFAULT.WIDTH
+    width: CELL_SIZE.DEFAULT.WIDTH,
+    offsetLeft: 0
   }
 }
 
@@ -59,6 +60,7 @@ export const toColumnDto = (column: Column): ColumnDto => {
 export const fromColumnDto = (dto: ColumnDto): Column => {
   return {
     ...dto,
-    width: dto.width ?? CELL_SIZE.DEFAULT.WIDTH
+    width: dto.width ?? CELL_SIZE.DEFAULT.WIDTH,
+    offsetLeft: 0
   }
 }

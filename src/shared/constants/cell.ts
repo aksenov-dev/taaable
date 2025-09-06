@@ -8,7 +8,7 @@ export const CELL_SIZE = {
     HEIGHT: 24
   },
   MIN: {
-    WIDTH: 40,
+    WIDTH: 24,
     HEIGHT: 24
   }
 } as const

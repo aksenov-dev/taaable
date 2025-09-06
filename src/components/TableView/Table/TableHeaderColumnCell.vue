@@ -15,6 +15,7 @@ const { columnLetter, column, isActive } = defineProps<Props>()
 <template>
   <div
     role="columnheader"
+    :data-column-letter="columnLetter"
     class="text-small border-gray-3 sticky top-0 z-3 flex cursor-default items-center justify-center border-r border-b
     select-none"
     :class="{

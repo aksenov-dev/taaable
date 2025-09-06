@@ -5,6 +5,7 @@ export interface Column {
   sheetId: string
   order: number
   width: number
+  offsetLeft: number
 }
 
 export interface ColumnsData {
@@ -12,4 +13,4 @@ export interface ColumnsData {
   columnOrder: string[]
 }
 
-export type ColumnDto = Optional<Column, 'width'>
+export type ColumnDto = Optional<Column, 'width' | 'offsetLeft'>
