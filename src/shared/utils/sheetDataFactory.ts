@@ -1,22 +1,22 @@
 import type { SheetData, SheetDataDto } from '@/shared/types'
-
 import { TABLE_SIZE } from '@/shared/constants'
+
 import {
-  generateColumns,
   columnsArrayToColumnsData,
   columnsRecordToArray,
+  fromCellDto,
   fromColumnDto,
-  toColumnDto,
+  fromRowDto,
+  generateCells,
+  generateColumns,
   generateRows,
   rowsArrayToRowsData,
   rowsRecordToArray,
-  fromRowDto,
+  toColumnDto,
   toRowDto,
-  generateCells,
-  fromCellDto
 } from '@/shared/utils'
 
-export const generateSheetData = (sheetId: string): SheetData => {
+export function generateSheetData(sheetId: string): SheetData {
   const { columns, columnOrder } = generateColumns(sheetId, TABLE_SIZE.DEFAULT.COLUMN_COUNT)
   const { rows, rowOrder } = generateRows(sheetId, TABLE_SIZE.DEFAULT.ROW_COUNT)
   const { cells } = generateCells(sheetId, columns, rows)
@@ -24,14 +24,16 @@ export const generateSheetData = (sheetId: string): SheetData => {
   return { columns, columnOrder, rows, rowOrder, cells }
 }
 
-export const toSheetDataDto = (sheetId: string, sheetData: SheetData): SheetDataDto => ({
-  sheetId,
-  columns: columnsRecordToArray(sheetData.columns).map(toColumnDto),
-  rows: rowsRecordToArray(sheetData.rows).map(toRowDto),
-  cells: []
-})
+export function toSheetDataDto(sheetId: string, sheetData: SheetData): SheetDataDto {
+  return {
+    sheetId,
+    columns: columnsRecordToArray(sheetData.columns).map(toColumnDto),
+    rows: rowsRecordToArray(sheetData.rows).map(toRowDto),
+    cells: [],
+  }
+}
 
-export const fromSheetDataDto = (dto: SheetDataDto): SheetData => {
+export function fromSheetDataDto(dto: SheetDataDto): SheetData {
   const { columns, columnOrder } = columnsArrayToColumnsData(dto.columns.map(fromColumnDto))
   const { rows, rowOrder } = rowsArrayToRowsData(dto.rows.map(fromRowDto))
   const { cells } = generateCells(dto.sheetId, columns, rows)
@@ -46,6 +48,6 @@ export const fromSheetDataDto = (dto: SheetDataDto): SheetData => {
     columnOrder,
     rows,
     rowOrder,
-    cells
+    cells,
   }
 }

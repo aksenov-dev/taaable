@@ -1,4 +1,4 @@
-export const createResizeMask = (direction: 'row' | 'column'): void => {
+export function createResizeMask(direction: 'row' | 'column'): void {
   const mask = document.createElement('div')
 
   mask.classList.add(
@@ -6,13 +6,15 @@ export const createResizeMask = (direction: 'row' | 'column'): void => {
     'fixed',
     'inset-0',
     'z-[9999]',
-    direction === 'row' ? 'cursor-row-resize' : 'cursor-col-resize'
+    direction === 'row' ? 'cursor-row-resize' : 'cursor-col-resize',
   )
 
   document.body.appendChild(mask)
 }
 
-export const removeResizeMask = (): void => {
+export function removeResizeMask(): void {
   const mask = document.querySelector('.resize-mask')
-  if (mask) mask.remove()
+
+  if (mask)
+    mask.remove()
 }

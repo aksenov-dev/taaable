@@ -1,24 +1,28 @@
 import { onBeforeUnmount, readonly, ref } from 'vue'
-
 import type { Ref } from 'vue'
 
+import type { useResizeRuler } from '@/composables/useResizeRuler'
 import { CELL_SIZE } from '@/shared/constants'
+
 import { createResizeMask, removeResizeMask } from '@/shared/utils'
-import { useResizeRuler } from '@/composables/useResizeRuler'
+
 import { useSheetsDataColumnsStore } from '@/stores/sheetsData/columns'
 
-export const useColumnResize = (resizeRuler: ReturnType<typeof useResizeRuler>, tableRef: Ref<HTMLElement | null>) => {
+export function useColumnResize(resizeRuler: ReturnType<typeof useResizeRuler>, tableRef: Ref<HTMLElement | null>) {
   const sheetsDataColumnsStore = useSheetsDataColumnsStore()
 
   let startX = 0
   let startWidth = 0
   const resizingColumnLetter = ref<string | null>(null)
 
-  const startColumnResize = (columnLetter: string, columnWidth: number): void => {
-    if (!tableRef.value) return
+  function startColumnResize(columnLetter: string, columnWidth: number): void {
+    if (!tableRef.value)
+      return
 
     const columnEl = tableRef.value.querySelector(`[data-column-letter="${columnLetter}"]`) as HTMLElement
-    if (!columnEl) return
+
+    if (!columnEl)
+      return
 
     const columnRect = columnEl.getBoundingClientRect()
 
@@ -33,8 +37,9 @@ export const useColumnResize = (resizeRuler: ReturnType<typeof useResizeRuler>, 
     window.addEventListener('mouseup', stopColumnResize)
   }
 
-  const onColumnResize = (event: MouseEvent): void => {
-    if (!tableRef.value || !resizingColumnLetter.value) return
+  function onColumnResize(event: MouseEvent): void {
+    if (!tableRef.value || !resizingColumnLetter.value)
+      return
 
     const relativeMouseX = event.clientX + tableRef.value.scrollLeft
     const maxRelativeX = tableRef.value.clientWidth + tableRef.value.scrollLeft
@@ -48,8 +53,9 @@ export const useColumnResize = (resizeRuler: ReturnType<typeof useResizeRuler>, 
     }
   }
 
-  const stopColumnResize = async (): Promise<void> => {
-    if (!tableRef.value || !resizingColumnLetter.value) return
+  async function stopColumnResize(): Promise<void> {
+    if (!tableRef.value || !resizingColumnLetter.value)
+      return
 
     const finalX = resizeRuler.resizeRulerPosition.value
     const delta = finalX - startX
@@ -72,6 +78,6 @@ export const useColumnResize = (resizeRuler: ReturnType<typeof useResizeRuler>, 
 
   return {
     resizingColumnLetter: readonly(resizingColumnLetter),
-    startColumnResize
+    startColumnResize,
   }
 }

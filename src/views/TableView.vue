@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
+
 import { useTableStore } from '@/stores/table'
 
 import { LoadingOverlay } from '@/shared/ui'
-import TableHeader from '@/components/TableView/TableHeader.vue'
-import TheToolbar from '@/components/TableView/Toolbar/TheToolbar.vue'
-import TheFormula from '@/components/TableView/TheFormula.vue'
-import TheTable from '@/components/TableView/Table/TheTable.vue'
 import TableFooter from '@/components/TableView/Footer/TableFooter.vue'
+import TheTable from '@/components/TableView/Table/TheTable.vue'
+import TableHeader from '@/components/TableView/TableHeader.vue'
+import TheFormula from '@/components/TableView/TheFormula.vue'
+import TheToolbar from '@/components/TableView/Toolbar/TheToolbar.vue'
 
 interface Props {
   tableId: string

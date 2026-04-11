@@ -1,10 +1,12 @@
-export const handleEditableCellKeydown = (e: KeyboardEvent): void => {
+export function handleEditableCellKeydown(e: KeyboardEvent): void {
   if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
     e.preventDefault()
     e.stopPropagation()
 
     const selection = window.getSelection()
-    if (!selection || !selection.rangeCount) return
+
+    if (!selection || !selection.rangeCount)
+      return
 
     const range = selection.getRangeAt(0)
 

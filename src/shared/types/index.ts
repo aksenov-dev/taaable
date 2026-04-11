@@ -1,13 +1,13 @@
-import type { Optional } from './utils'
-import type { Settings, MainSortVariant, MainViewVariant } from './settings'
-import type { Table, TableDto } from './table'
+import type { Cell, CellDto, CellsData } from './cell'
+import type { CellEditorPosition } from './cellEditor'
+import type { CellStyle } from './cellStyle'
+import type { Column, ColumnDto, ColumnsData } from './column'
+import type { Row, RowDto, RowsData } from './row'
+import type { MainSortVariant, MainViewVariant, Settings } from './settings'
 import type { Sheet, SheetDto } from './sheet'
 import type { SheetData, SheetDataDto } from './sheetData'
-import type { Column, ColumnsData, ColumnDto } from './column'
-import type { Row, RowsData, RowDto } from './row'
-import type { Cell, CellsData, CellDto } from './cell'
-import type { CellStyle } from './cellStyle'
-import type { CellEditorPosition } from './cellEditor'
+import type { Table, TableDto } from './table'
+import type { Optional } from './utils'
 
 export type {
   Optional,
@@ -30,5 +30,5 @@ export type {
   CellsData,
   CellDto,
   CellStyle,
-  CellEditorPosition
+  CellEditorPosition,
 }

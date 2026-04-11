@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useSheetsStore } from '@/stores/sheets'
 
-import FooterSheetItem from '@/components/TableView/Footer/FooterSheetItem.vue'
-import FooterIconContainer from '@/components/TableView/Footer/FooterIconContainer.vue'
-
 import { IconPlus } from '@/shared/ui'
+import FooterIconContainer from '@/components/TableView/Footer/FooterIconContainer.vue'
+import FooterSheetItem from '@/components/TableView/Footer/FooterSheetItem.vue'
 
 const sheetsStore = useSheetsStore()
 </script>

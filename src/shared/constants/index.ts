@@ -1,9 +1,9 @@
 import { BREAKPOINTS } from './breakpoints'
-import { TABLE_SIZE } from './table'
 import { CELL_SIZE } from './cell'
+import { TABLE_SIZE } from './table'
 
 export {
   BREAKPOINTS,
   TABLE_SIZE,
-  CELL_SIZE
+  CELL_SIZE,
 }

@@ -1,7 +1,8 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+
 import { BREAKPOINTS } from '@/shared/constants'
 
-export const useBreakpoints = () => {
+export function useBreakpoints() {
   const viewportWidth = ref(window.innerWidth)
 
   const onResize = (): void => {
@@ -17,6 +18,6 @@ export const useBreakpoints = () => {
     isMd: viewportWidth.value >= BREAKPOINTS.MD,
     isLg: viewportWidth.value >= BREAKPOINTS.LG,
     isXl: viewportWidth.value >= BREAKPOINTS.XL,
-    isXxl: viewportWidth.value >= BREAKPOINTS.XXL
+    isXxl: viewportWidth.value >= BREAKPOINTS.XXL,
   }))
 }

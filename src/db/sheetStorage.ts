@@ -2,18 +2,18 @@ import type { SheetDto } from '@/shared/types'
 
 import { getDB } from './database'
 
-export const createSheetStorage = () => {
-  const getSheetsByTableId = async (tableId: string): Promise<SheetDto[]> => {
+export function createSheetStorage() {
+  async function getSheetsByTableId(tableId: string): Promise<SheetDto[]> {
     const db = await getDB()
     return await db.getAllFromIndex('sheets', 'byTableId', tableId)
   }
 
-  const saveSheet = async (sheet: SheetDto): Promise<void> => {
+  async function saveSheet(sheet: SheetDto): Promise<void> {
     const db = await getDB()
     await db.put('sheets', sheet)
   }
 
-  const saveSheets = async (sheets: SheetDto[]): Promise<void> => {
+  async function saveSheets(sheets: SheetDto[]): Promise<void> {
     const db = await getDB()
 
     const tx = db.transaction('sheets', 'readwrite')
@@ -24,12 +24,12 @@ export const createSheetStorage = () => {
     await tx.done
   }
 
-  const deleteSheetById = async (sheetId: string): Promise<void> => {
+  async function deleteSheetById(sheetId: string): Promise<void> {
     const db = await getDB()
     await db.delete('sheets', sheetId)
   }
 
-  const deleteSheetsByTableId = async (tableId: string): Promise<void> => {
+  async function deleteSheetsByTableId(tableId: string): Promise<void> {
     const db = await getDB()
 
     const tx = db.transaction('sheets', 'readwrite')
@@ -48,6 +48,6 @@ export const createSheetStorage = () => {
     saveSheet,
     saveSheets,
     deleteSheetById,
-    deleteSheetsByTableId
+    deleteSheetsByTableId,
   }
 }

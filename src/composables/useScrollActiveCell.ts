@@ -1,23 +1,28 @@
 import { watch } from 'vue'
-
 import type { Ref } from 'vue'
 
 import { CELL_SIZE } from '@/shared/constants'
-import { useActiveCell } from '@/composables/useActiveCell'
+
 import { useSheetsStore } from '@/stores/sheets'
+import { useActiveCell } from '@/composables/useActiveCell'
 
 export function useScrollActiveCell(containerRef: Ref<HTMLDivElement | null>) {
   const sheetsStore = useSheetsStore()
   const { getActiveCell } = useActiveCell()
 
-  watch(() => getActiveCell(sheetsStore.currentSheetId), async newCellId => {
-    if (!sheetsStore.currentSheetId) return
+  watch(() => getActiveCell(sheetsStore.currentSheetId), async (newCellId) => {
+    if (!sheetsStore.currentSheetId)
+      return
 
     const container = containerRef.value
-    if (!container || !container.contains(document.activeElement)) return
+
+    if (!container || !container.contains(document.activeElement))
+      return
 
     const cellElement = container.querySelector<HTMLDivElement>(`[data-cell-id="${newCellId}"]`)
-    if (!cellElement) return
+
+    if (!cellElement)
+      return
 
     const containerRect = container.getBoundingClientRect()
     const cellRect = cellElement.getBoundingClientRect()

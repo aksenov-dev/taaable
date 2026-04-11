@@ -1,38 +1,45 @@
 import { onMounted, onUnmounted } from 'vue'
-
 import type { Ref } from 'vue'
 
-import { useActiveCell } from '@/composables/useActiveCell'
-import { useCellEditing } from '@/composables/useCellEditing'
+import { getCellId, parseCellId } from '@/shared/utils'
+
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
-import { parseCellId, getCellId } from '@/shared/utils'
+import { useActiveCell } from '@/composables/useActiveCell'
+import { useCellEditing } from '@/composables/useCellEditing'
 
-export const useKeyboardNavigation = (containerRef: Ref<HTMLDivElement | null>) => {
+export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) {
   const sheetsStore = useSheetsStore()
   const sheetsDataStore = useSheetsDataStore()
 
   const { getActiveCell, setActiveCell } = useActiveCell()
   const { editingCellId, activateEditor, stopEditing } = useCellEditing()
 
-  const startEditingMode = (cellId: string, initialInput?: string) => {
+  function startEditingMode(cellId: string, initialInput?: string) {
     const cell = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement | null
-    if (!cell) return
+
+    if (!cell)
+      return
 
     activateEditor(cellId, { element: cell, initialInput })
   }
 
-  const stopEditingMode = () => {
+  function stopEditingMode() {
     stopEditing()
     containerRef.value?.focus()
   }
 
-  const handleKeydown = async (event: KeyboardEvent) => {
-    if (!sheetsStore.currentSheetId) return
-    if (!containerRef.value || !containerRef.value.contains(document.activeElement)) return
+  async function handleKeydown(event: KeyboardEvent) {
+    if (!sheetsStore.currentSheetId)
+      return
+
+    if (!containerRef.value || !containerRef.value.contains(document.activeElement))
+      return
 
     const editModeNavigationKeys = ['Tab', 'Enter', 'Escape']
-    if (editingCellId.value && !editModeNavigationKeys.includes(event.key)) return
+
+    if (editingCellId.value && !editModeNavigationKeys.includes(event.key))
+      return
 
     const currentCellId = getActiveCell(sheetsStore.currentSheetId)
     const { columnLetter, rowNumber } = parseCellId(currentCellId)
@@ -43,7 +50,8 @@ export const useKeyboardNavigation = (containerRef: Ref<HTMLDivElement | null>) 
     const colIndex = columnOrder.indexOf(columnLetter)
     const rowIndex = rowOrder.indexOf(rowNumber)
 
-    if (colIndex === -1 || rowIndex === -1) return
+    if (colIndex === -1 || rowIndex === -1)
+      return
 
     let newColIndex = colIndex
     let newRowIndex = rowIndex
@@ -73,7 +81,8 @@ export const useKeyboardNavigation = (containerRef: Ref<HTMLDivElement | null>) 
         if (editingCellId.value) {
           stopEditingMode()
           newRowIndex = Math.min(rowOrder.length - 1, rowIndex + (shift ? -1 : 1))
-        } else {
+        }
+        else {
           startEditingMode(currentCellId)
         }
         break

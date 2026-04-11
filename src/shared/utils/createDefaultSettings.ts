@@ -1,9 +1,9 @@
 import type { Settings } from '@/shared/types'
 
-export const createDefaultSettings = (): Settings => {
+export function createDefaultSettings(): Settings {
   return {
     isDarkTheme: false,
     sortVariant: 'title',
-    viewVariant: 'list'
+    viewVariant: 'list',
   }
 }

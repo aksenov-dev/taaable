@@ -1,13 +1,15 @@
 import type { IDBPTransaction } from 'idb'
-import type { AppDBSchema } from './database'
+
 import type { SheetDataDto } from '@/shared/types'
 
 import { getDB } from '@/db/database'
 
+import type { AppDBSchema } from './database'
+
 type DeleteSheetDataTransaction = IDBPTransaction<AppDBSchema, ['sheets', 'columns', 'rows', 'cells'], 'readwrite'>
 
-export const createSheetDataStorage = () => {
-  const getSheetsDataByTableId = async (tableId: string): Promise<SheetDataDto[]> => {
+export function createSheetDataStorage() {
+  async function getSheetsDataByTableId(tableId: string): Promise<SheetDataDto[]> {
     const db = await getDB()
 
     const tx = db.transaction(['sheets', 'columns', 'rows', 'cells'], 'readonly')
@@ -27,7 +29,7 @@ export const createSheetDataStorage = () => {
       const [columns, rows, cells] = await Promise.all([
         columnsIndex.getAll(sheetId),
         rowsIndex.getAll(sheetId),
-        cellsIndex.getAll(sheetId)
+        cellsIndex.getAll(sheetId),
       ])
 
       return { sheetId, columns, rows, cells }
@@ -40,7 +42,7 @@ export const createSheetDataStorage = () => {
     return sheetsData
   }
 
-  const saveSheetData = async (sheetData: SheetDataDto): Promise<void> => {
+  async function saveSheetData(sheetData: SheetDataDto): Promise<void> {
     const db = await getDB()
 
     const tx = db.transaction(['columns', 'rows'], 'readwrite')
@@ -53,7 +55,7 @@ export const createSheetDataStorage = () => {
     await tx.done
   }
 
-  const deleteSheetData = async (tx: DeleteSheetDataTransaction, sheetId: string): Promise<void> => {
+  async function deleteSheetData(tx: DeleteSheetDataTransaction, sheetId: string): Promise<void> {
     const columnsStore = tx.objectStore('columns')
     const rowsStore = tx.objectStore('rows')
     const cellsStore = tx.objectStore('cells')
@@ -65,7 +67,7 @@ export const createSheetDataStorage = () => {
     const [columnIds, rowIds, cellIds] = await Promise.all([
       columnsIndex.getAllKeys(sheetId),
       rowsIndex.getAllKeys(sheetId),
-      cellsIndex.getAllKeys(sheetId)
+      cellsIndex.getAllKeys(sheetId),
     ])
 
     await Promise.all(columnIds.map(id => columnsStore.delete(id)))
@@ -73,7 +75,7 @@ export const createSheetDataStorage = () => {
     await Promise.all(cellIds.map(id => cellsStore.delete(id)))
   }
 
-  const deleteSheetDataBySheetId = async (sheetId: string): Promise<void> => {
+  async function deleteSheetDataBySheetId(sheetId: string): Promise<void> {
     const db = await getDB()
     const tx = db.transaction(['columns', 'rows', 'cells'], 'readwrite')
 
@@ -82,7 +84,7 @@ export const createSheetDataStorage = () => {
     await tx.done
   }
 
-  const deleteSheetsDataByTableId = async (tableId: string): Promise<void> => {
+  async function deleteSheetsDataByTableId(tableId: string): Promise<void> {
     const db = await getDB()
     const tx = db.transaction(['sheets', 'columns', 'rows', 'cells'], 'readwrite')
 
@@ -100,6 +102,6 @@ export const createSheetDataStorage = () => {
     getSheetsDataByTableId,
     saveSheetData,
     deleteSheetDataBySheetId,
-    deleteSheetsDataByTableId
+    deleteSheetsDataByTableId,
   }
 }

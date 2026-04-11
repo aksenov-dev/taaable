@@ -24,7 +24,7 @@ const { icon, title, isActive = false, disabled = false } = defineProps<Props>()
       :class="{
         'text-gray-4': disabled,
         'text-gray-6': !isActive && !disabled,
-        'text-black dark:text-white': isActive && !disabled
+        'text-black dark:text-white': isActive && !disabled,
       }"
     />
   </div>

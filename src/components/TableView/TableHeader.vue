@@ -24,9 +24,9 @@ const tableStore = useTableStore()
       />
     </div>
 
-      <DarkThemeToggle
-        :is-dark="settingsStore.settings.isDarkTheme"
-        @toggle="settingsStore.setDarkTheme"
-      />
+    <DarkThemeToggle
+      :is-dark="settingsStore.settings.isDarkTheme"
+      @toggle="settingsStore.setDarkTheme"
+    />
   </header>
 </template>

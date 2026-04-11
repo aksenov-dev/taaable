@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Props } from './types'
 
-const emit = defineEmits(['click'])
-
 const { icon, text } = defineProps<Props>()
+
+const emit = defineEmits(['click'])
 </script>
 
 <template>

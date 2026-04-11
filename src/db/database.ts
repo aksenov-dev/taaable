@@ -1,6 +1,6 @@
 import { openDB } from 'idb'
+import type { DBSchema, IDBPDatabase } from 'idb'
 
-import type { IDBPDatabase, DBSchema } from 'idb'
 import type { CellDto, ColumnDto, RowDto, SheetDto, TableDto } from '@/shared/types'
 
 interface MetaDB extends DBSchema {
@@ -32,7 +32,7 @@ interface ColumnDB extends DBSchema {
     key: ColumnDto['columnId']
     value: ColumnDto
     indexes: {
-      'bySheetId': SheetDto['sheetId']
+      bySheetId: SheetDto['sheetId']
     }
   }
 }
@@ -42,7 +42,7 @@ interface RowDB extends DBSchema {
     key: RowDto['rowId']
     value: RowDto
     indexes: {
-      'bySheetId': SheetDto['sheetId']
+      bySheetId: SheetDto['sheetId']
     }
   }
 }
@@ -52,9 +52,9 @@ interface CellDB extends DBSchema {
     key: [SheetDto['sheetId'], ColumnDto['columnId'], RowDto['rowId']]
     value: CellDto
     indexes: {
-      'bySheetId': string
-      'byColumnId': string
-      'byRowId': string
+      bySheetId: string
+      byColumnId: string
+      byRowId: string
     }
   }
 }
@@ -63,7 +63,7 @@ export type AppDBSchema = MetaDB & TableDB & SheetDB & ColumnDB & RowDB & CellDB
 
 let dbPromise: Promise<IDBPDatabase<AppDBSchema>>
 
-export const getDB = () => {
+export function getDB() {
   if (!dbPromise) {
     dbPromise = openDB('TaaableDB', 1, {
       upgrade(db) {
@@ -96,7 +96,7 @@ export const getDB = () => {
           store.createIndex('byColumnId', 'columnId')
           store.createIndex('byRowId', 'rowId')
         }
-      }
+      },
     })
   }
 

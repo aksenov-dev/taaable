@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { useActiveCell } from '@/composables/useActiveCell'
 import { useSheetsStore } from '@/stores/sheets'
+import { useActiveCell } from '@/composables/useActiveCell'
+
 import { TextInput } from '@/shared/ui'
 
 const { getActiveCell } = useActiveCell()
@@ -20,7 +21,7 @@ const activeCellId = computed(() => getActiveCell(sheetsStore.currentSheetId))
       :model-value="activeCellId.replace(':', '')"
     />
 
-    <span class="bg-gray-3 w-0.25 shrink-0 transition-colors"></span>
+    <span class="bg-gray-3 w-0.25 shrink-0 transition-colors" />
 
     <TextInput
       variant="formula"

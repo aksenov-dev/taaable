@@ -1,24 +1,28 @@
 import { onBeforeUnmount, readonly, ref } from 'vue'
-
 import type { Ref } from 'vue'
 
+import type { useResizeRuler } from '@/composables/useResizeRuler'
 import { CELL_SIZE } from '@/shared/constants'
+
 import { createResizeMask, removeResizeMask } from '@/shared/utils'
-import { useResizeRuler } from '@/composables/useResizeRuler'
+
 import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
 
-export const useRowResize = (resizeRuler: ReturnType<typeof useResizeRuler>, tableRef: Ref<HTMLElement | null>) => {
+export function useRowResize(resizeRuler: ReturnType<typeof useResizeRuler>, tableRef: Ref<HTMLElement | null>) {
   const sheetsDataRowsStore = useSheetsDataRowsStore()
 
   let startY = 0
   let startHeight = 0
   const resizingRowNumber = ref<string | null>(null)
 
-  const startRowResize = (rowNumber: string, rowHeight: number): void => {
-    if (!tableRef.value) return
+  function startRowResize(rowNumber: string, rowHeight: number): void {
+    if (!tableRef.value)
+      return
 
     const rowEl = tableRef.value.querySelector(`[data-row-number="${rowNumber}"]`) as HTMLElement
-    if (!rowEl) return
+
+    if (!rowEl)
+      return
 
     const containerRect = tableRef.value.getBoundingClientRect()
     const rowRect = rowEl.getBoundingClientRect()
@@ -34,8 +38,9 @@ export const useRowResize = (resizeRuler: ReturnType<typeof useResizeRuler>, tab
     window.addEventListener('mouseup', stopRowResize)
   }
 
-  const onRowResize = (event: MouseEvent): void => {
-    if (!tableRef.value || !resizingRowNumber.value) return
+  function onRowResize(event: MouseEvent): void {
+    if (!tableRef.value || !resizingRowNumber.value)
+      return
 
     const containerRect = tableRef.value.getBoundingClientRect()
     const relativeMouseY = event.clientY - containerRect.top + tableRef.value.scrollTop
@@ -51,8 +56,9 @@ export const useRowResize = (resizeRuler: ReturnType<typeof useResizeRuler>, tab
     }
   }
 
-  const stopRowResize = async (): Promise<void> => {
-    if (!tableRef.value || !resizingRowNumber.value) return
+  async function stopRowResize(): Promise<void> {
+    if (!tableRef.value || !resizingRowNumber.value)
+      return
 
     const finalY = resizeRuler.resizeRulerPosition.value
     const delta = finalY - startY
@@ -75,6 +81,6 @@ export const useRowResize = (resizeRuler: ReturnType<typeof useResizeRuler>, tab
 
   return {
     resizingRowNumber: readonly(resizingRowNumber),
-    startRowResize
+    startRowResize,
   }
 }

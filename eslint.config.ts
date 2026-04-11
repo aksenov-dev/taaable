@@ -48,6 +48,9 @@ export default antfu(
           'internal-ui',
           { newlinesBetween: 0 },
           'internal',
+          'type-index',
+          'type-sibling',
+          'type-parent',
           ['parent', 'sibling', 'index'],
         ],
         customGroups: [

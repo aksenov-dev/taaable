@@ -2,10 +2,9 @@
 import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
 import { useElementBounding, useFocus, useThrottleFn } from '@vueuse/core'
 
-import { type DropdownMenuOffset } from '@/shared/ui'
+import type { DropdownMenuOffset } from '@/shared/ui'
 
-import { IconChevronDown, IconDelete, IconEdit } from '@/shared/ui'
-import { DropdownMenu, DropdownMenuItem, TextInput } from '@/shared/ui'
+import { DropdownMenu, DropdownMenuItem, IconChevronDown, IconDelete, IconEdit, TextInput } from '@/shared/ui'
 
 interface Props {
   title: string
@@ -13,13 +12,13 @@ interface Props {
   isSingleSheet: boolean
 }
 
+const { title, isActive, isSingleSheet } = defineProps<Props>()
+
 const emit = defineEmits<{
   rename: [value: string]
   delete: []
   click: []
 }>()
-
-const { title, isActive, isSingleSheet } = defineProps<Props>()
 
 const sheetItemRef = useTemplateRef('sheet-item')
 const { left, top, update } = useElementBounding(sheetItemRef)
@@ -36,18 +35,18 @@ const menuOffset = computed<DropdownMenuOffset>(() => {
 
 const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
 
-const setEditMode = () => {
+function setEditMode() {
   isEditMode.value = true
   toggleMenu()
   nextTick(() => (focused.value = true))
 }
 
-const renameSheet = (value: string) => {
+function renameSheet(value: string) {
   emit('rename', value)
   isEditMode.value = false
 }
 
-const removeSheet = () => {
+function removeSheet() {
   emit('delete')
   isEditMode.value = false
   toggleMenu()
@@ -62,7 +61,7 @@ watch(isMenuOpen, () => nextTick(() => update()))
     class="flex min-w-0 items-center gap-0.5 rounded-b-sm px-1 select-none transition"
     :class="{
       'shadow-brand-1 bg-white text-black dark:bg-black dark:text-white': isActive,
-      'bg-gray-2 text-gray-6 cursor-pointer hover:text-black dark:hover:text-white': !isActive
+      'bg-gray-2 text-gray-6 cursor-pointer hover:text-black dark:hover:text-white': !isActive,
     }"
     @click="emit('click')"
   >
@@ -75,7 +74,7 @@ watch(isMenuOpen, () => nextTick(() => update()))
       auto-width
       :class="{
         'ml-1.25 border-none': !isEditMode,
-        'pr-5.75 pl-1': isEditMode
+        'pr-5.75 pl-1': isEditMode,
       }"
       @click.stop
       @blur="isEditMode = false"

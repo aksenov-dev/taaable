@@ -1,7 +1,7 @@
 const ALPHABET_LENGTH = 26
 const ASCII_CODE_A = 'A'.charCodeAt(0)
 
-export const numberToColumnLetter = (num: number): string => {
+export function numberToColumnLetter(num: number): string {
   let result = ''
   num++
 

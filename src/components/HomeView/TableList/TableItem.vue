@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
-
+import { useElementBounding, useFocus, useThrottleFn } from '@vueuse/core'
 import { useRouter } from 'vue-router'
-import { useElementBounding, useThrottleFn, useFocus } from '@vueuse/core'
 
 import type { MainViewVariant } from '@/shared/types'
 import type { DropdownMenuOffset } from '@/shared/ui'
 
-import { useTablesStore } from '@/stores/tables'
 import { formatTimestampToStringDate } from '@/shared/utils'
 
-import { IconDelete, IconEdit, IconFile, IconFileBig, IconMoreVertical } from '@/shared/ui'
-import { DropdownMenu, DropdownMenuItem, TextInput } from '@/shared/ui'
+import { useTablesStore } from '@/stores/tables'
+
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  IconDelete,
+  IconEdit,
+  IconFile,
+  IconFileBig,
+  IconMoreVertical,
+  TextInput,
+} from '@/shared/ui'
 
 interface Props {
   tableId: string
@@ -20,12 +28,12 @@ interface Props {
   variant: MainViewVariant
 }
 
+const { tableId, title, date, variant } = defineProps<Props>()
+
 const emit = defineEmits<{
   rename: [value: string]
   delete: []
 }>()
-
-const { tableId, title, date, variant } = defineProps<Props>()
 
 const router = useRouter()
 const tablesStore = useTablesStore()
@@ -51,18 +59,18 @@ const menuOffset = computed<DropdownMenuOffset>(() => {
 
 const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
 
-const setEditMode = () => {
+function setEditMode() {
   isEditMode.value = true
   toggleMenu()
   nextTick(() => (focused.value = true))
 }
 
-const renameTable = (value: string) => {
+function renameTable(value: string) {
   emit('rename', value)
   isEditMode.value = false
 }
 
-const removeTable = () => {
+function removeTable() {
   emit('delete')
   isEditMode.value = false
   toggleMenu()
@@ -80,7 +88,7 @@ watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
     class="group/item hover:bg-gray-1 flex min-w-0 rounded-sm p-5 transition-colors select-none hover:cursor-pointer"
     :class="{
       'h-15 gap-3': variant === 'list',
-      'h-67.5 basis-1/3 flex-col gap-1': variant === 'grid'
+      'h-67.5 basis-1/3 flex-col gap-1': variant === 'grid',
     }"
     @click="goToTable"
   >
@@ -88,13 +96,13 @@ watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
       class="flex min-w-0 grow gap-2"
       :class="{
         'items-center': variant === 'list',
-        'flex-col': variant === 'grid'
+        'flex-col': variant === 'grid',
       }"
     >
       <div
         class="border-gray-2 border-0 transition-colors"
         :class="{
-          'flex grow items-center justify-center rounded-xs border-1 bg-white dark:bg-black': variant === 'grid'
+          'flex grow items-center justify-center rounded-xs border-1 bg-white dark:bg-black': variant === 'grid',
         }"
       >
         <component
@@ -102,7 +110,7 @@ watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
           class="group-hover/item:text-accent-1 transition-colors"
           :class="{
             'text-gray-6': variant === 'list',
-            'text-gray-3': variant === 'grid'
+            'text-gray-3': variant === 'grid',
           }"
         />
       </div>
@@ -115,7 +123,7 @@ watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
         class="text-black dark:text-white"
         :class="{
           '-mr-0.25 -ml-0.25': variant === 'list',
-          '-mr-1.25 -ml-1.25 w-auto!': variant === 'grid'
+          '-mr-1.25 -ml-1.25 w-auto!': variant === 'grid',
         }"
         @click.stop
         @blur="isEditMode = false"

@@ -1,14 +1,9 @@
 <script setup lang="ts">
 import { nextTick, useTemplateRef, watch } from 'vue'
+
 import { useAutoInputWidth } from '@/composables/useAutoInputWidth'
 
 import type { Props } from './types'
-
-const emit = defineEmits<{
-  blur: []
-  input: [value: string]
-  change: [value: string]
-}>()
 
 const {
   variant,
@@ -16,8 +11,14 @@ const {
   disabled = false,
   placeholder = '',
   autoWidth = false,
-  maxLength = 500
+  maxLength = 500,
 } = defineProps<Props>()
+
+const emit = defineEmits<{
+  blur: []
+  input: [value: string]
+  change: [value: string]
+}>()
 
 const model = defineModel<string>({ default: '' })
 const inputRef = useTemplateRef('input')
@@ -27,7 +28,9 @@ const onEnter = () => inputRef.value?.blur()
 const { updateWidth } = useAutoInputWidth(inputRef, () => autoWidth)
 
 watch([model, () => disabled], () => {
-  if (autoWidth) nextTick(() => updateWidth())
+  if (autoWidth) {
+    nextTick(() => updateWidth())
+  }
 })
 </script>
 
@@ -44,7 +47,7 @@ watch([model, () => disabled], () => {
     @input="emit('input', model)"
     @change="emit('change', model)"
     @keydown.enter="onEnter"
-  />
+  >
 </template>
 
 <style scoped>

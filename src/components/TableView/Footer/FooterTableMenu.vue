@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import { useElementBounding, useThrottleFn } from '@vueuse/core'
-import { useTableStore } from '@/stores/table'
 
 import type { DropdownMenuOffset } from '@/shared/ui'
+
+import { useTableStore } from '@/stores/table'
 
 import { DropdownMenu, DropdownMenuItem, IconDelete, IconMoreHorizontal } from '@/shared/ui'
 import FooterIconContainer from '@/components/TableView/Footer/FooterIconContainer.vue'
@@ -21,7 +22,7 @@ const menuOffset = computed<DropdownMenuOffset>(() => {
 
 const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
 
-const removeTable = async () => {
+async function removeTable() {
   await tableStore.deleteTable()
   await toggleMenu()
 }

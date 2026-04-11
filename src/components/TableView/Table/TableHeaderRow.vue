@@ -22,7 +22,7 @@ const activeColumnLetter = computed(() => parseCellId(activeCellId).columnLetter
   <div
     role="none"
     class="bg-gray-1 border-gray-3 sticky top-0 left-0 z-4 border-r border-b"
-  ></div>
+  />
 
   <TableHeaderColumnCell
     v-for="columnLetter in columnOrder"

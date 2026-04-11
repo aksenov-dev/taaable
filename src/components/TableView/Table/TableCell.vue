@@ -6,15 +6,14 @@ interface Props {
   isActive: boolean
 }
 
+const { cell, isActive } = defineProps<Props>()
+
 const emit = defineEmits<{
-  dblclick: [{ event: MouseEvent; cellId: string }]
+  dblclick: [{ event: MouseEvent, cellId: string }]
   mousedown: []
 }>()
-
-const { cell, isActive } = defineProps<Props>()
 </script>
 
-<!-- eslint-disable vue/no-v-html -->
 <template>
   <div
     role="gridcell"
@@ -25,5 +24,5 @@ const { cell, isActive } = defineProps<Props>()
     @dblclick="event => emit('dblclick', { event, cellId: cell.cellId })"
     @mousedown="emit('mousedown')"
     v-html="cell.value"
-  ></div>
+  />
 </template>

@@ -1,23 +1,23 @@
-import { fileURLToPath, URL } from 'node:url'
-
-import { defineConfig } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
+import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-const base = process.env.NODE_ENV === 'development' ? '/' : '/taaable/'
+export default defineConfig(({ command }) => {
+  const base = command === 'serve' ? '/' : '/taaable/'
 
-// https://vite.dev/config/
-export default defineConfig({
-  base,
-  plugins: [
-    vue(),
-    vueDevTools(),
-    tailwindcss()
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+  return {
+    base,
+    plugins: [
+      vue(),
+      vueDevTools(),
+      tailwindcss(),
+    ],
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    },
   }
 })

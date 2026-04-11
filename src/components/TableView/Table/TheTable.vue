@@ -2,25 +2,26 @@
 import { computed, reactive, useTemplateRef, watch } from 'vue'
 
 import { CELL_SIZE } from '@/shared/constants'
-import { useActiveCell } from '@/composables/useActiveCell'
-import { useCellEditing } from '@/composables/useCellEditing'
-import { useSheetScrollPosition } from '@/composables/useSheetScrollPosition'
-import { useScrollActiveCell } from '@/composables/useScrollActiveCell'
-import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
-import { useRowResize } from '@/composables/useRowResize'
-import { useColumnResize } from '@/composables/useColumnResize'
-import { useResizeRuler } from '@/composables/useResizeRuler'
+
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
-import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
-import { useSheetsDataColumnsStore } from '@/stores/sheetsData/columns'
 import { useSheetsDataCellsStore } from '@/stores/sheetsData/cells'
+import { useSheetsDataColumnsStore } from '@/stores/sheetsData/columns'
+import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
+import { useActiveCell } from '@/composables/useActiveCell'
+import { useCellEditing } from '@/composables/useCellEditing'
+import { useColumnResize } from '@/composables/useColumnResize'
+import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
+import { useResizeRuler } from '@/composables/useResizeRuler'
+import { useRowResize } from '@/composables/useRowResize'
+import { useScrollActiveCell } from '@/composables/useScrollActiveCell'
+import { useSheetScrollPosition } from '@/composables/useSheetScrollPosition'
 
+import TableCellEditor from '@/components/TableView/Table/TableCellEditor.vue'
+import TableColumnResizer from '@/components/TableView/Table/TableColumnResizer.vue'
 import TableHeaderRow from '@/components/TableView/Table/TableHeaderRow.vue'
 import TableRow from '@/components/TableView/Table/TableRow.vue'
-import TableCellEditor from '@/components/TableView/Table/TableCellEditor.vue'
 import TableRowResizer from '@/components/TableView/Table/TableRowResizer.vue'
-import TableColumnResizer from '@/components/TableView/Table/TableColumnResizer.vue'
 
 const { getActiveCell, setActiveCell } = useActiveCell()
 const { editingCellId, activateEditor, stopEditing } = useCellEditing()
@@ -50,43 +51,49 @@ const activeCellId = computed(() => getActiveCell(sheetsStore.currentSheetId))
 
 const gridTemplateRows = computed(() => {
   const header = `${CELL_SIZE.HEADER.COL_HEIGHT}px`
-  if (!sheetsDataStore.currentSheetData) return `${header} repeat(${rowCount.value}, auto)`
+  if (!sheetsDataStore.currentSheetData)
+    return `${header} repeat(${rowCount.value}, auto)`
 
   const rows = sheetsDataStore.currentSheetData.rows
   const rowOrder = sheetsDataStore.currentSheetData.rowOrder
 
-  return `${header} ${rowOrder.map(order => rows[order].isAutoHeight ? 'auto' : rows[order].height + 'px').join(' ')}`
+  return `${header} ${rowOrder.map(order => rows[order].isAutoHeight ? 'auto' : `${rows[order].height}px`).join(' ')}`
 })
 
 const gridTemplateColumns = computed(() => {
   const header = `${CELL_SIZE.HEADER.ROW_WIDTH}px`
-  if (!sheetsDataStore.currentSheetData) return `${header} repeat(${columnCount.value}, 1fr)`
+
+  if (!sheetsDataStore.currentSheetData)
+    return `${header} repeat(${columnCount.value}, 1fr)`
 
   const columns = sheetsDataStore.currentSheetData.columns
   const columnOrder = sheetsDataStore.currentSheetData.columnOrder
 
-  return `${header} ${columnOrder.map(order => columns[order].width + 'px').join(' ')}`
+  return `${header} ${columnOrder.map(order => `${columns[order].width}px`).join(' ')}`
 })
 
-const onTableScroll = (e: Event): void => {
+function onTableScroll(e: Event): void {
   const target = e.target as HTMLElement
   tableScroll.left = target.scrollLeft
   tableScroll.top = target.scrollTop
 }
 
-const handleCellMouseDown = (cellId: string): void => {
+function handleCellMouseDown(cellId: string): void {
   if (sheetsStore.currentSheetId) {
     setActiveCell(sheetsStore.currentSheetId, cellId)
   }
 }
 
-const handleCellEditorBlur = (e: FocusEvent, cellId: string, value: string): void => {
+function handleCellEditorBlur(e: FocusEvent, cellId: string, value: string): void {
   sheetsDataCellsStore.updateCellValue(cellId, value)
   stopEditing()
 }
 
 watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
-  if (tableContainerRef.value) tableContainerRef.value.focus()
+  if (tableContainerRef.value) {
+    tableContainerRef.value.focus()
+  }
+
   stopEditing()
 })
 </script>

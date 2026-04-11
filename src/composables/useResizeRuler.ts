@@ -1,15 +1,15 @@
 import { ref } from 'vue'
 
-export const useResizeRuler = () => {
+export function useResizeRuler() {
   const isResizeRulerVisible = ref(false)
   const resizeRulerPosition = ref(0)
 
-  const show = (position: number): void => {
+  function show(position: number): void {
     isResizeRulerVisible.value = true
     resizeRulerPosition.value = position
   }
 
-  const hide = (): void => {
+  function hide(): void {
     isResizeRulerVisible.value = false
     resizeRulerPosition.value = 0
   }
@@ -18,6 +18,6 @@ export const useResizeRuler = () => {
     isResizeRulerVisible,
     resizeRulerPosition,
     show,
-    hide
+    hide,
   }
 }

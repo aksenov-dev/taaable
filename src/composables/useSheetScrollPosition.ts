@@ -1,5 +1,4 @@
 import { watch } from 'vue'
-
 import type { Ref } from 'vue'
 
 import { useSheetsStore } from '@/stores/sheets'
@@ -11,16 +10,16 @@ interface ScrollPosition {
 
 const scrollPositions: Record<string, ScrollPosition> = {}
 
-export const useSheetScrollPosition = (containerRef: Ref<HTMLDivElement | null>) => {
+export function useSheetScrollPosition(containerRef: Ref<HTMLDivElement | null>) {
   const sheetsStore = useSheetsStore()
 
-  const saveScroll = (sheetId: string | null): void => {
+  function saveScroll(sheetId: string | null): void {
     if (sheetId && containerRef.value) {
       scrollPositions[sheetId] = { top: containerRef.value.scrollTop, left: containerRef.value.scrollLeft }
     }
   }
 
-  const restoreScroll = (sheetId: string | null): void => {
+  function restoreScroll(sheetId: string | null): void {
     if (containerRef.value) {
       let newScrollPosition = { top: 0, left: 0 }
 

@@ -1,4 +1,4 @@
-import type { ColumnDto, ColumnsData, CellDto, CellsData, RowDto, RowsData } from '@/shared/types'
+import type { CellDto, CellsData, ColumnDto, ColumnsData, RowDto, RowsData } from '@/shared/types'
 
 export interface SheetData extends ColumnsData, RowsData, CellsData {}
 
