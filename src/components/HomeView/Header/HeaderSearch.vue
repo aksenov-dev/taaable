@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useTablesStore } from '@/stores/tables'
+
 import { TextInput } from '@/shared/ui'
 
 const tablesStore = useTablesStore()

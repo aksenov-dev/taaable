@@ -1,6 +1,6 @@
 import { readonly } from 'vue'
-import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { defineStore } from 'pinia'
 
 import type { MainSortVariant, MainViewVariant } from '@/shared/types'
 
@@ -28,6 +28,6 @@ export const useSettingsStore = defineStore('settings', () => {
     settings: readonly(settings),
     setDarkTheme,
     setSortVariant,
-    setViewVariant
+    setViewVariant,
   }
 })

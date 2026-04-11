@@ -2,15 +2,15 @@ import { readonly, ref } from 'vue'
 
 import type { CellEditorPosition } from '@/shared/types'
 
-type ActivateEditorOptions =
-  | { event: MouseEvent; initialInput?: string }
-  | { element: HTMLElement; initialInput?: string }
+type ActivateEditorOptions
+  = | { event: MouseEvent, initialInput?: string }
+    | { element: HTMLElement, initialInput?: string }
 
 const editingCellId = ref<string | null>(null)
 const cellEditorPosition = ref<CellEditorPosition>({ top: 0, left: 0, width: 0, height: 0 })
 const initialInput = ref<string | undefined>(undefined)
 
-export const useCellEditing = () => {
+export function useCellEditing() {
   const startEditing = (cellId: string): void => {
     editingCellId.value = cellId
   }
@@ -27,7 +27,7 @@ export const useCellEditing = () => {
       top: rect.top,
       left: rect.left,
       width: rect.width,
-      height: rect.height
+      height: rect.height,
     }
   }
 
@@ -36,7 +36,8 @@ export const useCellEditing = () => {
 
     if ('event' in options) {
       element = options.event.currentTarget as HTMLElement
-    } else {
+    }
+    else {
       element = options.element
     }
 
@@ -52,6 +53,6 @@ export const useCellEditing = () => {
     initialInput: readonly(initialInput),
     startEditing,
     stopEditing,
-    activateEditor
+    activateEditor,
   }
 }

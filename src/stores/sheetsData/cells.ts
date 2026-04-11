@@ -2,11 +2,12 @@ import { computed } from 'vue'
 import { defineStore } from 'pinia'
 
 import { parseCellId, toCellDto } from '@/shared/utils'
+
+import { createCellStorage } from '@/db/cellStorage'
 import { useSheetsStore } from '@/stores/sheets'
-import { useActiveCell } from '@/composables/useActiveCell'
 import { useSheetsDataStore } from '@/stores/sheetsData'
 import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
-import { createCellStorage } from '@/db/cellStorage'
+import { useActiveCell } from '@/composables/useActiveCell'
 
 export const useSheetsDataCellsStore = defineStore('sheetsDataCells', () => {
   const { getActiveCell } = useActiveCell()
@@ -16,15 +17,20 @@ export const useSheetsDataCellsStore = defineStore('sheetsDataCells', () => {
   const cellStorage = createCellStorage()
 
   const currentCell = computed(() => {
-    if (!sheetsDataStore.currentSheetData) return
+    if (!sheetsDataStore.currentSheetData)
+      return
+
     return sheetsDataStore.currentSheetData.cells[getActiveCell(sheetsStore.currentSheetId)]
   })
 
   const updateCellValue = async (cellId: string, value: string): Promise<void> => {
-    if (!sheetsDataStore.currentSheetData) return
+    if (!sheetsDataStore.currentSheetData)
+      return
 
     const currentCell = sheetsDataStore.currentSheetData.cells[cellId]
-    if (!currentCell) return
+
+    if (!currentCell)
+      return
 
     currentCell.value = value
     await cellStorage.saveCell(toCellDto(currentCell))
@@ -32,7 +38,9 @@ export const useSheetsDataCellsStore = defineStore('sheetsDataCells', () => {
     const { rowNumber } = parseCellId(cellId)
 
     const row = sheetsDataStore.currentSheetData.rows[parseCellId(cellId).rowNumber]
-    if (!row) return
+
+    if (!row)
+      return
 
     if (row.isAutoHeight) {
       await sheetsDataRowsStore.setRowHeight(rowNumber, { auto: true })
@@ -41,6 +49,6 @@ export const useSheetsDataCellsStore = defineStore('sheetsDataCells', () => {
 
   return {
     currentCell,
-    updateCellValue
+    updateCellValue,
   }
 })

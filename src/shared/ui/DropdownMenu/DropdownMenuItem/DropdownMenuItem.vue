@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Props } from './types'
 
-const emit = defineEmits(['click'])
-
 const { title, icon, disabled = false } = defineProps<Props>()
+
+const emit = defineEmits(['click'])
 </script>
 
 <template>
@@ -16,10 +16,10 @@ const { title, icon, disabled = false } = defineProps<Props>()
     <component
       :is="icon"
       class="group-hover:text-accent-1 transition-colors"
-      :class="disabled ? 'text-gray-4': 'text-gray-6'"
+      :class="disabled ? 'text-gray-4' : 'text-gray-6'"
     />
 
-    <span class="text-medium" :class="disabled ? 'text-gray-4': 'text-black dark:text-white'">
+    <span class="text-medium" :class="disabled ? 'text-gray-4' : 'text-black dark:text-white'">
       {{ title }}
     </span>
   </div>

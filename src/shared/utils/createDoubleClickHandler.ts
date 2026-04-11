@@ -1,4 +1,4 @@
-export const createDoubleClickHandler = (onDouble: () => void, onSingle: (event: MouseEvent) => void, delay = 300) => {
+export function createDoubleClickHandler(onDouble: () => void, onSingle: (event: MouseEvent) => void, delay = 300) {
   let lastClickTime = 0
 
   return (event: MouseEvent) => {
@@ -6,7 +6,8 @@ export const createDoubleClickHandler = (onDouble: () => void, onSingle: (event:
 
     if (now - lastClickTime < delay) {
       onDouble()
-    } else {
+    }
+    else {
       onSingle(event)
     }
 

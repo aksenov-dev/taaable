@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { MainSortVariant } from '@/shared/types'
+
 import { IconChevronDown } from '@/shared/ui'
 
 interface Props {
@@ -7,9 +8,9 @@ interface Props {
   isActive: boolean
 }
 
-const emit = defineEmits(['click'])
-
 const { variant, isActive } = defineProps<Props>()
+
+const emit = defineEmits(['click'])
 </script>
 
 <template>
@@ -17,7 +18,7 @@ const { variant, isActive } = defineProps<Props>()
     class="flex items-center gap-1 transition-colors select-none"
     :class="{
       'cursor-default text-black dark:text-white': isActive,
-      'text-gray-6 hover:text-accent-1 cursor-pointer': !isActive
+      'text-gray-6 hover:text-accent-1 cursor-pointer': !isActive,
     }"
     @click="!isActive && emit('click', variant)"
   >

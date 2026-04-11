@@ -7,19 +7,19 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: HomeView
+    component: HomeView,
   },
   {
     path: '/table/:tableId/:sheetId?',
     name: 'Table',
     component: TableView,
-    props: true
-  }
+    props: true,
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL || '/'),
-  routes
+  routes,
 })
 
 export default router

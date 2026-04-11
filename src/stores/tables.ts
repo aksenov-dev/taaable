@@ -4,8 +4,9 @@ import { defineStore } from 'pinia'
 import type { Table } from '@/shared/types'
 
 import { fromTableDto, toTableDto } from '@/shared/utils'
-import { useSettingsStore } from '@/stores/settings'
+
 import { createTableStorage } from '@/db/tableStorage'
+import { useSettingsStore } from '@/stores/settings'
 
 export const useTablesStore = defineStore('tables', () => {
   const tables = ref<Table[]>([])
@@ -27,20 +28,22 @@ export const useTablesStore = defineStore('tables', () => {
     return sortedTables.value.filter(t => t.title.toLowerCase().includes(filterText.value.toLowerCase()))
   })
 
-  const getTables = async (): Promise<void> => {
+  async function getTables(): Promise<void> {
     isLoading.value = true
 
     try {
       const tablesDto = await tableStorage.getAllTables()
       tables.value = tablesDto.map(fromTableDto)
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Ошибка при загрузке таблиц из IndexedDB:', error)
-    } finally {
+    }
+    finally {
       isLoading.value = false
     }
   }
 
-  const renameTable = async (tableId: string, value: string): Promise<void> => {
+  async function renameTable(tableId: string, value: string): Promise<void> {
     const table = tables.value.find(t => t.tableId === tableId)
 
     if (table) {
@@ -49,10 +52,11 @@ export const useTablesStore = defineStore('tables', () => {
     }
   }
 
-  const deleteTable = async (tableId: string): Promise<void> => {
+  async function deleteTable(tableId: string): Promise<void> {
     const tableIndex = tables.value.findIndex(t => t.tableId === tableId)
 
-    if (tableIndex === -1) return
+    if (tableIndex === -1)
+      return
 
     tables.value.splice(tableIndex, 1)
     await tableStorage.deleteTableById(tableId)
@@ -64,6 +68,6 @@ export const useTablesStore = defineStore('tables', () => {
     filteredTables,
     getTables,
     renameTable,
-    deleteTable
+    deleteTable,
   }
 })

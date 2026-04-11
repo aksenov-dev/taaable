@@ -1,10 +1,11 @@
-export const setHtmlDark = (value: boolean): void => {
+export function setHtmlDark(value: boolean): void {
   document.documentElement.classList.add('theme-switching')
   requestAnimationFrame(() => document.documentElement.classList.remove('theme-switching'))
 
   if (value) {
     document.documentElement.classList.add('dark')
-  } else {
+  }
+  else {
     document.documentElement.classList.remove('dark')
   }
 }

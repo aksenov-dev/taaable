@@ -3,12 +3,13 @@ import { defineStore } from 'pinia'
 
 import type { SheetData } from '@/shared/types'
 
-import { generateSheetData, fromSheetDataDto, toSheetDataDto } from '@/shared/utils'
-import { useTableStore } from '@/stores/table'
-import { useSheetsStore } from '@/stores/sheets'
-import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
-import { useSheetsDataColumnsStore } from '@/stores/sheetsData/columns'
+import { fromSheetDataDto, generateSheetData, toSheetDataDto } from '@/shared/utils'
+
 import { createSheetDataStorage } from '@/db/sheetDataStorage'
+import { useSheetsStore } from '@/stores/sheets'
+import { useSheetsDataColumnsStore } from '@/stores/sheetsData/columns'
+import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
+import { useTableStore } from '@/stores/table'
 
 export const useSheetsDataStore = defineStore('sheetsData', () => {
   const sheetsData = ref<Record<string, SheetData>>({})
@@ -20,11 +21,13 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
   const sheetDataStorage = createSheetDataStorage()
 
   const currentSheetData = computed(() => {
-    if (!sheetsStore.currentSheetId) return
+    if (!sheetsStore.currentSheetId)
+      return
+
     return sheetsData.value[sheetsStore.currentSheetId]
   })
 
-  const createSheetData = async (sheetId: string): Promise<void> => {
+  async function createSheetData(sheetId: string): Promise<void> {
     const sheetData = generateSheetData(sheetId)
 
     sheetsData.value[sheetId] = sheetData
@@ -34,8 +37,9 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
     await sheetDataStorage.saveSheetData(toSheetDataDto(sheetId, sheetData))
   }
 
-  const getSheetsData = async (): Promise<void> => {
-    if (!tableStore.currentTable) return
+  async function getSheetsData(): Promise<void> {
+    if (!tableStore.currentTable)
+      return
 
     try {
       const sheetDataDtos = await sheetDataStorage.getSheetsDataByTableId(tableStore.currentTable.tableId)
@@ -45,21 +49,22 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
         sheetsDataRowsStore.calculateRowsOffsets(sheetDataDto.sheetId)
         sheetsDataColumnsStore.calculateColumnsOffsets(sheetDataDto.sheetId)
       }
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Ошибка при загрузке данных таблицы из IndexedDB:', error)
     }
   }
 
-  const getSheetDataById = (sheetId: string): SheetData | null => {
+  function getSheetDataById(sheetId: string): SheetData | null {
     return sheetsData.value[sheetId] ?? null
   }
 
-  const deleteSheetData = async (sheetId: string): Promise<void> => {
+  async function deleteSheetData(sheetId: string): Promise<void> {
     await sheetDataStorage.deleteSheetDataBySheetId(sheetId)
     delete sheetsData.value[sheetId]
   }
 
-  const clear = (): void => {
+  function clear(): void {
     sheetsData.value = {}
   }
 
@@ -69,6 +74,6 @@ export const useSheetsDataStore = defineStore('sheetsData', () => {
     getSheetsData,
     getSheetDataById,
     deleteSheetData,
-    clear
+    clear,
   }
 })

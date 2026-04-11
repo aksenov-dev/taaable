@@ -13,21 +13,21 @@ interface Props {
   rulerVisible: boolean
 }
 
+const { rowNumber, row, position, tableScrollLeft, rulerVisible } = defineProps<Props>()
+
 const emit = defineEmits<{
   dblclick: [rowNumber: string]
   mousedown: [rowNumber: string, rowHeight: number, offsetTop: number]
 }>()
 
-const { rowNumber, row, position, tableScrollLeft, rulerVisible } = defineProps<Props>()
-
 const onResizerMousedown = createDoubleClickHandler(
   () => emit('dblclick', rowNumber),
-  () => emit('mousedown', rowNumber, row.height, row.offsetTop)
+  () => emit('mousedown', rowNumber, row.height, row.offsetTop),
 )
 
 const style = computed(() => ({
   top: `${rulerVisible ? position : row.offsetTop}px`,
-  left: `${tableScrollLeft}px`
+  left: `${tableScrollLeft}px`,
 }))
 </script>
 
@@ -42,13 +42,13 @@ const style = computed(() => ({
       :class="{ 'opacity-100': rulerVisible }"
       @mousedown="onResizerMousedown"
     >
-      <div class="bg-gray-5 absolute h-0.75 w-full rounded-xs"></div>
-      <div class="bg-gray-5 absolute top-1.5 h-0.75 w-full rounded-xs"></div>
+      <div class="bg-gray-5 absolute h-0.75 w-full rounded-xs" />
+      <div class="bg-gray-5 absolute top-1.5 h-0.75 w-full rounded-xs" />
     </div>
 
     <div
       v-if="rulerVisible"
       class="bg-gray-3 absolute top-0.75 h-0.75 w-full z-5"
-    ></div>
+    />
   </div>
 </template>

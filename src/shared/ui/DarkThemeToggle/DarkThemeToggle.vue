@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Props } from './types'
 
-const emit = defineEmits(['toggle'])
-
 const { isDark } = defineProps<Props>()
+
+const emit = defineEmits(['toggle'])
 </script>
 
 <template>
@@ -18,13 +18,13 @@ const { isDark } = defineProps<Props>()
         role="switch"
         :checked="isDark"
         @change="emit('toggle', ($event.target as HTMLInputElement).checked)"
-      />
+      >
+
       <span
         class="span-transition pointer-events-none absolute top-1.25 left-1.25 z-1 block h-4.5 w-4.5
         transform-[rotate(-45deg)] bg-[url(@/assets/sun.svg)] peer-checked:transform-[translateX(25px)]
         peer-checked:bg-[url(@/assets/moon.svg)]"
-      >
-      </span>
+      />
     </span>
   </div>
 </template>

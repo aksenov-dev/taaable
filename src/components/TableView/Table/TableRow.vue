@@ -5,8 +5,8 @@ import type { Cell, CellsData, ColumnsData } from '@/shared/types'
 
 import { getCellId, parseCellId } from '@/shared/utils'
 
-import TableHeaderRowCell from '@/components/TableView/Table/TableHeaderRowCell.vue'
 import TableCell from '@/components/TableView/Table/TableCell.vue'
+import TableHeaderRowCell from '@/components/TableView/Table/TableHeaderRowCell.vue'
 
 interface Props {
   columnOrder: ColumnsData['columnOrder']
@@ -15,12 +15,12 @@ interface Props {
   activeCellId: Cell['cellId']
 }
 
+const { columnOrder, rowNumber, cells, activeCellId } = defineProps<Props>()
+
 const emit = defineEmits<{
   cellDblclick: [{ event: MouseEvent, cellId: string }]
   cellMousedown: [value: string]
 }>()
-
-const { columnOrder, rowNumber, cells, activeCellId } = defineProps<Props>()
 
 const activeRowNumber = computed(() => parseCellId(activeCellId).rowNumber)
 </script>

@@ -12,16 +12,16 @@ interface Props {
   rulerVisible: boolean
 }
 
+const { columnLetter, column, position, rulerVisible } = defineProps<Props>()
+
 const emit = defineEmits<{
   dblclick: [columnLetter: string]
   mousedown: [columnLetter: string, columnWidth: number, offsetLeft: number]
 }>()
 
-const { columnLetter, column, position, rulerVisible } = defineProps<Props>()
-
 const onResizerMousedown = createDoubleClickHandler(
   () => emit('dblclick', columnLetter),
-  () => emit('mousedown', columnLetter, column.width, column.offsetLeft)
+  () => emit('mousedown', columnLetter, column.width, column.offsetLeft),
 )
 
 const style = computed(() => ({ left: `${rulerVisible ? position : column.offsetLeft}px` }))
@@ -38,13 +38,13 @@ const style = computed(() => ({ left: `${rulerVisible ? position : column.offset
       :class="{ 'opacity-100': rulerVisible }"
       @mousedown="onResizerMousedown"
     >
-      <div class="bg-gray-5 absolute h-full w-0.75 rounded-xs"></div>
-      <div class="bg-gray-5 absolute left-1.5 h-full w-0.75 rounded-xs"></div>
+      <div class="bg-gray-5 absolute h-full w-0.75 rounded-xs" />
+      <div class="bg-gray-5 absolute left-1.5 h-full w-0.75 rounded-xs" />
     </div>
 
     <div
       v-if="rulerVisible"
       class="bg-gray-3 absolute left-0.75 z-4 h-full w-0.75"
-    ></div>
+    />
   </div>
 </template>

@@ -4,7 +4,9 @@ export function useTableWidth(tableContainer: HTMLDivElement | null) {
   const tableWidth = ref(0)
 
   const updateWidth = () => {
-    if (!tableContainer) return
+    if (!tableContainer)
+      return
+
     tableWidth.value = tableContainer.clientWidth
   }
 
@@ -16,6 +18,6 @@ export function useTableWidth(tableContainer: HTMLDivElement | null) {
   onUnmounted(() => window.removeEventListener('resize', updateWidth))
 
   return {
-    tableWidth
+    tableWidth,
   }
 }

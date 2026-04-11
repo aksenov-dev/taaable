@@ -1,15 +1,15 @@
 import { readonly, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-
-import router from '@/router'
+import { useRouter } from 'vue-router'
 
 import type { Sheet } from '@/shared/types'
 
-import { generateSheet, fromSheetDto, toSheetDto } from '@/shared/utils'
-import { useTableStore } from '@/stores/table'
-import { useSheetsDataStore } from '@/stores/sheetsData'
+import { fromSheetDto, generateSheet, toSheetDto } from '@/shared/utils'
+
 import { createMetaStorage } from '@/db/metaStorage'
 import { createSheetStorage } from '@/db/sheetStorage'
+import { useSheetsDataStore } from '@/stores/sheetsData'
+import { useTableStore } from '@/stores/table'
 
 export const useSheetsStore = defineStore('sheets', () => {
   const sheets = ref<Sheet[]>([])
@@ -20,8 +20,11 @@ export const useSheetsStore = defineStore('sheets', () => {
   const metaStorage = createMetaStorage()
   const sheetStorage = createSheetStorage()
 
-  const createSheet = async (): Promise<void> => {
-    if (!tableStore.currentTable) return
+  const router = useRouter()
+
+  async function createSheet(): Promise<void> {
+    if (!tableStore.currentTable)
+      return
 
     const nextSheetNumber = await metaStorage.getNextSheetNumber(tableStore.currentTable.tableId)
     const sheet = generateSheet(tableStore.currentTable.tableId, sheets.value.length, nextSheetNumber)
@@ -37,8 +40,9 @@ export const useSheetsStore = defineStore('sheets', () => {
     await goToSheet(tableStore.currentTable.tableId, currentSheetId.value)
   }
 
-  const getSheets = async (activeSheetId?: string): Promise<void> => {
-    if (!tableStore.currentTable) return
+  async function getSheets(activeSheetId?: string): Promise<void> {
+    if (!tableStore.currentTable)
+      return
 
     try {
       const sheetsDto = await sheetStorage.getSheetsByTableId(tableStore.currentTable.tableId)
@@ -48,19 +52,21 @@ export const useSheetsStore = defineStore('sheets', () => {
 
       await sheetsDataStore.getSheetsData()
       await goToSheet(tableStore.currentTable.tableId, currentSheetId.value)
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Ошибка при загрузке листов таблицы из IndexedDB:', error)
     }
   }
 
-  const setCurrentSheet = async (sheetId: string): Promise<void> => {
-    if (!tableStore.currentTable) return
+  async function setCurrentSheet(sheetId: string): Promise<void> {
+    if (!tableStore.currentTable)
+      return
 
     currentSheetId.value = sheetId
     await goToSheet(tableStore.currentTable.tableId, sheetId)
   }
 
-  const renameSheet = async (sheetId: string, value: string): Promise<void> => {
+  async function renameSheet(sheetId: string, value: string): Promise<void> {
     const sheet = sheets.value.find(s => s.sheetId === sheetId)
 
     if (sheet) {
@@ -69,10 +75,11 @@ export const useSheetsStore = defineStore('sheets', () => {
     }
   }
 
-  const deleteSheet = async (sheetId: string): Promise<void> => {
+  async function deleteSheet(sheetId: string): Promise<void> {
     const sheetIndex = sheets.value.findIndex(s => s.sheetId === sheetId)
 
-    if (sheetIndex === -1) return
+    if (sheetIndex === -1)
+      return
 
     sheets.value.splice(sheetIndex, 1)
 
@@ -86,10 +93,11 @@ export const useSheetsStore = defineStore('sheets', () => {
     await reorderSheets()
   }
 
-  const reorderSheets = async (): Promise<void> => {
+  async function reorderSheets(): Promise<void> {
     const isOrderBroken = sheets.value.some((sheet, index) => sheet.order !== index)
 
-    if (!isOrderBroken) return
+    if (!isOrderBroken)
+      return
 
     const reorderedSheets = sheets.value.map((sheet, index) => ({ ...sheet, order: index }))
     await sheetStorage.saveSheets(reorderedSheets.map(toSheetDto))
@@ -97,24 +105,23 @@ export const useSheetsStore = defineStore('sheets', () => {
     sheets.value = reorderedSheets
   }
 
-  const goToSheet = async (tableId: string, sheetId: string): Promise<void> => {
+  async function goToSheet(tableId: string, sheetId: string): Promise<void> {
     await router.push({
       name: 'Table',
-      params: { tableId, sheetId }
+      params: { tableId, sheetId },
     })
   }
 
-  const clear = (): void => {
+  function clear(): void {
     sheets.value = []
     currentSheetId.value = null
     sheetsDataStore.clear()
   }
 
-  watch(() => router.currentRoute.value.params.sheetId, async newSheetId => {
+  watch(() => router.currentRoute.value.params.sheetId, async (newSheetId) => {
     if (newSheetId !== currentSheetId.value && typeof newSheetId === 'string')
       await setCurrentSheet(newSheetId)
-    }
-  )
+  })
 
   return {
     currentSheetId: readonly(currentSheetId),
@@ -124,6 +131,6 @@ export const useSheetsStore = defineStore('sheets', () => {
     setCurrentSheet,
     renameSheet,
     deleteSheet,
-    clear
+    clear,
   }
 })

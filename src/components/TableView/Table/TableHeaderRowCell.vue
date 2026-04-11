@@ -17,7 +17,7 @@ const { rowNumber, isActive } = defineProps<Props>()
     select-none"
     :class="{
       'bg-gray-2 text-black dark:text-white': isActive,
-      'text-gray-5 bg-gray-1': !isActive
+      'text-gray-5 bg-gray-1': !isActive,
     }"
     :style="{ minHeight: `${CELL_SIZE.MIN.HEIGHT}px` }"
   >

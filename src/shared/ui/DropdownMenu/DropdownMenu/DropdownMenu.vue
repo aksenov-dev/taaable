@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { Props } from './types'
-
 import { useTemplateRef } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 
-const emit = defineEmits(['close'])
+import type { Props } from './types'
 
 const { isOpen, offset } = defineProps<Props>()
+
+const emit = defineEmits(['close'])
 
 const menuRef = useTemplateRef('menu')
 

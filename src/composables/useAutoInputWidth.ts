@@ -5,7 +5,8 @@ export function useAutoInputWidth(inputRef: Ref<HTMLInputElement | null>, isEnab
   const updateWidth = () => {
     const input = inputRef.value
 
-    if (!input) return
+    if (!input)
+      return
 
     const inputStyle = getComputedStyle(input)
     const hiddenSpan = document.createElement('span')
@@ -30,21 +31,24 @@ export function useAutoInputWidth(inputRef: Ref<HTMLInputElement | null>, isEnab
   }
 
   const resetInputWidth = () => {
-    if (!inputRef.value) return
+    if (!inputRef.value)
+      return
+
     inputRef.value.style.width = ''
   }
 
   onMounted(() => {
-    watch(() => toValue(isEnabled), isEnabled => {
+    watch(() => toValue(isEnabled), (isEnabled) => {
       if (isEnabled) {
         updateWidth()
-      } else {
+      }
+      else {
         resetInputWidth()
       }
     }, { immediate: true })
   })
 
   return {
-    updateWidth
+    updateWidth,
   }
 }

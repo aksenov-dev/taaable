@@ -1,17 +1,17 @@
 import { ref } from 'vue'
 
-type ActiveCell = string
+import { DEFAULT_CELL_ID } from '@/shared/constants/cell.ts'
 
-const DEFAULT_CELL_ID = 'A:1'
-const activeCells = ref<Record<string, ActiveCell>>({})
+const activeCells = ref<Record<string, string>>({})
 
-export const useActiveCell = () => {
-  const setActiveCell = (sheetId: string, cellId: ActiveCell): void => {
+export function useActiveCell() {
+  const setActiveCell = (sheetId: string, cellId: string): void => {
     activeCells.value[sheetId] = cellId
   }
 
-  const getActiveCell = (sheetId?: string | null): ActiveCell => {
-    if (!sheetId) return DEFAULT_CELL_ID
+  const getActiveCell = (sheetId?: string | null): string => {
+    if (!sheetId)
+      return DEFAULT_CELL_ID
 
     if (!(sheetId in activeCells.value)) {
       activeCells.value[sheetId] = DEFAULT_CELL_ID
@@ -34,6 +34,6 @@ export const useActiveCell = () => {
     setActiveCell,
     getActiveCell,
     resetActiveCell,
-    resetAllActiveCells
+    resetAllActiveCells,
   }
 }

@@ -1,27 +1,26 @@
 <script setup lang="ts">
+import {
+  IconAlignCenter,
+  IconAlignLeft,
+  IconAlignRight,
+  IconBold,
+  IconBorderAll,
+  IconColorFill,
+  IconGroup,
+  IconItalic,
+  IconMinus,
+  IconPalette,
+  IconPlus,
+  IconRedo,
+  IconStrike,
+  IconUndo,
+  IconVerticalAlignBottom,
+  IconVerticalAlignCenter,
+  IconVerticalAlignTop,
+  TextInput,
+} from '@/shared/ui'
 import ToolbarIconContainer from '@/components/TableView/Toolbar/ToolbarIconContainer.vue'
 import ToolbarVerticalDivider from '@/components/TableView/Toolbar/ToolbarVerticalDivider.vue'
-
-import {
-  IconUndo,
-  IconRedo,
-  IconMinus,
-  IconPlus,
-  IconBold,
-  IconItalic,
-  IconStrike,
-  IconPalette,
-  IconColorFill,
-  IconBorderAll,
-  IconGroup,
-  IconAlignLeft,
-  IconAlignCenter,
-  IconAlignRight,
-  IconVerticalAlignTop,
-  IconVerticalAlignCenter,
-  IconVerticalAlignBottom,
-  TextInput
-} from '@/shared/ui'
 </script>
 
 <template>
@@ -32,7 +31,7 @@ import {
     <ToolbarVerticalDivider />
 
     <ToolbarIconContainer :icon="IconMinus" title="Уменьшить размер шрифта" />
-    <TextInput variant="font-size" :model-value="'12'" />
+    <TextInput variant="font-size" model-value="12" />
     <ToolbarIconContainer :icon="IconPlus" title="Увеличить размер шрифта" />
 
     <ToolbarVerticalDivider />

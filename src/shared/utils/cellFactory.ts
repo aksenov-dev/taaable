@@ -1,15 +1,15 @@
 import type { Cell, CellDto, CellsData, ColumnsData, RowsData } from '@/shared/types'
 
-export const getCellId = (columnLetter: string, rowNumber: string): string => {
+export function getCellId(columnLetter: string, rowNumber: string): string {
   return `${columnLetter}:${rowNumber}`
 }
 
-export const parseCellId = (cellId: string): { columnLetter: string, rowNumber: string } => {
+export function parseCellId(cellId: string): { columnLetter: string, rowNumber: string } {
   const [columnLetter, rowNumber] = cellId.split(':')
   return { columnLetter, rowNumber }
 }
 
-const generateCell = (cellId: string, sheetId: string, columnId: string, rowId: string): Cell => {
+function generateCell(cellId: string, sheetId: string, columnId: string, rowId: string): Cell {
   return {
     cellId,
     sheetId,
@@ -17,11 +17,11 @@ const generateCell = (cellId: string, sheetId: string, columnId: string, rowId: 
     rowId,
     value: '',
     type: 'text',
-    style: {}
+    style: {},
   }
 }
 
-export const generateCells = (sheetId: string, columns: ColumnsData['columns'], rows: RowsData['rows']): CellsData => {
+export function generateCells(sheetId: string, columns: ColumnsData['columns'], rows: RowsData['rows']): CellsData {
   const cells: CellsData['cells'] = {}
 
   const columnKeys = Object.keys(columns)
@@ -40,21 +40,20 @@ export const generateCells = (sheetId: string, columns: ColumnsData['columns'], 
   }
 
   return {
-    cells
+    cells,
   }
 }
 
-export const toCellDto = (cell: Cell): CellDto => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function toCellDto(cell: Cell): CellDto {
   const { cellId, style, ...rest } = cell
 
   return {
     ...rest,
-    ...(Object.keys(style).length > 0 ? { style } : {})
+    ...(Object.keys(style).length > 0 ? { style } : {}),
   }
 }
 
-export const fromCellDto = (dto: CellDto, columns: ColumnsData['columns'], rows: RowsData['rows']): Cell => {
+export function fromCellDto(dto: CellDto, columns: ColumnsData['columns'], rows: RowsData['rows']): Cell {
   const columnKey = Object.keys(columns).find(key => columns[key].columnId === dto.columnId)
   const rowKey = Object.keys(rows).find(key => rows[key].rowId === dto.rowId)
 
@@ -67,6 +66,6 @@ export const fromCellDto = (dto: CellDto, columns: ColumnsData['columns'], rows:
   return {
     cellId,
     ...dto,
-    style: dto.style ?? {}
+    style: dto.style ?? {},
   }
 }

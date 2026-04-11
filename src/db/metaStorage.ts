@@ -1,6 +1,6 @@
 import { getDB } from './database'
 
-export const createMetaStorage = () => {
+export function createMetaStorage() {
   const getNextSheetNumber = async (tableId: string): Promise<number> => {
     const db = await getDB()
     const value = await db.get('meta', `nextSheetId:${tableId}`)
@@ -21,6 +21,6 @@ export const createMetaStorage = () => {
   return {
     getNextSheetNumber,
     setNextSheetNumber,
-    deleteNextSheetId
+    deleteNextSheetId,
   }
 }
