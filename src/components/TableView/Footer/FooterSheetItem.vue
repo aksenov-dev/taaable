@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
-import { useElementBounding, useFocus, useThrottleFn } from '@vueuse/core'
+import { nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
+import { useElementBounding, useFocus } from '@vueuse/core'
 
-import type { DropdownMenuOffset } from '@/shared/ui'
+import { useMenuToggle } from '@/composables/useMenuToggle'
 
 import { DropdownMenu, DropdownMenuItem, IconChevronDown, IconDelete, IconEdit, TextInput } from '@/shared/ui'
 
-interface Props {
+const { title, isActive, isSingleSheet } = defineProps<{
   title: string
   isActive: boolean
   isSingleSheet: boolean
-}
-
-const { title, isActive, isSingleSheet } = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   rename: [value: string]
@@ -21,19 +19,14 @@ const emit = defineEmits<{
 }>()
 
 const sheetItemRef = useTemplateRef('sheet-item')
-const { left, top, update } = useElementBounding(sheetItemRef)
+const { update } = useElementBounding(sheetItemRef)
 
 const input = shallowRef()
 const { focused } = useFocus(input, { initialValue: true })
 
-const isMenuOpen = ref(false)
+const { isMenuOpen, toggleMenu } = useMenuToggle()
+
 const isEditMode = ref(false)
-
-const menuOffset = computed<DropdownMenuOffset>(() => {
-  return { offsetX: left.value, offsetY: top.value - 81 }
-})
-
-const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
 
 function setEditMode() {
   isEditMode.value = true
@@ -89,7 +82,9 @@ watch(isMenuOpen, () => nextTick(() => update()))
 
     <DropdownMenu
       :is-open="isMenuOpen"
-      :offset="menuOffset"
+      :reference-element="sheetItemRef"
+      placement="top-start"
+      :offset-value="4"
       @close="toggleMenu"
     >
       <DropdownMenuItem
