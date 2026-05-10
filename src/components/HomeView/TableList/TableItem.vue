@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'
-import { useElementBounding, useFocus, useThrottleFn } from '@vueuse/core'
+import { useElementBounding, useFocus } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 
 import type { MainViewVariant } from '@/shared/types'
-import type { DropdownMenuOffset } from '@/shared/ui'
 
 import { formatTimestampToStringDate } from '@/shared/utils'
 
 import { useTablesStore } from '@/stores/tables'
+import { useBreakpoints } from '@/composables/useBreakpoints'
+import { useMenuToggle } from '@/composables/useMenuToggle'
 
 import {
   DropdownMenu,
@@ -39,25 +40,45 @@ const router = useRouter()
 const tablesStore = useTablesStore()
 
 const tableItemRef = useTemplateRef('table-item')
-const { width, height, top, left, update } = useElementBounding(tableItemRef)
+const { width, top, update } = useElementBounding(tableItemRef)
 
 const input = shallowRef()
 const { focused } = useFocus(input, { initialValue: true })
 
-const isMenuOpen = ref(false)
+const breakpoints = useBreakpoints()
+const { isMenuOpen, toggleMenu } = useMenuToggle()
+
 const isEditMode = ref(false)
 
 const stringDate = computed(() => formatTimestampToStringDate(date))
 
-const menuOffset = computed<DropdownMenuOffset>(() => {
+const menuPlacement = computed(() => {
   if (variant === 'list') {
-    return { offsetX: left.value + width.value + 4, offsetY: top.value - 2 }
+    if (breakpoints.LG.value)
+      return 'right-start'
+
+    return 'bottom-end'
   }
 
-  return { offsetX: left.value + width.value - 54, offsetY: top.value + height.value + 4 }
+  if (breakpoints.LG.value)
+    return 'bottom-start'
+
+  return 'bottom-end'
 })
 
-const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
+const menuOffsetValue = computed(() => {
+  if (variant === 'list') {
+    if (breakpoints.LG.value)
+      return { mainAxis: 4, crossAxis: -2 }
+
+    return { mainAxis: 4, crossAxis: 0 }
+  }
+
+  if (breakpoints.LG.value)
+    return { mainAxis: 4, crossAxis: width.value - 54 }
+
+  return { mainAxis: 4, crossAxis: 0 }
+})
 
 function setEditMode() {
   isEditMode.value = true
@@ -102,7 +123,7 @@ watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
       <div
         class="border-gray-2 border-0 transition-colors"
         :class="{
-          'flex grow items-center justify-center rounded-xs border-1 bg-white dark:bg-black': variant === 'grid',
+          'flex grow items-center justify-center rounded-xs border bg-white dark:bg-black': variant === 'grid',
         }"
       >
         <component
@@ -122,7 +143,7 @@ watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
         :disabled="!isEditMode"
         class="text-black dark:text-white"
         :class="{
-          '-mr-0.25 -ml-0.25': variant === 'list',
+          '-mr-px -ml-px': variant === 'list',
           '-mr-1.25 -ml-1.25 w-auto!': variant === 'grid',
         }"
         @click.stop
@@ -142,7 +163,9 @@ watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
 
     <DropdownMenu
       :is-open="isMenuOpen"
-      :offset="menuOffset"
+      :reference-element="tableItemRef"
+      :placement="menuPlacement"
+      :offset-value="menuOffsetValue"
       @close="toggleMenu"
     >
       <DropdownMenuItem

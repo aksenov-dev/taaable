@@ -9,7 +9,7 @@ const tablesStore = useTablesStore()
 </script>
 
 <template>
-  <div class="scrollbar mx-auto h-full max-h-max w-[680px] overflow-y-auto rounded-lg bg-white dark:bg-black">
+  <div class="scrollbar mx-auto h-full max-h-max w-170 overflow-y-auto rounded-lg bg-white dark:bg-black">
     <main
       class="min-h-21 bg-white p-3 transition-colors dark:bg-black"
       :class="{ 'flex flex-wrap': settingsStore.settings.viewVariant === 'grid' }"

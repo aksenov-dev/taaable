@@ -1,26 +1,17 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
-import { useElementBounding, useThrottleFn } from '@vueuse/core'
-
-import type { DropdownMenuOffset } from '@/shared/ui'
+import { useTemplateRef } from 'vue'
 
 import { useTableStore } from '@/stores/table'
+import { useMenuToggle } from '@/composables/useMenuToggle.ts'
 
 import { DropdownMenu, DropdownMenuItem, IconDelete, IconMoreHorizontal } from '@/shared/ui'
 import FooterIconContainer from '@/components/TableView/Footer/FooterIconContainer.vue'
 
-const tableMenuRef = useTemplateRef('table-menu')
-const { top, right } = useElementBounding(tableMenuRef)
+const menuTriggerRef = useTemplateRef<HTMLElement>('menu-trigger')
 
-const isMenuOpen = ref(false)
+const { isMenuOpen, toggleMenu } = useMenuToggle()
 
 const tableStore = useTableStore()
-
-const menuOffset = computed<DropdownMenuOffset>(() => {
-  return { offsetX: right.value - 174, offsetY: top.value - 46 }
-})
-
-const toggleMenu = useThrottleFn(() => (isMenuOpen.value = !isMenuOpen.value), 200)
 
 async function removeTable() {
   await tableStore.deleteTable()
@@ -29,21 +20,24 @@ async function removeTable() {
 </script>
 
 <template>
-  <div ref="table-menu">
-    <FooterIconContainer @click="toggleMenu">
-      <IconMoreHorizontal />
-    </FooterIconContainer>
+  <FooterIconContainer
+    ref="menu-trigger"
+    @click="toggleMenu"
+  >
+    <IconMoreHorizontal />
+  </FooterIconContainer>
 
-    <DropdownMenu
-      :is-open="isMenuOpen"
-      :offset="menuOffset"
-      @close="toggleMenu"
-    >
-      <DropdownMenuItem
-        title="Удалить таблицу"
-        :icon="IconDelete"
-        @click="removeTable"
-      />
-    </DropdownMenu>
-  </div>
+  <DropdownMenu
+    :is-open="isMenuOpen"
+    :reference-element="menuTriggerRef"
+    placement="top-end"
+    :offset-value="4"
+    @close="toggleMenu"
+  >
+    <DropdownMenuItem
+      title="Удалить таблицу"
+      :icon="IconDelete"
+      @click="removeTable"
+    />
+  </DropdownMenu>
 </template>

@@ -1,9 +1,8 @@
-export interface DropdownMenuOffset {
-  offsetX: number
-  offsetY: number
-}
+import type { OffsetOptions, Placement } from '@floating-ui/vue'
 
 export interface Props {
   isOpen: boolean
-  offset: DropdownMenuOffset
+  referenceElement: HTMLElement | null
+  placement?: Placement
+  offsetValue?: OffsetOptions
 }
