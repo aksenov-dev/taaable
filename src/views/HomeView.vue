@@ -18,7 +18,10 @@ onMounted(async () => {
 <template>
   <LoadingOverlay :is-visible="tablesStore.isLoading" />
 
-  <div class="bg-gray-1 grid h-screen w-screen grid-rows-[123px_1fr_72px] p-8 transition-colors">
+  <div
+    class="bg-gray-1 grid h-screen w-screen ml:grid-rows-[123px_1fr_72px] md:grid-rows-[184px_1fr_72px] p-8
+    transition-colors"
+  >
     <HomeHeader />
     <TableList />
     <HomeFooter />

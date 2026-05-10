@@ -121,8 +121,9 @@ watch(() => tablesStore.filteredTables, () => nextTick(() => update()))
       }"
     >
       <div
-        class="border-gray-2 border-0 transition-colors"
+        class="border-gray-2 transition-colors"
         :class="{
+          'border-0': variant !== 'grid',
           'flex grow items-center justify-center rounded-xs border bg-white dark:bg-black': variant === 'grid',
         }"
       >

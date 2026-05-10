@@ -9,18 +9,18 @@ const settingsStore = useSettingsStore()
 </script>
 
 <template>
-  <header class="flex justify-between">
-    <div class="flex h-7 w-30 items-center text-black transition-colors dark:text-white">
+  <header class="flex justify-between gap-x-10 gap-y-8 md:flex-wrap ml:flex-nowrap">
+    <div class="flex h-7 w-28 items-center text-black transition-colors dark:text-white shrink-0">
       <IconGrid class="mr-2 h-6 w-6" />
       <span class="text-extra-large select-none">Taaable</span>
     </div>
 
-    <div class="w-[680px]">
+    <div class="w-full ml:max-w-170 md:order-1 ml:order-0">
       <HeaderSearch />
       <HeaderFilters />
     </div>
 
-    <div class="flex w-30 justify-end">
+    <div class="flex w-28 justify-end shrink-0">
       <DarkThemeToggle
         :is-dark="settingsStore.settings.isDarkTheme"
         @toggle="settingsStore.setDarkTheme"
