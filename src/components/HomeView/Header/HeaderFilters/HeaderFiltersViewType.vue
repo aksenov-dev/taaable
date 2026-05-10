@@ -3,12 +3,10 @@ import type { MainViewVariant } from '@/shared/types'
 
 import { IconGrid, IconList } from '@/shared/ui'
 
-interface Props {
+const { variant, isActive } = defineProps<{
   variant: MainViewVariant
   isActive: boolean
-}
-
-const { variant, isActive } = defineProps<Props>()
+}>()
 
 const emit = defineEmits(['click'])
 </script>

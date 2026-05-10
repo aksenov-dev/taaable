@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { CELL_SIZE } from '@/shared/constants'
 
-interface Props {
+const { rowNumber, isActive } = defineProps<{
   rowNumber: string
   isActive: boolean
-}
-
-const { rowNumber, isActive } = defineProps<Props>()
+}>()
 </script>
 
 <template>

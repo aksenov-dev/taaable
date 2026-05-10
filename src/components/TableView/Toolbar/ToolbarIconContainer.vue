@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 
-interface Props {
+const { icon, title, isActive = false, disabled = false } = defineProps<{
   icon: Component
   title: string
   isActive?: boolean
   disabled?: boolean
-}
-
-const { icon, title, isActive = false, disabled = false } = defineProps<Props>()
+}>()
 </script>
 
 <template>

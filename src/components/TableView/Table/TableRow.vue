@@ -8,14 +8,12 @@ import { getCellId, parseCellId } from '@/shared/utils'
 import TableCell from '@/components/TableView/Table/TableCell.vue'
 import TableHeaderRowCell from '@/components/TableView/Table/TableHeaderRowCell.vue'
 
-interface Props {
+const { columnOrder, rowNumber, cells, activeCellId } = defineProps<{
   columnOrder: ColumnsData['columnOrder']
   rowNumber: string
   cells: CellsData['cells']
   activeCellId: Cell['cellId']
-}
-
-const { columnOrder, rowNumber, cells, activeCellId } = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   cellDblclick: [{ event: MouseEvent, cellId: string }]

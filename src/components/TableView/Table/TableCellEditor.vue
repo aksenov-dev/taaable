@@ -7,11 +7,9 @@ import { useSheetsDataCellsStore } from '@/stores/sheetsData/cells'
 import { useCellEditing } from '@/composables/useCellEditing'
 import { useTableWidth } from '@/composables/useTableWidth'
 
-interface Props {
+const { tableContainer } = defineProps<{
   tableContainer: HTMLDivElement | null
-}
-
-const { tableContainer } = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   keydown: [e: KeyboardEvent]

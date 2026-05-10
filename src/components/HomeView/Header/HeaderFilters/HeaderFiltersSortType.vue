@@ -3,12 +3,10 @@ import type { MainSortVariant } from '@/shared/types'
 
 import { IconChevronDown } from '@/shared/ui'
 
-interface Props {
+const { variant, isActive } = defineProps<{
   variant: MainSortVariant
   isActive: boolean
-}
-
-const { variant, isActive } = defineProps<Props>()
+}>()
 
 const emit = defineEmits(['click'])
 </script>

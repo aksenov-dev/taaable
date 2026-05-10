@@ -22,14 +22,12 @@ import {
   TextInput,
 } from '@/shared/ui'
 
-interface Props {
+const { tableId, title, date, variant } = defineProps<{
   tableId: string
   title: string
   date: number
   variant: MainViewVariant
-}
-
-const { tableId, title, date, variant } = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   rename: [value: string]
