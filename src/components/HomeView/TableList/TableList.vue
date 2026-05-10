@@ -11,7 +11,7 @@ const tablesStore = useTablesStore()
 <template>
   <div
     class="scrollbar mx-auto h-full max-h-max overflow-y-auto rounded-lg bg-white
-    md:w-full ml:max-w-[calc(100%-304px)] ml:w-170 dark:bg-black"
+    sm:w-full ml:max-w-[calc(100%-304px)] ml:w-170 dark:bg-black"
   >
     <main
       class="min-h-21 bg-white p-3 transition-colors dark:bg-black"

@@ -49,6 +49,7 @@ html.theme-switching * {
 
 @theme {
   --breakpoint-ml: 56rem;
+  --breakpoint-sm: 36rem;
 
   --text-small: 12px;
   --text-small--font-weight: 500;
