@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import { useSettingsStore } from '@/stores/settings'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 import HeaderFiltersSortType from '@/components/HomeView/Header/HeaderFilters/HeaderFiltersSortType.vue'
 import HeaderFiltersViewType from '@/components/HomeView/Header/HeaderFilters/HeaderFiltersViewType.vue'
 
 const settingsStore = useSettingsStore()
+const { SM } = useBreakpoints()
 </script>
 
 <template>
-  <div class="my-8 flex justify-between">
-    <div class="flex gap-3">
-      <span class="text-medium text-gray-6 select-none">Сортировка:</span>
+  <div class="my-4 sm:my-8 flex justify-between">
+    <div class="flex gap-2 sm:gap-3">
+      <span
+        v-if="SM"
+        class="text-medium text-gray-6 select-none"
+      >
+        Сортировка:
+      </span>
 
       <HeaderFiltersSortType
         variant="title"
@@ -25,7 +32,7 @@ const settingsStore = useSettingsStore()
       />
     </div>
 
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2 sm:gap-3">
       <HeaderFiltersViewType
         variant="list"
         :is-active="settingsStore.settings.viewVariant === 'list'"

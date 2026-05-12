@@ -1,6 +1,6 @@
 import type { Component } from 'vue'
 
 export interface Props {
-  text: string
+  text?: string
   icon?: Component
 }

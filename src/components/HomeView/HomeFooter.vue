@@ -1,9 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import { useTableStore } from '@/stores/table'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 
 import { BaseButton, IconPlus } from '@/shared/ui'
 
 const tableStore = useTableStore()
+const { SM } = useBreakpoints()
+
+const btnText = computed(() => SM.value ? 'Создать таблицу' : '')
 </script>
 
 <template>
@@ -15,7 +21,7 @@ const tableStore = useTableStore()
     />
 
     <BaseButton
-      text="Создать таблицу"
+      :text="btnText"
       :icon="IconPlus"
       @click="tableStore.createTable"
     />

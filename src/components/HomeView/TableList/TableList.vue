@@ -1,24 +1,30 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import { useSettingsStore } from '@/stores/settings'
 import { useTablesStore } from '@/stores/tables'
 
-import TableItem from '@/components/HomeView/TableList/TableItem.vue'
+import TableItemGrid from './TableItemGrid.vue'
+import TableItemList from './TableItemList.vue'
 
 const settingsStore = useSettingsStore()
 const tablesStore = useTablesStore()
+
+const currentComponent = computed(() => settingsStore.settings.viewVariant === 'list' ? TableItemList : TableItemGrid)
 </script>
 
 <template>
   <div
     class="scrollbar mx-auto h-full max-h-max overflow-y-auto rounded-lg bg-white
-    sm:w-full ml:max-w-[calc(100%-304px)] ml:w-170 dark:bg-black"
+    w-full ml:max-w-[calc(100%-304px)] ml:w-170 dark:bg-black"
   >
     <main
-      class="min-h-21 bg-white p-3 transition-colors dark:bg-black"
+      class="min-h-21 bg-white p-2 sm:p-3 transition-colors dark:bg-black"
       :class="{ 'flex flex-wrap': settingsStore.settings.viewVariant === 'grid' }"
     >
       <template v-if="tablesStore.filteredTables.length">
-        <TableItem
+        <component
+          :is="currentComponent"
           v-for="table in tablesStore.filteredTables"
           :key="table.tableId"
           :table-id="table.tableId"
