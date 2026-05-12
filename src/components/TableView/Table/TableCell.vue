@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import type { Cell } from '@/shared/types'
 
-interface Props {
+const { cell, isActive } = defineProps<{
   cell: Cell
   isActive: boolean
-}
-
-const { cell, isActive } = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   dblclick: [{ event: MouseEvent, cellId: string }]

@@ -10,12 +10,10 @@ import TableHeader from '@/components/TableView/TableHeader.vue'
 import TheFormula from '@/components/TableView/TheFormula.vue'
 import TheToolbar from '@/components/TableView/Toolbar/TheToolbar.vue'
 
-interface Props {
+const { tableId, sheetId } = defineProps<{
   tableId: string
   sheetId?: string
-}
-
-const { tableId, sheetId } = defineProps<Props>()
+}>()
 
 const tableStore = useTableStore()
 

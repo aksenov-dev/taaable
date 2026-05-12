@@ -5,14 +5,12 @@ import type { Column } from '@/shared/types'
 
 import { createDoubleClickHandler } from '@/shared/utils'
 
-interface Props {
+const { columnLetter, column, position, rulerVisible } = defineProps<{
   columnLetter: string
   column: Column
   position: number
   rulerVisible: boolean
-}
-
-const { columnLetter, column, position, rulerVisible } = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   dblclick: [columnLetter: string]

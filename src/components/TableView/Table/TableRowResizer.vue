@@ -5,15 +5,13 @@ import type { Row } from '@/shared/types'
 
 import { createDoubleClickHandler } from '@/shared/utils'
 
-interface Props {
+const { rowNumber, row, position, tableScrollLeft, rulerVisible } = defineProps<{
   rowNumber: string
   row: Row
   position: number
   tableScrollLeft: number
   rulerVisible: boolean
-}
-
-const { rowNumber, row, position, tableScrollLeft, rulerVisible } = defineProps<Props>()
+}>()
 
 const emit = defineEmits<{
   dblclick: [rowNumber: string]

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Props } from './types'
 
-const { icon, text } = defineProps<Props>()
+const { icon, text = '' } = defineProps<Props>()
 
 const emit = defineEmits(['click'])
 </script>
@@ -13,6 +13,12 @@ const emit = defineEmits(['click'])
     @click="emit('click')"
   >
     <component :is="icon" />
-    <span class="select-none">{{ text }}</span>
+
+    <span
+      v-if="text"
+      class="select-none"
+    >
+      {{ text }}
+    </span>
   </button>
 </template>

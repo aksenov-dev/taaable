@@ -7,13 +7,11 @@ import { parseCellId } from '@/shared/utils'
 
 import TableHeaderColumnCell from '@/components/TableView/Table/TableHeaderColumnCell.vue'
 
-interface Props {
+const { columnOrder, columns, activeCellId } = defineProps<{
   columnOrder: ColumnsData['columnOrder']
   columns: ColumnsData['columns']
   activeCellId: Cell['cellId']
-}
-
-const { columnOrder, columns, activeCellId } = defineProps<Props>()
+}>()
 
 const activeColumnLetter = computed(() => parseCellId(activeCellId).columnLetter)
 </script>

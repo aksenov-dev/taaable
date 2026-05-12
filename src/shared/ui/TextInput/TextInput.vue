@@ -59,9 +59,9 @@ input {
 }
 
 .search {
-  @apply text-gray-5 border-gray-3 bg-gray-2 hover:text-gray-6 h-10 rounded-lg bg-[url(@/assets/search.svg)]
-  bg-[right_15px_top_9px] bg-no-repeat pr-12 pl-4 focus:text-black dark:bg-[url(@/assets/search-dark.svg)]
-  dark:focus:text-white;
+  @apply text-gray-5 border-gray-3 hover:border-gray-4 focus:border-accent-1 bg-gray-2 hover:text-gray-6 h-10
+  rounded-lg bg-[url(@/assets/search.svg)] bg-position-[right_15px_top_9px] bg-no-repeat pr-12 pl-4 focus:text-black
+  dark:bg-[url(@/assets/search-dark.svg)] dark:focus:text-white;
 }
 
 .title {
@@ -84,7 +84,8 @@ input {
   text-black dark:bg-black dark:text-white;
 }
 
-.range, .formula {
+.range,
+.formula {
   @apply h-7 border-none bg-white pr-2 pl-2 text-black dark:bg-black dark:text-white;
 }
 

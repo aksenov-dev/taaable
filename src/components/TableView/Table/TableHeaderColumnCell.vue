@@ -2,13 +2,11 @@
 import type { Column } from '@/shared/types'
 import { CELL_SIZE } from '@/shared/constants'
 
-interface Props {
+const { columnLetter, column, isActive } = defineProps<{
   columnLetter: string
   column: Column
   isActive: boolean
-}
-
-const { columnLetter, column, isActive } = defineProps<Props>()
+}>()
 </script>
 
 <template>
