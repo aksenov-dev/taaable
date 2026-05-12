@@ -1,4 +1,4 @@
-export type MainSortVariant = 'title' | 'date'
+export type MainSortVariant = 'title-asc' | 'title-desc' | 'date-asc' | 'date-desc'
 export type MainViewVariant = 'list' | 'grid'
 
 export interface Settings {
