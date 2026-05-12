@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import { useSettingsStore } from '@/stores/settings'
 import { useBreakpoints } from '@/composables/useBreakpoints'
 
@@ -7,6 +9,19 @@ import HeaderFiltersViewType from '@/components/HomeView/Header/HeaderFilters/He
 
 const settingsStore = useSettingsStore()
 const { SM } = useBreakpoints()
+
+const sortVariant = computed(() => settingsStore.settings.sortVariant)
+const sortDirection = computed(() => sortVariant.value.endsWith('asc') ? 'asc' : 'desc')
+
+function onSortClick(field: 'title' | 'date') {
+  if (sortVariant.value.startsWith(field)) {
+    const dir = sortVariant.value.endsWith('asc') ? 'desc' : 'asc'
+    settingsStore.setSortVariant(`${field}-${dir}`)
+  }
+  else {
+    settingsStore.setSortVariant(`${field}-asc`)
+  }
+}
 </script>
 
 <template>
@@ -21,14 +36,16 @@ const { SM } = useBreakpoints()
 
       <HeaderFiltersSortType
         variant="title"
-        :is-active="settingsStore.settings.sortVariant === 'title'"
-        @click="settingsStore.setSortVariant"
+        :is-active="sortVariant.startsWith('title')"
+        :direction="sortDirection"
+        @click="onSortClick"
       />
 
       <HeaderFiltersSortType
         variant="date"
-        :is-active="settingsStore.settings.sortVariant === 'date'"
-        @click="settingsStore.setSortVariant"
+        :is-active="sortVariant.startsWith('date')"
+        :direction="sortDirection"
+        @click="onSortClick"
       />
     </div>
 

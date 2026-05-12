@@ -17,11 +17,18 @@ export const useTablesStore = defineStore('tables', () => {
   const tableStorage = createTableStorage()
 
   const sortedTables = computed<Table[]>(() => {
-    if (settingsStore.settings.sortVariant === 'title') {
-      return [...tables.value].sort((a, b) => a.title.localeCompare(b.title))
-    }
+    const copy = [...tables.value]
 
-    return [...tables.value].sort((a, b) => b.viewedAt - a.viewedAt)
+    switch (settingsStore.settings.sortVariant) {
+      case 'title-asc':
+        return copy.sort((a, b) => a.title.localeCompare(b.title))
+      case 'title-desc':
+        return copy.sort((a, b) => b.title.localeCompare(a.title))
+      case 'date-asc':
+        return copy.sort((a, b) => a.viewedAt - b.viewedAt)
+      case 'date-desc':
+        return copy.sort((a, b) => b.viewedAt - a.viewedAt)
+    }
   })
 
   const filteredTables = computed(() => {
