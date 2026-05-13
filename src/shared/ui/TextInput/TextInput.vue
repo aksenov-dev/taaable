@@ -61,7 +61,7 @@ input {
 .search {
   @apply text-gray-5 border-gray-3 hover:border-gray-4 focus:border-accent-1 bg-gray-2 hover:text-gray-6 h-10
   rounded-lg bg-[url(@/assets/search.svg)] bg-position-[right_15px_top_9px] bg-no-repeat pr-12 pl-4 focus:text-black
-  dark:bg-[url(@/assets/search-dark.svg)] dark:focus:text-white;
+  dark:bg-[url(@/assets/search-dark.svg)] dark:focus:text-white placeholder:transition-colors;
 }
 
 .title {
@@ -71,7 +71,7 @@ input {
 }
 
 .title-preview {
-  @apply h-5 rounded-xs border-transparent pr-1 pl-1 transition-none disabled:pointer-events-none disabled:truncate;
+  @apply h-5 rounded-xs border-transparent pr-1 pl-1 disabled:pointer-events-none disabled:truncate;
 }
 
 .sheet {

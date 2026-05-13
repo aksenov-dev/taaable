@@ -60,7 +60,9 @@ const menuOffsetValue = computed(() => {
         @change="renameTable"
       />
 
-      <span class="text-small sm:text-medium shrink-0 text-gray-6 sm:w-24 md:w-36 ml:w-24 lg:w-36 px-0.75">
+      <span
+        class="text-small sm:text-medium shrink-0 text-gray-6 sm:w-24 md:w-36 ml:w-24 lg:w-36 px-0.75 transition-colors"
+      >
         {{ stringDate }}
       </span>
     </div>

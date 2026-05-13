@@ -17,8 +17,15 @@ const { tableId, sheetId } = defineProps<{
 
 const tableStore = useTableStore()
 
-onMounted(async () => await tableStore.getTable(tableId, sheetId))
-onUnmounted(() => tableStore.clear())
+onMounted(async () => {
+  document.documentElement.classList.add('table-page')
+  await tableStore.getTable(tableId, sheetId)
+})
+
+onUnmounted(() => {
+  document.documentElement.classList.remove('table-page')
+  tableStore.clear()
+})
 </script>
 
 <template>
