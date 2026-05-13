@@ -29,7 +29,7 @@ function onSortClick(field: 'title' | 'date') {
     <div class="flex gap-2 sm:gap-3">
       <span
         v-if="SM"
-        class="text-medium text-gray-6 select-none"
+        class="text-medium text-gray-6 select-none transition-colors"
       >
         Сортировка:
       </span>

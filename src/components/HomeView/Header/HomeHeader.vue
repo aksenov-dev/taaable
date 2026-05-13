@@ -23,6 +23,7 @@ const settingsStore = useSettingsStore()
     <div class="flex w-28 justify-end shrink-0">
       <DarkThemeToggle
         :is-dark="settingsStore.settings.isDarkTheme"
+        animated
         @toggle="settingsStore.setDarkTheme"
       />
     </div>

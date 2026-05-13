@@ -68,7 +68,7 @@ const menuOffsetValue = computed(() => {
     </div>
 
     <div class="flex h-5 items-center justify-between gap-3">
-      <span class="text-small sm:text-medium text-gray-6">
+      <span class="text-small sm:text-medium text-gray-6 transition-colors">
         {{ stringDate }}
       </span>
 

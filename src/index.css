@@ -7,7 +7,7 @@ html {
   color-scheme: dark light;
 }
 
-html.theme-switching * {
+:where(html.table-page.theme-switching) * {
   transition: none !important;
 }
 
