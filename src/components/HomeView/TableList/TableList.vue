@@ -19,7 +19,7 @@ const currentComponent = computed(() => settingsStore.settings.viewVariant === '
     w-full ml:max-w-[calc(100%-304px)] ml:w-170 transition-colors dark:bg-black"
   >
     <main
-      class="min-h-21 bg-white p-2 sm:p-3 transition-colors dark:bg-black"
+      class="min-h-19 sm:min-h-21 bg-white p-2 sm:p-3 transition-colors dark:bg-black"
       :class="{ 'flex flex-wrap': settingsStore.settings.viewVariant === 'grid' }"
     >
       <template v-if="tablesStore.filteredTables.length">
