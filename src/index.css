@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&family=Roboto:wght@400;700&display=swap');
 @import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -51,14 +51,16 @@ html {
   --breakpoint-ml: 56rem;
   --breakpoint-sm: 36rem;
 
+  --font-roboto: 'Roboto', sans-serif;
+
   --text-small: 12px;
-  --text-small--font-weight: 500;
+  --text-small--font-weight: 400;
   --text-medium: 14px;
-  --text-medium--font-weight: 500;
+  --text-medium--font-weight: 400;
   --text-large: 17px;
-  --text-large--font-weight: 500;
+  --text-large--font-weight: 400;
   --text-extra-large: 21px;
-  --text-extra-large--font-weight: 700;
+  --text-extra-large--font-weight: 600;
 
   --color-black: var(--black-color);
   --color-gray-1: var(--gray-1-color);

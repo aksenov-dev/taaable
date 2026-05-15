@@ -76,9 +76,9 @@ onMounted(async () => {
   <div
     ref="editorRef"
     contenteditable
-    class="text-small border-gray-3 outline-accent-1 absolute z-1 cursor-default justify-start rounded-xs border-r
-    border-b bg-white p-1 leading-3.75 text-black outline-2 -outline-offset-1 focus:cursor-text dark:bg-black
-    dark:text-white"
+    class="font-roboto text-small border-gray-3 outline-accent-1 absolute z-1 cursor-default justify-start rounded-xs
+    border-r border-b bg-white p-1 leading-3.75 text-black outline-2 -outline-offset-1 focus:cursor-text
+    dark:bg-black dark:text-white"
     :style="style"
     @keydown="handleEditableCellKeydown"
     @blur="event => emit('blur', event, cellId!, editorValue)"
