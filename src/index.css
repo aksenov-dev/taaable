@@ -33,6 +33,7 @@ html {
   --accent-2-color: #1AB3FF;
 
   --shadow-1: 0 2px 5px rgba(0, 0, 0, 0.12);
+  --shadow-2: 0px 0px 10px rgba(26, 159, 255, 0.75);
 }
 
 .dark {
@@ -73,4 +74,5 @@ html {
   --color-accent-2: var(--accent-2-color);
 
   --shadow-brand-1: var(--shadow-1);
+  --shadow-brand-2: var(--shadow-2);
 }
