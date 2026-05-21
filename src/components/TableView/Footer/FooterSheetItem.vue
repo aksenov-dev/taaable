@@ -76,7 +76,11 @@ watch(isMenuOpen, () => nextTick(() => update()))
 
     <IconChevronDown
       v-if="!isEditMode"
-      class="mr-1 shrink-0 cursor-pointer transition-colors"
+      class="mr-1 shrink-0 cursor-pointer rounded border-2 transition-colors"
+      :class="{
+        'border-white hover:bg-gray-2 dark:border-black': isActive,
+        'border-gray-2 hover:bg-gray-3': !isActive,
+      }"
       @click.stop="toggleMenu"
     />
 
