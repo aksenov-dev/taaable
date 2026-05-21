@@ -61,7 +61,7 @@ const menuOffsetValue = computed(() => {
       />
 
       <span
-        class="text-small sm:text-medium shrink-0 text-gray-6 sm:w-24 md:w-36 ml:w-24 lg:w-36 px-0.75 transition-colors"
+        class="text-small sm:text-medium shrink-0 text-gray-6 sm:w-25 md:w-36 ml:w-25 lg:w-36 px-0.75 transition-colors"
       >
         {{ stringDate }}
       </span>
