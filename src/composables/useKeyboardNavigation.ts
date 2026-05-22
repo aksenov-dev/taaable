@@ -5,12 +5,14 @@ import { getCellId, parseCellId } from '@/shared/utils'
 
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
+import { useSheetsDataCellsStore } from '@/stores/sheetsData/cells'
 import { useActiveCell } from '@/composables/useActiveCell'
 import { useCellEditing } from '@/composables/useCellEditing'
 
 export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) {
   const sheetsStore = useSheetsStore()
   const sheetsDataStore = useSheetsDataStore()
+  const sheetsDataCellsStore = useSheetsDataCellsStore()
 
   const { getActiveCell, setActiveCell } = useActiveCell()
   const { editingCellId, activateEditor, stopEditing } = useCellEditing()
@@ -88,6 +90,13 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
         break
       case 'Escape':
         stopEditingMode()
+        return
+      case 'Delete':
+      case 'Backspace':
+        if (!editingCellId.value) {
+          event.preventDefault()
+          await sheetsDataCellsStore.updateCellValue(currentCellId, '')
+        }
         return
 
       default: handled = false
