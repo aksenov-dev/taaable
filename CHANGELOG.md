@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-05-23
+
+### Added
+- Fill handle dot on active cell
+- Clear cell content with Delete and Backspace keys
+- Hover style on sheet tab chevron icon
+- Custom text selection color
+
+### Changed
+- Cell editor border replaced with accent glow shadow
+- Table cells now use Roboto font; Manrope weights adjusted
+
+### Fixed
+- Visual layout bugs
+
 ## [1.0.0] - 2026-05-14
 
 ### Added
