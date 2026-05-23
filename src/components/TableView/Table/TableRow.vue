@@ -8,11 +8,12 @@ import { getCellId, parseCellId } from '@/shared/utils'
 import TableCell from '@/components/TableView/Table/TableCell.vue'
 import TableHeaderRowCell from '@/components/TableView/Table/TableHeaderRowCell.vue'
 
-const { columnOrder, rowNumber, cells, activeCellId } = defineProps<{
+const { columnOrder, rowNumber, cells, activeCellId, isEditing } = defineProps<{
   columnOrder: ColumnsData['columnOrder']
   rowNumber: string
   cells: CellsData['cells']
   activeCellId: Cell['cellId']
+  isEditing: boolean
 }>()
 
 const emit = defineEmits<{
@@ -34,6 +35,7 @@ const activeRowNumber = computed(() => parseCellId(activeCellId).rowNumber)
     :key="getCellId(columnLetter, rowNumber)"
     :cell="cells[getCellId(columnLetter, rowNumber)]"
     :is-active="activeCellId === getCellId(columnLetter, rowNumber)"
+    :is-editing="isEditing"
     @dblclick="payload => emit('cellDblclick', payload)"
     @mousedown="emit('cellMousedown', getCellId(columnLetter, rowNumber))"
   />

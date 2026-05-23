@@ -147,6 +147,7 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
         :row-number="rowNumber"
         :cells="sheetsDataStore.currentSheetData.cells"
         :active-cell-id="activeCellId"
+        :is-editing="editingCellId !== null"
         @cell-dblclick="({ event, cellId }) => activateEditor(cellId, { event })"
         @cell-mousedown="handleCellMouseDown"
       />
