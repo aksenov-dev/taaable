@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import type { Cell } from '@/shared/types'
 
-const { cell, isActive, isEditing } = defineProps<{
+const { cell, isActive, isEditing, isInSelection } = defineProps<{
   cell: Cell
   isActive: boolean
   isEditing: boolean
+  isInSelection: boolean
 }>()
 
 const emit = defineEmits<{
-  dblclick: [{ event: MouseEvent, cellId: string }]
-  mousedown: []
+  dblclick: [event: MouseEvent]
+  mousedown: [event: MouseEvent]
 }>()
 </script>
 
@@ -20,10 +21,11 @@ const emit = defineEmits<{
     class="cell"
     :class="{
       'cell--active': isActive,
-      'cell--fill-handle': isActive && !isEditing,
+      'cell--fill-handle': isActive && !isEditing && !isInSelection,
+      'cell--selected': isInSelection,
     }"
-    @dblclick="event => emit('dblclick', { event, cellId: cell.cellId })"
-    @mousedown="emit('mousedown')"
+    @dblclick="event => emit('dblclick', event)"
+    @mousedown="event => emit('mousedown', event)"
     v-html="cell.value"
   />
 </template>
@@ -44,5 +46,9 @@ const emit = defineEmits<{
 .cell--fill-handle::after {
   @apply content-[''] absolute size-2 rounded-full bg-accent-1 ring-[1px] ring-(--fill-handle-ring)
   -bottom-1 -right-1 z-10 cursor-crosshair;
+}
+
+.cell--selected {
+  @apply bg-gray-1;
 }
 </style>

@@ -15,8 +15,10 @@ import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
 import { useResizeRuler } from '@/composables/useResizeRuler'
 import { useRowResize } from '@/composables/useRowResize'
 import { useScrollActiveCell } from '@/composables/useScrollActiveCell'
+import { useSelection } from '@/composables/useSelection'
 import { useSheetScrollPosition } from '@/composables/useSheetScrollPosition'
 
+import SelectionOverlay from '@/components/TableView/Table/SelectionOverlay.vue'
 import TableCellEditor from '@/components/TableView/Table/TableCellEditor.vue'
 import TableColumnResizer from '@/components/TableView/Table/TableColumnResizer.vue'
 import TableHeaderRow from '@/components/TableView/Table/TableHeaderRow.vue'
@@ -38,6 +40,7 @@ const { isResizeRulerVisible, resizeRulerPosition } = resizeRuler
 
 const { resizingRowNumber, startRowResize } = useRowResize(resizeRuler, tableContainerRef)
 const { resizingColumnLetter, startColumnResize } = useColumnResize(resizeRuler, tableContainerRef)
+const { extendSelection, clearSelection, hasSelection, getSelectionStart, getSelectionEnd } = useSelection()
 
 const sheetsStore = useSheetsStore()
 const sheetsDataStore = useSheetsDataStore()
@@ -49,8 +52,17 @@ const columnCount = computed(() => sheetsDataStore.currentSheetData?.columnOrder
 const rowCount = computed(() => sheetsDataStore.currentSheetData?.rowOrder.length ?? 0)
 const activeCellId = computed(() => getActiveCell(sheetsStore.currentSheetId))
 
+const selectionStartId = computed(() => {
+  return sheetsStore.currentSheetId ? getSelectionStart(sheetsStore.currentSheetId) : null
+})
+
+const selectionEndId = computed(() => {
+  return sheetsStore.currentSheetId ? getSelectionEnd(sheetsStore.currentSheetId) : null
+})
+
 const gridTemplateRows = computed(() => {
   const header = `${CELL_SIZE.HEADER.COL_HEIGHT}px`
+
   if (!sheetsDataStore.currentSheetData)
     return `${header} repeat(${rowCount.value}, auto)`
 
@@ -78,10 +90,25 @@ function onTableScroll(e: Event): void {
   tableScroll.top = target.scrollTop
 }
 
-function handleCellMouseDown(cellId: string): void {
-  if (sheetsStore.currentSheetId) {
+function handleCellMouseDown(cellId: string, event: MouseEvent): void {
+  if (!sheetsStore.currentSheetId)
+    return
+
+  if (event.shiftKey) {
+    extendSelection(sheetsStore.currentSheetId, cellId)
+  }
+  else {
+    clearSelection(sheetsStore.currentSheetId)
     setActiveCell(sheetsStore.currentSheetId, cellId)
   }
+}
+
+function handleCellDblClick(cellId: string, event: MouseEvent): void {
+  if (sheetsStore.currentSheetId) {
+    clearSelection(sheetsStore.currentSheetId)
+  }
+
+  activateEditor(cellId, { event })
 }
 
 function handleCellEditorBlur(e: FocusEvent, cellId: string, value: string): void {
@@ -148,7 +175,7 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
         :cells="sheetsDataStore.currentSheetData.cells"
         :active-cell-id="activeCellId"
         :is-editing="editingCellId !== null"
-        @cell-dblclick="({ event, cellId }) => activateEditor(cellId, { event })"
+        @cell-dblclick="handleCellDblClick"
         @cell-mousedown="handleCellMouseDown"
       />
 
@@ -156,6 +183,13 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
         v-if="editingCellId"
         :table-container="tableContainerRef"
         @blur="handleCellEditorBlur"
+      />
+
+      <SelectionOverlay
+        v-if="sheetsStore.currentSheetId && hasSelection(sheetsStore.currentSheetId)"
+        :table-container="tableContainerRef"
+        :start-cell-id="selectionStartId"
+        :end-cell-id="selectionEndId"
       />
     </div>
   </div>
