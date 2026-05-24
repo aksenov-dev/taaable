@@ -156,7 +156,7 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     }
   }
 
-  function handleEnter(ctx: NavigationCtx): NavigationResult {
+  function handleEnter(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
     const { sheetId, currentCellId, colIndex, rowIndex, rowOrder, shift } = ctx
     const wasEditing = Boolean(editingCellId.value)
 
@@ -192,6 +192,7 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
       }
     }
 
+    event.preventDefault()
     startEditingMode(currentCellId)
     return null
   }
@@ -277,7 +278,7 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
         result = handleTab(ctx)
         break
       case 'Enter':
-        result = handleEnter(ctx)
+        result = handleEnter(event, ctx)
         break
       case 'Escape':
         handleEscape()
