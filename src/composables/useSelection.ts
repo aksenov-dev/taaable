@@ -2,7 +2,7 @@ import { ref } from 'vue'
 
 import type { SelectionBounds, SelectionRange } from '@/shared/types'
 
-import { parseCellId } from '@/shared/utils'
+import { getCellId, parseCellId } from '@/shared/utils'
 
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
@@ -15,9 +15,38 @@ export function useSelection() {
   const sheetsDataStore = useSheetsDataStore()
   const { getActiveCell } = useActiveCell()
 
+  function rangeToIndexBounds(range: SelectionRange, columnOrder: string[], rowOrder: string[]): SelectionBounds {
+    const startColIdx = columnOrder.indexOf(parseCellId(range.startId).columnLetter)
+    const startRowIdx = rowOrder.indexOf(parseCellId(range.startId).rowNumber)
+    const endColIdx = columnOrder.indexOf(parseCellId(range.endId).columnLetter)
+    const endRowIdx = rowOrder.indexOf(parseCellId(range.endId).rowNumber)
+
+    return {
+      minColIndex: Math.min(startColIdx, endColIdx),
+      maxColIndex: Math.max(startColIdx, endColIdx),
+      minRowIndex: Math.min(startRowIdx, endRowIdx),
+      maxRowIndex: Math.max(startRowIdx, endRowIdx),
+    }
+  }
+
+  function saveNormalized(sheetId: string, startId: string, endId: string): void {
+    const columnOrder = sheetsDataStore.currentSheetData?.columnOrder ?? []
+    const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
+    const bounds = rangeToIndexBounds({ startId, endId }, columnOrder, rowOrder)
+
+    selections.value[sheetId] = {
+      startId: getCellId(columnOrder[bounds.minColIndex], rowOrder[bounds.minRowIndex]),
+      endId: getCellId(columnOrder[bounds.maxColIndex], rowOrder[bounds.maxRowIndex]),
+    }
+  }
+
   function extendSelection(sheetId: string, newEndId: string): void {
-    const startId = selections.value[sheetId]?.startId ?? getActiveCell(sheetId)
-    selections.value[sheetId] = { startId, endId: newEndId }
+    const anchorId = selections.value[sheetId]?.startId ?? getActiveCell(sheetId)
+    saveNormalized(sheetId, anchorId, newEndId)
+  }
+
+  function setSelectionRange(sheetId: string, startId: string, endId: string): void {
+    saveNormalized(sheetId, startId, endId)
   }
 
   function clearSelection(sheetId: string): void {
@@ -34,20 +63,6 @@ export function useSelection() {
 
   function getSelectionEnd(sheetId: string): string | null {
     return selections.value[sheetId]?.endId ?? null
-  }
-
-  function rangeToIndexBounds(range: SelectionRange, columnOrder: string[], rowOrder: string[]): SelectionBounds {
-    const startColIdx = columnOrder.indexOf(parseCellId(range.startId).columnLetter)
-    const startRowIdx = rowOrder.indexOf(parseCellId(range.startId).rowNumber)
-    const endColIdx = columnOrder.indexOf(parseCellId(range.endId).columnLetter)
-    const endRowIdx = rowOrder.indexOf(parseCellId(range.endId).rowNumber)
-
-    return {
-      minColIndex: Math.min(startColIdx, endColIdx),
-      maxColIndex: Math.max(startColIdx, endColIdx),
-      minRowIndex: Math.min(startRowIdx, endRowIdx),
-      maxRowIndex: Math.max(startRowIdx, endRowIdx),
-    }
   }
 
   function isInSelection(cellId: string): boolean {
@@ -86,6 +101,7 @@ export function useSelection() {
 
   return {
     extendSelection,
+    setSelectionRange,
     clearSelection,
     hasSelection,
     getSelectionStart,
