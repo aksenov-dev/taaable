@@ -95,6 +95,7 @@ function handleCellMouseDown(cellId: string, event: MouseEvent): void {
     return
 
   if (event.shiftKey) {
+    clearSelection(sheetsStore.currentSheetId)
     extendSelection(sheetsStore.currentSheetId, cellId)
   }
   else {
