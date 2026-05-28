@@ -1,7 +1,7 @@
 export interface NavigationCtx {
   sheetId: string
   currentCellId: string
-  colIndex: number
+  columnIndex: number
   rowIndex: number
   columnOrder: string[]
   rowOrder: string[]
@@ -9,4 +9,4 @@ export interface NavigationCtx {
   ctrl: boolean
 }
 
-export type NavigationResult = { colIndex: number, rowIndex: number } | null
+export type NavigationResult = { columnIndex: number, rowIndex: number } | null

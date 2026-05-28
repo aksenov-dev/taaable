@@ -19,7 +19,14 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
 
   const { getActiveCell, setActiveCell } = useActiveCell()
   const { editingCellId, activateEditor, stopEditing } = useCellEditing()
-  const { extendSelection, clearSelection, hasSelection, getSelectionEnd, getSelectionBounds } = useSelection()
+  const {
+    setSelectionRange,
+    clearSelection,
+    hasSelection,
+    getSelectionStart,
+    getSelectionEnd,
+    getSelectionBounds,
+  } = useSelection()
 
   function startEditingMode(cellId: string, initialInput?: string) {
     const cell = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement | null
@@ -35,160 +42,239 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     containerRef.value?.focus()
   }
 
-  function handleArrowUp(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, currentCellId, colIndex, rowIndex, rowOrder, shift, ctrl } = ctx
+  function getSelectionEndpoints(ctx: NavigationCtx) {
+    const { sheetId, currentCellId, columnOrder, rowOrder } = ctx
 
-    if (shift) {
-      event.preventDefault()
+    const startId = getSelectionStart(sheetId) ?? currentCellId
+    const endId = getSelectionEnd(sheetId) ?? currentCellId
 
-      const endId = getSelectionEnd(sheetId) ?? currentCellId
-      const { columnLetter: endCol, rowNumber: endRow } = parseCellId(endId)
-      const newEndRowIdx = ctrl ? 0 : Math.max(0, rowOrder.indexOf(endRow) - 1)
-      extendSelection(sheetId, getCellId(endCol, rowOrder[newEndRowIdx]))
-
-      return null
-    }
-
-    clearSelection(sheetId)
+    const { columnLetter: startCol, rowNumber: startRow } = parseCellId(startId)
+    const { columnLetter: endCol, rowNumber: endRow } = parseCellId(endId)
 
     return {
-      colIndex,
-      rowIndex: ctrl ? 0 : Math.max(0, rowIndex - 1),
+      startId,
+      endId,
+      startCol,
+      startRow,
+      endCol,
+      endRow,
+      startColIndex: columnOrder.indexOf(startCol),
+      endColIndex: columnOrder.indexOf(endCol),
+      startRowIndex: rowOrder.indexOf(startRow),
+      endRowIndex: rowOrder.indexOf(endRow),
     }
+  }
+
+  function handleArrowUp(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
+    const { sheetId, columnIndex, rowIndex, rowOrder, shift, ctrl } = ctx
+
+    if (!shift) {
+      clearSelection(sheetId)
+
+      return {
+        columnIndex,
+        rowIndex: ctrl ? 0 : Math.max(0, rowIndex - 1),
+      }
+    }
+
+    event.preventDefault()
+
+    const { startId, startCol, endCol, startRowIndex, endRowIndex } = getSelectionEndpoints(ctx)
+
+    const newEndRowIndex = ctrl ? 0 : Math.max(0, endRowIndex - 1)
+    const newBottomRowIndex = Math.max(startRowIndex, newEndRowIndex)
+
+    if (rowIndex > newBottomRowIndex) {
+      const newTopRowIndex = ctrl ? 0 : Math.max(0, startRowIndex - 1)
+      const newStartId = getCellId(startCol, rowOrder[newTopRowIndex])
+      const newEndId = getCellId(endCol, rowOrder[rowIndex])
+
+      setSelectionRange(sheetId, newStartId, newEndId)
+    }
+    else {
+      setSelectionRange(sheetId, startId, getCellId(endCol, rowOrder[newEndRowIndex]))
+    }
+
+    return null
   }
 
   function handleArrowDown(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, currentCellId, colIndex, rowIndex, rowOrder, shift, ctrl } = ctx
+    const { sheetId, columnIndex, rowIndex, rowOrder, shift, ctrl } = ctx
 
-    if (shift) {
-      event.preventDefault()
+    if (!shift) {
+      clearSelection(sheetId)
 
-      const endId = getSelectionEnd(sheetId) ?? currentCellId
-      const { columnLetter: endCol, rowNumber: endRow } = parseCellId(endId)
-      const newEndRowIdx = ctrl ? rowOrder.length - 1 : Math.min(rowOrder.length - 1, rowOrder.indexOf(endRow) + 1)
-      extendSelection(sheetId, getCellId(endCol, rowOrder[newEndRowIdx]))
-
-      return null
+      return {
+        columnIndex,
+        rowIndex: ctrl ? rowOrder.length - 1 : Math.min(rowOrder.length - 1, rowIndex + 1),
+      }
     }
 
-    clearSelection(sheetId)
+    event.preventDefault()
 
-    return {
-      colIndex,
-      rowIndex: ctrl ? rowOrder.length - 1 : Math.min(rowOrder.length - 1, rowIndex + 1),
+    const { startCol, endCol, startRowIndex, endRowIndex } = getSelectionEndpoints(ctx)
+
+    const newEndRowIndex = ctrl ? rowOrder.length - 1 : Math.min(rowOrder.length - 1, endRowIndex + 1)
+    const newTopRowIndex = Math.min(startRowIndex + 1, newEndRowIndex)
+
+    if (ctrl || rowIndex < newTopRowIndex) {
+      const newStartId = getCellId(startCol, rowOrder[newEndRowIndex])
+      const newEndId = getCellId(endCol, rowOrder[rowIndex])
+
+      setSelectionRange(sheetId, newStartId, newEndId)
     }
+    else {
+      setSelectionRange(
+        sheetId,
+        getCellId(startCol, rowOrder[startRowIndex + 1]),
+        getCellId(endCol, rowOrder[endRowIndex])
+      )
+    }
+
+    return null
   }
 
   function handleArrowLeft(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, currentCellId, colIndex, rowIndex, columnOrder, shift, ctrl } = ctx
+    const { sheetId, columnIndex, rowIndex, columnOrder, shift, ctrl } = ctx
 
-    if (shift) {
-      event.preventDefault()
+    if (!shift) {
+      clearSelection(sheetId)
 
-      const endId = getSelectionEnd(sheetId) ?? currentCellId
-      const { columnLetter: endCol, rowNumber: endRow } = parseCellId(endId)
-      const newEndColIdx = ctrl ? 0 : Math.max(0, columnOrder.indexOf(endCol) - 1)
-      extendSelection(sheetId, getCellId(columnOrder[newEndColIdx], endRow))
-
-      return null
+      return {
+        columnIndex: ctrl ? 0 : Math.max(0, columnIndex - 1),
+        rowIndex,
+      }
     }
 
-    clearSelection(sheetId)
+    event.preventDefault()
 
-    return {
-      colIndex: ctrl ? 0 : Math.max(0, colIndex - 1),
-      rowIndex,
+    const { startId, startRow, endRow, startColIndex, endColIndex } = getSelectionEndpoints(ctx)
+
+    const newEndColIndex = ctrl ? 0 : Math.max(0, endColIndex - 1)
+    const newRightColIndex = Math.max(startColIndex, newEndColIndex)
+
+    if (columnIndex > newRightColIndex) {
+      const newLeftColIdx = ctrl ? 0 : Math.max(0, startColIndex - 1)
+      const newStartId = getCellId(columnOrder[newLeftColIdx], startRow)
+      const newEndId = getCellId(columnOrder[columnIndex], endRow)
+
+      setSelectionRange(sheetId, newStartId, newEndId)
     }
+    else {
+      setSelectionRange(sheetId, startId, getCellId(columnOrder[newEndColIndex], endRow))
+    }
+
+    return null
   }
 
   function handleArrowRight(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, currentCellId, colIndex, rowIndex, columnOrder, shift, ctrl } = ctx
+    const { sheetId, columnIndex, rowIndex, columnOrder, shift, ctrl } = ctx
 
-    if (shift) {
-      event.preventDefault()
+    if (!shift) {
+      clearSelection(sheetId)
 
-      const endId = getSelectionEnd(sheetId) ?? currentCellId
-      const { columnLetter: endCol, rowNumber: endRow } = parseCellId(endId)
-      const newEndColIdx = ctrl
-        ? columnOrder.length - 1
-        : Math.min(columnOrder.length - 1, columnOrder.indexOf(endCol) + 1)
-      extendSelection(sheetId, getCellId(columnOrder[newEndColIdx], endRow))
-
-      return null
+      return {
+        columnIndex: ctrl ? columnOrder.length - 1 : Math.min(columnOrder.length - 1, columnIndex + 1),
+        rowIndex,
+      }
     }
 
-    clearSelection(sheetId)
+    event.preventDefault()
 
-    return {
-      colIndex: ctrl ? columnOrder.length - 1 : Math.min(columnOrder.length - 1, colIndex + 1),
-      rowIndex,
+    const { startRow, endRow, startColIndex, endColIndex } = getSelectionEndpoints(ctx)
+
+    const newEndColIndex = ctrl ? columnOrder.length - 1 : Math.min(columnOrder.length - 1, endColIndex + 1)
+    const newLeftColIndex = Math.min(startColIndex + 1, newEndColIndex)
+
+    if (ctrl || columnIndex < newLeftColIndex) {
+      const newStartId = getCellId(columnOrder[newEndColIndex], startRow)
+      const newEndId = getCellId(columnOrder[columnIndex], endRow)
+
+      setSelectionRange(sheetId, newStartId, newEndId)
     }
+    else {
+      setSelectionRange(
+        sheetId,
+        getCellId(columnOrder[startColIndex + 1], startRow),
+        getCellId(columnOrder[endColIndex], endRow)
+      )
+    }
+
+    return null
   }
 
   function handleTab(ctx: NavigationCtx): NavigationResult {
-    const { sheetId, colIndex, rowIndex, columnOrder, shift } = ctx
+    const { sheetId, columnIndex, rowIndex, columnOrder, shift } = ctx
+    const dir = shift ? -1 : 1
 
     stopEditingMode()
 
     if (hasSelection(sheetId)) {
-      const bounds = getSelectionBounds(sheetId)!
+      const bounds = getSelectionBounds(sheetId)
 
-      if (shift) {
-        return {
-          colIndex: colIndex > bounds.minColIndex ? colIndex - 1 : bounds.maxColIndex,
-          rowIndex: colIndex > bounds.minColIndex
-            ? rowIndex
-            : rowIndex > bounds.minRowIndex ? rowIndex - 1 : bounds.maxRowIndex,
-        }
-      }
+      if (!bounds)
+        return null
 
-      return {
-        colIndex: colIndex < bounds.maxColIndex ? colIndex + 1 : bounds.minColIndex,
-        rowIndex: colIndex < bounds.maxColIndex
-          ? rowIndex
-          : rowIndex < bounds.maxRowIndex ? rowIndex + 1 : bounds.minRowIndex,
-      }
+      const canMoveInRow = shift
+        ? columnIndex > bounds.minColIndex
+        : columnIndex < bounds.maxColIndex
+
+      const newColIndex = canMoveInRow
+        ? columnIndex + dir
+        : shift ? bounds.maxColIndex : bounds.minColIndex
+
+      const newRowIndex = canMoveInRow
+        ? rowIndex
+        : shift
+          ? rowIndex > bounds.minRowIndex ? rowIndex - 1 : bounds.maxRowIndex
+          : rowIndex < bounds.maxRowIndex ? rowIndex + 1 : bounds.minRowIndex
+
+      return { columnIndex: newColIndex, rowIndex: newRowIndex }
     }
 
     return {
-      colIndex: Math.max(0, Math.min(columnOrder.length - 1, colIndex + (shift ? -1 : 1))),
+      columnIndex: Math.max(0, Math.min(columnOrder.length - 1, columnIndex + dir)),
       rowIndex,
     }
   }
 
   function handleEnter(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, currentCellId, colIndex, rowIndex, rowOrder, shift } = ctx
+    const { sheetId, currentCellId, columnIndex, rowIndex, rowOrder, shift } = ctx
+    const dir = shift ? -1 : 1
     const wasEditing = Boolean(editingCellId.value)
 
     if (hasSelection(sheetId)) {
       if (wasEditing)
         stopEditingMode()
 
-      const bounds = getSelectionBounds(sheetId)!
+      const bounds = getSelectionBounds(sheetId)
 
-      if (shift) {
-        return {
-          rowIndex: rowIndex > bounds.minRowIndex ? rowIndex - 1 : bounds.maxRowIndex,
-          colIndex: rowIndex > bounds.minRowIndex
-            ? colIndex
-            : colIndex > bounds.minColIndex ? colIndex - 1 : bounds.maxColIndex,
-        }
-      }
+      if (!bounds)
+        return null
 
-      return {
-        rowIndex: rowIndex < bounds.maxRowIndex ? rowIndex + 1 : bounds.minRowIndex,
-        colIndex: rowIndex < bounds.maxRowIndex
-          ? colIndex
-          : colIndex < bounds.maxColIndex ? colIndex + 1 : bounds.minColIndex,
-      }
+      const canMoveInCol = shift
+        ? rowIndex > bounds.minRowIndex
+        : rowIndex < bounds.maxRowIndex
+
+      const newRowIndex = canMoveInCol
+        ? rowIndex + dir
+        : shift ? bounds.maxRowIndex : bounds.minRowIndex
+
+      const newColIndex = canMoveInCol
+        ? columnIndex
+        : shift
+          ? columnIndex > bounds.minColIndex ? columnIndex - 1 : bounds.maxColIndex
+          : columnIndex < bounds.maxColIndex ? columnIndex + 1 : bounds.minColIndex
+
+      return { columnIndex: newColIndex, rowIndex: newRowIndex }
     }
 
     if (wasEditing) {
       stopEditingMode()
 
       return {
-        colIndex,
-        rowIndex: Math.min(rowOrder.length - 1, rowIndex + (shift ? -1 : 1)),
+        columnIndex,
+        rowIndex: Math.min(rowOrder.length - 1, rowIndex + dir),
       }
     }
 
@@ -242,16 +328,16 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     const columnOrder = sheetsDataStore.currentSheetData?.columnOrder ?? []
     const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
 
-    const colIndex = columnOrder.indexOf(columnLetter)
+    const columnIndex = columnOrder.indexOf(columnLetter)
     const rowIndex = rowOrder.indexOf(rowNumber)
 
-    if (colIndex === -1 || rowIndex === -1)
+    if (columnIndex === -1 || rowIndex === -1)
       return
 
     const ctx: NavigationCtx = {
       sheetId,
       currentCellId,
-      colIndex,
+      columnIndex,
       rowIndex,
       columnOrder,
       rowOrder,
@@ -294,7 +380,7 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     if (result) {
       event.preventDefault()
 
-      const newCol = columnOrder[result.colIndex]
+      const newCol = columnOrder[result.columnIndex]
       const newRow = rowOrder[result.rowIndex]
 
       if (newCol && newRow)
