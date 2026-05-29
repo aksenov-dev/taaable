@@ -40,7 +40,7 @@ const { isResizeRulerVisible, resizeRulerPosition } = resizeRuler
 
 const { resizingRowNumber, startRowResize } = useRowResize(resizeRuler, tableContainerRef)
 const { resizingColumnLetter, startColumnResize } = useColumnResize(resizeRuler, tableContainerRef)
-const { extendSelection, clearSelection, hasSelection, getSelectionStart, getSelectionEnd } = useSelection()
+const { extendSelection, clearSelection, getSelectionRanges, toggleCellInSelection } = useSelection()
 
 const sheetsStore = useSheetsStore()
 const sheetsDataStore = useSheetsDataStore()
@@ -52,12 +52,8 @@ const columnCount = computed(() => sheetsDataStore.currentSheetData?.columnOrder
 const rowCount = computed(() => sheetsDataStore.currentSheetData?.rowOrder.length ?? 0)
 const activeCellId = computed(() => getActiveCell(sheetsStore.currentSheetId))
 
-const selectionStartId = computed(() => {
-  return sheetsStore.currentSheetId ? getSelectionStart(sheetsStore.currentSheetId) : null
-})
-
-const selectionEndId = computed(() => {
-  return sheetsStore.currentSheetId ? getSelectionEnd(sheetsStore.currentSheetId) : null
+const selectionRanges = computed(() => {
+  return sheetsStore.currentSheetId ? getSelectionRanges(sheetsStore.currentSheetId) : []
 })
 
 const gridTemplateRows = computed(() => {
@@ -93,6 +89,18 @@ function onTableScroll(e: Event): void {
 function handleCellMouseDown(cellId: string, event: MouseEvent): void {
   if (!sheetsStore.currentSheetId)
     return
+
+  if (event.ctrlKey || event.metaKey) {
+    if (event.shiftKey) {
+      extendSelection(sheetsStore.currentSheetId, cellId)
+    }
+    else {
+      toggleCellInSelection(sheetsStore.currentSheetId, cellId)
+      setActiveCell(sheetsStore.currentSheetId, cellId)
+    }
+
+    return
+  }
 
   if (event.shiftKey) {
     clearSelection(sheetsStore.currentSheetId)
@@ -187,10 +195,12 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
       />
 
       <SelectionOverlay
-        v-if="sheetsStore.currentSheetId && hasSelection(sheetsStore.currentSheetId)"
+        v-for="(range, index) in selectionRanges"
+        :key="`${range.startId}-${range.endId}`"
         :table-container="tableContainerRef"
-        :start-cell-id="selectionStartId"
-        :end-cell-id="selectionEndId"
+        :start-cell-id="range.startId"
+        :end-cell-id="range.endId"
+        :show-fill-handle="index === selectionRanges.length - 1"
       />
     </div>
   </div>

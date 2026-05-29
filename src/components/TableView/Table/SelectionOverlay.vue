@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 
-const { tableContainer, startCellId, endCellId } = defineProps<{
+const { tableContainer, startCellId, endCellId, showFillHandle = true } = defineProps<{
   tableContainer: HTMLElement | null
   startCellId: string | null
   endCellId: string | null
+  showFillHandle?: boolean
 }>()
 
 const overlayStyle = ref<Record<string, string> | null>(null)
@@ -43,8 +44,9 @@ watchEffect(() => {
 
 <template>
   <div
-    v-if="overlayStyle && endCellId && startCellId !== endCellId"
+    v-if="overlayStyle && endCellId && startCellId"
     class="selection-overlay"
+    :class="{ 'has-fill-handle': showFillHandle }"
     :style="overlayStyle"
   />
 </template>
@@ -56,7 +58,7 @@ watchEffect(() => {
   @apply absolute pointer-events-none border border-accent-1 z-2 rounded-xs;
 }
 
-.selection-overlay:after {
+.selection-overlay.has-fill-handle:after {
   @apply content-[''] absolute size-2 rounded-full bg-accent-1 ring-[1px] ring-(--fill-handle-ring)
   -bottom-1 -right-1 z-10 cursor-crosshair pointer-events-auto;
 }

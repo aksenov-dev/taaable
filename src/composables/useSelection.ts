@@ -8,7 +8,7 @@ import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
 import { useActiveCell } from '@/composables/useActiveCell'
 
-const selections = ref<Record<string, SelectionRange>>({})
+const selections = ref<Record<string, SelectionRange[]>>({})
 
 export function useSelection() {
   const sheetsStore = useSheetsStore()
@@ -29,24 +29,28 @@ export function useSelection() {
     }
   }
 
-  function saveNormalized(sheetId: string, startId: string, endId: string): void {
+  function saveNormalized(sheetId: string, startId: string, endId: string, replaceAll = false): void {
     const columnOrder = sheetsDataStore.currentSheetData?.columnOrder ?? []
     const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
     const bounds = rangeToIndexBounds({ startId, endId }, columnOrder, rowOrder)
 
-    selections.value[sheetId] = {
+    const normalized = {
       startId: getCellId(columnOrder[bounds.minColIndex], rowOrder[bounds.minRowIndex]),
       endId: getCellId(columnOrder[bounds.maxColIndex], rowOrder[bounds.maxRowIndex]),
     }
+
+    const prev = selections.value[sheetId] ?? []
+    selections.value[sheetId] = replaceAll ? [normalized] : [...prev.slice(0, -1), normalized]
   }
 
   function extendSelection(sheetId: string, newEndId: string): void {
-    const anchorId = selections.value[sheetId]?.startId ?? getActiveCell(sheetId)
+    const ranges = selections.value[sheetId]
+    const anchorId = ranges?.at(-1)?.startId ?? getActiveCell(sheetId)
     saveNormalized(sheetId, anchorId, newEndId)
   }
 
   function setSelectionRange(sheetId: string, startId: string, endId: string): void {
-    saveNormalized(sheetId, startId, endId)
+    saveNormalized(sheetId, startId, endId, true)
   }
 
   function clearSelection(sheetId: string): void {
@@ -54,49 +58,105 @@ export function useSelection() {
   }
 
   function hasSelection(sheetId: string): boolean {
-    return sheetId in selections.value
+    return (selections.value[sheetId]?.length ?? 0) > 0
   }
 
   function getSelectionStart(sheetId: string): string | null {
-    return selections.value[sheetId]?.startId ?? null
+    return selections.value[sheetId]?.at(-1)?.startId ?? null
   }
 
   function getSelectionEnd(sheetId: string): string | null {
-    return selections.value[sheetId]?.endId ?? null
+    return selections.value[sheetId]?.at(-1)?.endId ?? null
+  }
+
+  function getSelectionRanges(sheetId: string): SelectionRange[] {
+    return selections.value[sheetId] ?? []
+  }
+
+  function getSelectionRangeCount(sheetId: string): number {
+    return selections.value[sheetId]?.length ?? 0
   }
 
   function isInSelection(cellId: string): boolean {
     const sheetId = sheetsStore.currentSheetId
-    const selection = sheetId ? selections.value[sheetId] : null
+    const ranges = sheetId ? selections.value[sheetId] : null
 
-    if (!selection)
+    if (!ranges?.length)
       return false
 
     const columnOrder = sheetsDataStore.currentSheetData?.columnOrder ?? []
     const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
+    const cellColIndex = columnOrder.indexOf(parseCellId(cellId).columnLetter)
+    const cellRowIndex = rowOrder.indexOf(parseCellId(cellId).rowNumber)
 
-    const bounds = rangeToIndexBounds(selection, columnOrder, rowOrder)
-    const cellColIdx = columnOrder.indexOf(parseCellId(cellId).columnLetter)
-    const cellRowIdx = rowOrder.indexOf(parseCellId(cellId).rowNumber)
+    return ranges.some((range) => {
+      const bounds = rangeToIndexBounds(range, columnOrder, rowOrder)
 
-    return (
-      cellColIdx >= bounds.minColIndex
-      && cellColIdx <= bounds.maxColIndex
-      && cellRowIdx >= bounds.minRowIndex
-      && cellRowIdx <= bounds.maxRowIndex
-    )
+      return (
+        cellColIndex >= bounds.minColIndex
+        && cellColIndex <= bounds.maxColIndex
+        && cellRowIndex >= bounds.minRowIndex
+        && cellRowIndex <= bounds.maxRowIndex
+      )
+    })
   }
 
   function getSelectionBounds(sheetId: string): SelectionBounds | null {
-    const selection = selections.value[sheetId]
+    const range = selections.value[sheetId]?.at(-1)
 
-    if (!selection)
+    if (!range)
       return null
 
     const columnOrder = sheetsDataStore.currentSheetData?.columnOrder ?? []
     const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
 
-    return rangeToIndexBounds(selection, columnOrder, rowOrder)
+    return rangeToIndexBounds(range, columnOrder, rowOrder)
+  }
+
+  function toggleCellInSelection(sheetId: string, cellId: string): void {
+    const ranges = selections.value[sheetId] ?? []
+    const exactIndex = ranges.findIndex(r => r.startId === cellId && r.endId === cellId)
+
+    if (exactIndex !== -1) {
+      const next = ranges.filter((_, i) => i !== exactIndex)
+
+      if (next.length === 0) {
+        delete selections.value[sheetId]
+      }
+      else {
+        selections.value[sheetId] = next
+      }
+    }
+    else if (!isInSelection(cellId)) {
+      const activeId = getActiveCell(sheetId)
+      const first = ranges.length === 0 ? [{ startId: activeId, endId: activeId }] : ranges
+      selections.value[sheetId] = [...first, { startId: cellId, endId: cellId }]
+    }
+  }
+
+  function getSelectedCellIds(sheetId: string, columnOrder: string[], rowOrder: string[], vertical = false): string[] {
+    const ranges = selections.value[sheetId] ?? []
+    const cellSet = new Set<string>()
+
+    for (const range of ranges) {
+      const bounds = rangeToIndexBounds(range, columnOrder, rowOrder)
+
+      for (let rowIndex = bounds.minRowIndex; rowIndex <= bounds.maxRowIndex; rowIndex++) {
+        for (let columnIndex = bounds.minColIndex; columnIndex <= bounds.maxColIndex; columnIndex++) {
+          cellSet.add(getCellId(columnOrder[columnIndex], rowOrder[rowIndex]))
+        }
+      }
+    }
+
+    return [...cellSet].sort((a, b) => {
+      const cellA = parseCellId(a)
+      const cellB = parseCellId(b)
+
+      const rowDiff = rowOrder.indexOf(cellA.rowNumber) - rowOrder.indexOf(cellB.rowNumber)
+      const columnDiff = columnOrder.indexOf(cellA.columnLetter) - columnOrder.indexOf(cellB.columnLetter)
+
+      return vertical ? (columnDiff !== 0 ? columnDiff : rowDiff) : (rowDiff !== 0 ? rowDiff : columnDiff)
+    })
   }
 
   return {
@@ -106,7 +166,11 @@ export function useSelection() {
     hasSelection,
     getSelectionStart,
     getSelectionEnd,
+    getSelectionRanges,
+    getSelectionRangeCount,
     isInSelection,
     getSelectionBounds,
+    toggleCellInSelection,
+    getSelectedCellIds,
   }
 }

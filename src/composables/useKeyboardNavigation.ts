@@ -26,6 +26,8 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     getSelectionStart,
     getSelectionEnd,
     getSelectionBounds,
+    getSelectedCellIds,
+    getSelectionRangeCount,
   } = useSelection()
 
   function startEditingMode(cellId: string, initialInput?: string) {
@@ -63,6 +65,21 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
       startRowIndex: rowOrder.indexOf(startRow),
       endRowIndex: rowOrder.indexOf(endRow),
     }
+  }
+
+  function cycleSelection(
+    currentCellId: string,
+    sheetId: string,
+    columnOrder: string[],
+    rowOrder: string[],
+    dir: number,
+    vertical = false,
+  ): NavigationResult {
+    const cellIndex = getSelectedCellIds(sheetId, columnOrder, rowOrder, vertical)
+    const nextIndex = (cellIndex.indexOf(currentCellId) + dir + cellIndex.length) % cellIndex.length
+    const { columnLetter, rowNumber } = parseCellId(cellIndex[nextIndex])
+
+    return { columnIndex: columnOrder.indexOf(columnLetter), rowIndex: rowOrder.indexOf(rowNumber) }
   }
 
   function handleArrowUp(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
@@ -127,7 +144,7 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
       setSelectionRange(
         sheetId,
         getCellId(startCol, rowOrder[startRowIndex + 1]),
-        getCellId(endCol, rowOrder[endRowIndex])
+        getCellId(endCol, rowOrder[endRowIndex]),
       )
     }
 
@@ -196,7 +213,7 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
       setSelectionRange(
         sheetId,
         getCellId(columnOrder[startColIndex + 1], startRow),
-        getCellId(columnOrder[endColIndex], endRow)
+        getCellId(columnOrder[endColIndex], endRow),
       )
     }
 
@@ -204,12 +221,15 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
   }
 
   function handleTab(ctx: NavigationCtx): NavigationResult {
-    const { sheetId, columnIndex, rowIndex, columnOrder, shift } = ctx
+    const { sheetId, currentCellId, columnIndex, rowIndex, columnOrder, rowOrder, shift } = ctx
     const dir = shift ? -1 : 1
 
     stopEditingMode()
 
     if (hasSelection(sheetId)) {
+      if (getSelectionRangeCount(sheetId) > 1)
+        return cycleSelection(currentCellId, sheetId, columnOrder, rowOrder, dir)
+
       const bounds = getSelectionBounds(sheetId)
 
       if (!bounds)
@@ -239,13 +259,16 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
   }
 
   function handleEnter(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, currentCellId, columnIndex, rowIndex, rowOrder, shift } = ctx
+    const { sheetId, currentCellId, columnIndex, rowIndex, rowOrder, columnOrder, shift } = ctx
     const dir = shift ? -1 : 1
     const wasEditing = Boolean(editingCellId.value)
 
     if (hasSelection(sheetId)) {
       if (wasEditing)
         stopEditingMode()
+
+      if (getSelectionRangeCount(sheetId) > 1)
+        return cycleSelection(currentCellId, sheetId, columnOrder, rowOrder, dir, true)
 
       const bounds = getSelectionBounds(sheetId)
 
@@ -292,7 +315,14 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
       return null
 
     event.preventDefault()
-    await sheetsDataCellsStore.updateCellValue(ctx.currentCellId, '')
+
+    if (hasSelection(ctx.sheetId)) {
+      const cellIds = getSelectedCellIds(ctx.sheetId, ctx.columnOrder, ctx.rowOrder)
+      await Promise.all(cellIds.map(id => sheetsDataCellsStore.updateCellValue(id, '')))
+    }
+    else {
+      await sheetsDataCellsStore.updateCellValue(ctx.currentCellId, '')
+    }
 
     return null
   }
