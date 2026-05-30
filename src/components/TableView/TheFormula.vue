@@ -3,14 +3,28 @@ import { computed } from 'vue'
 
 import { useSheetsStore } from '@/stores/sheets'
 import { useActiveCell } from '@/composables/useActiveCell'
+import { useSelection } from '@/composables/useSelection'
 
 import { TextInput } from '@/shared/ui'
 
 const { getActiveCell } = useActiveCell()
+const { hasSelection, getSelectionStart, getSelectionEnd } = useSelection()
 
 const sheetsStore = useSheetsStore()
 
 const activeCellId = computed(() => getActiveCell(sheetsStore.currentSheetId))
+
+const rangeLabel = computed(() => {
+  const sheetId = sheetsStore.currentSheetId
+
+  if (sheetId && hasSelection(sheetId)) {
+    const start = getSelectionStart(sheetId)?.replace(':', '') ?? ''
+    const end = getSelectionEnd(sheetId)?.replace(':', '') ?? ''
+    return start === end ? start : `${start}:${end}`
+  }
+
+  return activeCellId.value?.replace(':', '') ?? ''
+})
 </script>
 
 <template>
@@ -18,10 +32,10 @@ const activeCellId = computed(() => getActiveCell(sheetsStore.currentSheetId))
     <TextInput
       variant="range"
       disabled
-      :model-value="activeCellId.replace(':', '')"
+      :model-value="rangeLabel"
     />
 
-    <span class="bg-gray-3 w-0.25 shrink-0 transition-colors" />
+    <span class="bg-gray-3 w-px shrink-0 transition-colors" />
 
     <TextInput
       variant="formula"

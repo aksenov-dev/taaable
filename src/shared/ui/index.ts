@@ -1,5 +1,3 @@
-import type { DropdownMenuOffset } from './DropdownMenu/DropdownMenu/types'
-
 import BaseButton from './BaseButton/BaseButton.vue'
 import DarkThemeToggle from './DarkThemeToggle/DarkThemeToggle.vue'
 import DropdownMenu from './DropdownMenu/DropdownMenu/DropdownMenu.vue'
@@ -16,8 +14,4 @@ export {
   DropdownMenuItem,
   LoadingOverlay,
   TextInput,
-}
-
-export type {
-  DropdownMenuOffset,
 }

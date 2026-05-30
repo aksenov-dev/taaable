@@ -50,18 +50,18 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     const startId = getSelectionStart(sheetId) ?? currentCellId
     const endId = getSelectionEnd(sheetId) ?? currentCellId
 
-    const { columnLetter: startCol, rowNumber: startRow } = parseCellId(startId)
-    const { columnLetter: endCol, rowNumber: endRow } = parseCellId(endId)
+    const { columnLetter: startColumn, rowNumber: startRow } = parseCellId(startId)
+    const { columnLetter: endColumn, rowNumber: endRow } = parseCellId(endId)
 
     return {
       startId,
       endId,
-      startCol,
+      startColumn,
       startRow,
-      endCol,
+      endColumn,
       endRow,
-      startColIndex: columnOrder.indexOf(startCol),
-      endColIndex: columnOrder.indexOf(endCol),
+      startColumnIndex: columnOrder.indexOf(startColumn),
+      endColumnIndex: columnOrder.indexOf(endColumn),
       startRowIndex: rowOrder.indexOf(startRow),
       endRowIndex: rowOrder.indexOf(endRow),
     }
@@ -96,20 +96,20 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
 
     event.preventDefault()
 
-    const { startId, startCol, endCol, startRowIndex, endRowIndex } = getSelectionEndpoints(ctx)
+    const { startId, startColumn, endColumn, startRowIndex, endRowIndex } = getSelectionEndpoints(ctx)
 
     const newEndRowIndex = ctrl ? 0 : Math.max(0, endRowIndex - 1)
     const newBottomRowIndex = Math.max(startRowIndex, newEndRowIndex)
 
     if (rowIndex > newBottomRowIndex) {
       const newTopRowIndex = ctrl ? 0 : Math.max(0, startRowIndex - 1)
-      const newStartId = getCellId(startCol, rowOrder[newTopRowIndex])
-      const newEndId = getCellId(endCol, rowOrder[rowIndex])
+      const newStartId = getCellId(startColumn, rowOrder[newTopRowIndex])
+      const newEndId = getCellId(endColumn, rowOrder[rowIndex])
 
       setSelectionRange(sheetId, newStartId, newEndId)
     }
     else {
-      setSelectionRange(sheetId, startId, getCellId(endCol, rowOrder[newEndRowIndex]))
+      setSelectionRange(sheetId, startId, getCellId(endColumn, rowOrder[newEndRowIndex]))
     }
 
     return null
@@ -129,22 +129,22 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
 
     event.preventDefault()
 
-    const { startCol, endCol, startRowIndex, endRowIndex } = getSelectionEndpoints(ctx)
+    const { startColumn, endColumn, startRowIndex, endRowIndex } = getSelectionEndpoints(ctx)
 
     const newEndRowIndex = ctrl ? rowOrder.length - 1 : Math.min(rowOrder.length - 1, endRowIndex + 1)
     const newTopRowIndex = Math.min(startRowIndex + 1, newEndRowIndex)
 
     if (ctrl || rowIndex < newTopRowIndex) {
-      const newStartId = getCellId(startCol, rowOrder[newEndRowIndex])
-      const newEndId = getCellId(endCol, rowOrder[rowIndex])
+      const newStartId = getCellId(startColumn, rowOrder[newEndRowIndex])
+      const newEndId = getCellId(endColumn, rowOrder[rowIndex])
 
       setSelectionRange(sheetId, newStartId, newEndId)
     }
     else {
       setSelectionRange(
         sheetId,
-        getCellId(startCol, rowOrder[startRowIndex + 1]),
-        getCellId(endCol, rowOrder[endRowIndex]),
+        getCellId(startColumn, rowOrder[startRowIndex + 1]),
+        getCellId(endColumn, rowOrder[endRowIndex]),
       )
     }
 
@@ -165,20 +165,20 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
 
     event.preventDefault()
 
-    const { startId, startRow, endRow, startColIndex, endColIndex } = getSelectionEndpoints(ctx)
+    const { startId, startRow, endRow, startColumnIndex, endColumnIndex } = getSelectionEndpoints(ctx)
 
-    const newEndColIndex = ctrl ? 0 : Math.max(0, endColIndex - 1)
-    const newRightColIndex = Math.max(startColIndex, newEndColIndex)
+    const newEndColumnIndex = ctrl ? 0 : Math.max(0, endColumnIndex - 1)
+    const newRightColumnIndex = Math.max(startColumnIndex, newEndColumnIndex)
 
-    if (columnIndex > newRightColIndex) {
-      const newLeftColIdx = ctrl ? 0 : Math.max(0, startColIndex - 1)
-      const newStartId = getCellId(columnOrder[newLeftColIdx], startRow)
+    if (columnIndex > newRightColumnIndex) {
+      const newLeftColumnIndex = ctrl ? 0 : Math.max(0, startColumnIndex - 1)
+      const newStartId = getCellId(columnOrder[newLeftColumnIndex], startRow)
       const newEndId = getCellId(columnOrder[columnIndex], endRow)
 
       setSelectionRange(sheetId, newStartId, newEndId)
     }
     else {
-      setSelectionRange(sheetId, startId, getCellId(columnOrder[newEndColIndex], endRow))
+      setSelectionRange(sheetId, startId, getCellId(columnOrder[newEndColumnIndex], endRow))
     }
 
     return null
@@ -198,13 +198,13 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
 
     event.preventDefault()
 
-    const { startRow, endRow, startColIndex, endColIndex } = getSelectionEndpoints(ctx)
+    const { startRow, endRow, startColumnIndex, endColumnIndex } = getSelectionEndpoints(ctx)
 
-    const newEndColIndex = ctrl ? columnOrder.length - 1 : Math.min(columnOrder.length - 1, endColIndex + 1)
-    const newLeftColIndex = Math.min(startColIndex + 1, newEndColIndex)
+    const newEndColumnIndex = ctrl ? columnOrder.length - 1 : Math.min(columnOrder.length - 1, endColumnIndex + 1)
+    const newLeftColumnIndex = Math.min(startColumnIndex + 1, newEndColumnIndex)
 
-    if (ctrl || columnIndex < newLeftColIndex) {
-      const newStartId = getCellId(columnOrder[newEndColIndex], startRow)
+    if (ctrl || columnIndex < newLeftColumnIndex) {
+      const newStartId = getCellId(columnOrder[newEndColumnIndex], startRow)
       const newEndId = getCellId(columnOrder[columnIndex], endRow)
 
       setSelectionRange(sheetId, newStartId, newEndId)
@@ -212,8 +212,8 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     else {
       setSelectionRange(
         sheetId,
-        getCellId(columnOrder[startColIndex + 1], startRow),
-        getCellId(columnOrder[endColIndex], endRow),
+        getCellId(columnOrder[startColumnIndex + 1], startRow),
+        getCellId(columnOrder[endColumnIndex], endRow),
       )
     }
 
@@ -236,12 +236,12 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
         return null
 
       const canMoveInRow = shift
-        ? columnIndex > bounds.minColIndex
-        : columnIndex < bounds.maxColIndex
+        ? columnIndex > bounds.minColumnIndex
+        : columnIndex < bounds.maxColumnIndex
 
       const newColIndex = canMoveInRow
         ? columnIndex + dir
-        : shift ? bounds.maxColIndex : bounds.minColIndex
+        : shift ? bounds.maxColumnIndex : bounds.minColumnIndex
 
       const newRowIndex = canMoveInRow
         ? rowIndex
@@ -286,8 +286,8 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
       const newColIndex = canMoveInCol
         ? columnIndex
         : shift
-          ? columnIndex > bounds.minColIndex ? columnIndex - 1 : bounds.maxColIndex
-          : columnIndex < bounds.maxColIndex ? columnIndex + 1 : bounds.minColIndex
+          ? columnIndex > bounds.minColumnIndex ? columnIndex - 1 : bounds.maxColumnIndex
+          : columnIndex < bounds.maxColumnIndex ? columnIndex + 1 : bounds.minColumnIndex
 
       return { columnIndex: newColIndex, rowIndex: newRowIndex }
     }

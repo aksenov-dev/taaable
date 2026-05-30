@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
-    "type-check": "vue-tsc --noEmit",
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json",
     "lint": "NODE_OPTIONS='--no-warnings=ExperimentalWarning' eslint .",
     "lint:fix": "eslint . --fix",
     "deploy": "npm run build && cp dist/index.html dist/404.html && gh-pages -d dist"

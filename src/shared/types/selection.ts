@@ -4,8 +4,8 @@ export interface SelectionRange {
 }
 
 export interface SelectionBounds {
-  minColIndex: number
-  maxColIndex: number
+  minColumnIndex: number
+  maxColumnIndex: number
   minRowIndex: number
   maxRowIndex: number
 }

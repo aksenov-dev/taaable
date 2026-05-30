@@ -16,16 +16,16 @@ export function useSelection() {
   const { getActiveCell } = useActiveCell()
 
   function rangeToIndexBounds(range: SelectionRange, columnOrder: string[], rowOrder: string[]): SelectionBounds {
-    const startColIdx = columnOrder.indexOf(parseCellId(range.startId).columnLetter)
-    const startRowIdx = rowOrder.indexOf(parseCellId(range.startId).rowNumber)
-    const endColIdx = columnOrder.indexOf(parseCellId(range.endId).columnLetter)
-    const endRowIdx = rowOrder.indexOf(parseCellId(range.endId).rowNumber)
+    const startColumnIndex = columnOrder.indexOf(parseCellId(range.startId).columnLetter)
+    const startRowIndex = rowOrder.indexOf(parseCellId(range.startId).rowNumber)
+    const endColumnIndex = columnOrder.indexOf(parseCellId(range.endId).columnLetter)
+    const endRowIndex = rowOrder.indexOf(parseCellId(range.endId).rowNumber)
 
     return {
-      minColIndex: Math.min(startColIdx, endColIdx),
-      maxColIndex: Math.max(startColIdx, endColIdx),
-      minRowIndex: Math.min(startRowIdx, endRowIdx),
-      maxRowIndex: Math.max(startRowIdx, endRowIdx),
+      minColumnIndex: Math.min(startColumnIndex, endColumnIndex),
+      maxColumnIndex: Math.max(startColumnIndex, endColumnIndex),
+      minRowIndex: Math.min(startRowIndex, endRowIndex),
+      maxRowIndex: Math.max(startRowIndex, endRowIndex),
     }
   }
 
@@ -35,8 +35,8 @@ export function useSelection() {
     const bounds = rangeToIndexBounds({ startId, endId }, columnOrder, rowOrder)
 
     const normalized = {
-      startId: getCellId(columnOrder[bounds.minColIndex], rowOrder[bounds.minRowIndex]),
-      endId: getCellId(columnOrder[bounds.maxColIndex], rowOrder[bounds.maxRowIndex]),
+      startId: getCellId(columnOrder[bounds.minColumnIndex], rowOrder[bounds.minRowIndex]),
+      endId: getCellId(columnOrder[bounds.maxColumnIndex], rowOrder[bounds.maxRowIndex]),
     }
 
     const prev = selections.value[sheetId] ?? []
@@ -77,27 +77,65 @@ export function useSelection() {
     return selections.value[sheetId]?.length ?? 0
   }
 
-  function isInSelection(cellId: string): boolean {
+  function getCurrentRangeContext() {
     const sheetId = sheetsStore.currentSheetId
     const ranges = sheetId ? selections.value[sheetId] : null
 
     if (!ranges?.length)
-      return false
+      return null
 
     const columnOrder = sheetsDataStore.currentSheetData?.columnOrder ?? []
     const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
-    const cellColIndex = columnOrder.indexOf(parseCellId(cellId).columnLetter)
-    const cellRowIndex = rowOrder.indexOf(parseCellId(cellId).rowNumber)
 
-    return ranges.some((range) => {
-      const bounds = rangeToIndexBounds(range, columnOrder, rowOrder)
+    return { ranges, columnOrder, rowOrder }
+  }
+
+  function isInSelection(cellId: string): boolean {
+    const ctx = getCurrentRangeContext()
+
+    if (!ctx)
+      return false
+
+    const cellColIndex = ctx.columnOrder.indexOf(parseCellId(cellId).columnLetter)
+    const cellRowIndex = ctx.rowOrder.indexOf(parseCellId(cellId).rowNumber)
+
+    return ctx.ranges.some((range) => {
+      const bounds = rangeToIndexBounds(range, ctx.columnOrder, ctx.rowOrder)
 
       return (
-        cellColIndex >= bounds.minColIndex
-        && cellColIndex <= bounds.maxColIndex
+        cellColIndex >= bounds.minColumnIndex
+        && cellColIndex <= bounds.maxColumnIndex
         && cellRowIndex >= bounds.minRowIndex
         && cellRowIndex <= bounds.maxRowIndex
       )
+    })
+  }
+
+  function isColumnInSelection(columnLetter: string): boolean {
+    const ctx = getCurrentRangeContext()
+
+    if (!ctx)
+      return false
+
+    const columnIndex = ctx.columnOrder.indexOf(columnLetter)
+
+    return ctx.ranges.some((range) => {
+      const bounds = rangeToIndexBounds(range, ctx.columnOrder, ctx.rowOrder)
+      return columnIndex >= bounds.minColumnIndex && columnIndex <= bounds.maxColumnIndex
+    })
+  }
+
+  function isRowInSelection(rowNumber: string): boolean {
+    const ctx = getCurrentRangeContext()
+
+    if (!ctx)
+      return false
+
+    const rowIndex = ctx.rowOrder.indexOf(rowNumber)
+
+    return ctx.ranges.some((range) => {
+      const bounds = rangeToIndexBounds(range, ctx.columnOrder, ctx.rowOrder)
+      return rowIndex >= bounds.minRowIndex && rowIndex <= bounds.maxRowIndex
     })
   }
 
@@ -142,7 +180,7 @@ export function useSelection() {
       const bounds = rangeToIndexBounds(range, columnOrder, rowOrder)
 
       for (let rowIndex = bounds.minRowIndex; rowIndex <= bounds.maxRowIndex; rowIndex++) {
-        for (let columnIndex = bounds.minColIndex; columnIndex <= bounds.maxColIndex; columnIndex++) {
+        for (let columnIndex = bounds.minColumnIndex; columnIndex <= bounds.maxColumnIndex; columnIndex++) {
           cellSet.add(getCellId(columnOrder[columnIndex], rowOrder[rowIndex]))
         }
       }
@@ -169,6 +207,8 @@ export function useSelection() {
     getSelectionRanges,
     getSelectionRangeCount,
     isInSelection,
+    isColumnInSelection,
+    isRowInSelection,
     getSelectionBounds,
     toggleCellInSelection,
     getSelectedCellIds,

@@ -23,7 +23,7 @@ const emit = defineEmits<{
   cellMousedown: [cellId: string, event: MouseEvent]
 }>()
 
-const { isInSelection } = useSelection()
+const { isInSelection, isRowInSelection } = useSelection()
 
 const activeRowNumber = computed(() => parseCellId(activeCellId).rowNumber)
 const cellIds = computed(() => columnOrder.map(columnLetter => getCellId(columnLetter, rowNumber)))
@@ -32,7 +32,7 @@ const cellIds = computed(() => columnOrder.map(columnLetter => getCellId(columnL
 <template>
   <TableHeaderRowCell
     :row-number="rowNumber"
-    :is-active="activeRowNumber === rowNumber"
+    :is-active="activeRowNumber === rowNumber || isRowInSelection(rowNumber)"
   />
 
   <TableCell
