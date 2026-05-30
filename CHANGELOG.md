@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-30
+
+### Added
+- Multi-cell range selection with Shift+Click and Shift+Arrow keys
+- Multi-range selection with Ctrl/Cmd+Click (non-contiguous ranges)
+- Mouse drag selection with Shift and Ctrl/Cmd support
+- Active selection range displayed in formula bar name box
+
+### Fixed
+- Prevent default on Enter/Shift+Enter when opening cell editor
+- Clear selection before extending on Shift+Click
+
 ## [1.1.0] - 2026-05-23
 
 ### Added
