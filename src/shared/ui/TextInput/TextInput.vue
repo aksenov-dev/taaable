@@ -90,6 +90,6 @@ input {
 }
 
 .range {
-  @apply w-20;
+  @apply w-21;
 }
 </style>

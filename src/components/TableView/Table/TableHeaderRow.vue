@@ -5,6 +5,8 @@ import type { Cell, ColumnsData } from '@/shared/types'
 
 import { parseCellId } from '@/shared/utils'
 
+import { useSelection } from '@/composables/useSelection'
+
 import TableHeaderColumnCell from '@/components/TableView/Table/TableHeaderColumnCell.vue'
 
 const { columnOrder, columns, activeCellId } = defineProps<{
@@ -12,6 +14,8 @@ const { columnOrder, columns, activeCellId } = defineProps<{
   columns: ColumnsData['columns']
   activeCellId: Cell['cellId']
 }>()
+
+const { isColumnInSelection } = useSelection()
 
 const activeColumnLetter = computed(() => parseCellId(activeCellId).columnLetter)
 </script>
@@ -27,6 +31,6 @@ const activeColumnLetter = computed(() => parseCellId(activeCellId).columnLetter
     :key="columnLetter"
     :column-letter="columnLetter"
     :column="columns[columnLetter]"
-    :is-active="activeColumnLetter === columnLetter"
+    :is-active="activeColumnLetter === columnLetter || isColumnInSelection(columnLetter)"
   />
 </template>

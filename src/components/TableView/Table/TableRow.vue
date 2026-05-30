@@ -5,6 +5,8 @@ import type { Cell, CellsData, ColumnsData } from '@/shared/types'
 
 import { getCellId, parseCellId } from '@/shared/utils'
 
+import { useSelection } from '@/composables/useSelection'
+
 import TableCell from '@/components/TableView/Table/TableCell.vue'
 import TableHeaderRowCell from '@/components/TableView/Table/TableHeaderRowCell.vue'
 
@@ -17,26 +19,30 @@ const { columnOrder, rowNumber, cells, activeCellId, isEditing } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  cellDblclick: [{ event: MouseEvent, cellId: string }]
-  cellMousedown: [value: string]
+  cellDblclick: [cellId: string, event: MouseEvent]
+  cellMousedown: [cellId: string, event: MouseEvent]
 }>()
 
+const { isInSelection, isRowInSelection } = useSelection()
+
 const activeRowNumber = computed(() => parseCellId(activeCellId).rowNumber)
+const cellIds = computed(() => columnOrder.map(columnLetter => getCellId(columnLetter, rowNumber)))
 </script>
 
 <template>
   <TableHeaderRowCell
     :row-number="rowNumber"
-    :is-active="activeRowNumber === rowNumber"
+    :is-active="activeRowNumber === rowNumber || isRowInSelection(rowNumber)"
   />
 
   <TableCell
-    v-for="columnLetter in columnOrder"
-    :key="getCellId(columnLetter, rowNumber)"
-    :cell="cells[getCellId(columnLetter, rowNumber)]"
-    :is-active="activeCellId === getCellId(columnLetter, rowNumber)"
+    v-for="cellId in cellIds"
+    :key="cellId"
+    :cell="cells[cellId]"
+    :is-active="activeCellId === cellId"
     :is-editing="isEditing"
-    @dblclick="payload => emit('cellDblclick', payload)"
-    @mousedown="emit('cellMousedown', getCellId(columnLetter, rowNumber))"
+    :is-in-selection="isInSelection(cellId)"
+    @dblclick="event => emit('cellDblclick', cellId, event)"
+    @mousedown="event => emit('cellMousedown', cellId, event)"
   />
 </template>

@@ -11,7 +11,7 @@ const { rowNumber, isActive } = defineProps<{
   <div
     role="rowheader"
     :data-row-number="rowNumber"
-    class="text-small border-gray-3 sticky left-0 z-2 flex cursor-default items-center justify-center border-r border-b
+    class="text-small border-gray-3 sticky left-0 z-3 flex cursor-default items-center justify-center border-r border-b
     select-none"
     :class="{
       'bg-gray-2 text-black dark:text-white': isActive,

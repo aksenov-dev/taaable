@@ -3,17 +3,33 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-html {
-  color-scheme: dark light;
-}
+@theme {
+  --breakpoint-ml: 56rem;
+  --breakpoint-sm: 36rem;
 
-:where(html.table-page.theme-switching) * {
-  transition: none !important;
-}
+  --font-roboto: 'Roboto', sans-serif;
 
-.scrollbar {
-  scrollbar-color: var(--color-gray-3) transparent;
-  scrollbar-width: thin;
+  --text-small: 12px;
+  --text-small--font-weight: 400;
+  --text-medium: 14px;
+  --text-medium--font-weight: 400;
+  --text-large: 17px;
+  --text-large--font-weight: 400;
+  --text-extra-large: 21px;
+  --text-extra-large--font-weight: 600;
+
+  --color-black: var(--black-color);
+  --color-gray-1: var(--gray-1-color);
+  --color-gray-2: var(--gray-2-color);
+  --color-gray-3: var(--gray-3-color);
+  --color-gray-4: var(--gray-4-color);
+  --color-gray-5: var(--gray-5-color);
+  --color-gray-6: var(--gray-6-color);
+  --color-accent-1: var(--accent-1-color);
+  --color-accent-2: var(--accent-2-color);
+
+  --shadow-brand-1: var(--shadow-1);
+  --shadow-brand-2: var(--shadow-2);
 }
 
 :root {
@@ -54,35 +70,26 @@ html {
   --shadow-1: 0 2px 5px rgba(0, 0, 0, 0.25);
 }
 
+html {
+  color-scheme: dark light;
+}
+
+:where(html.table-page.theme-switching) * {
+  transition: none !important;
+}
+
 ::selection {
   background-color: var(--text-select-color);
 }
 
-@theme {
-  --breakpoint-ml: 56rem;
-  --breakpoint-sm: 36rem;
+.scrollbar {
+  scrollbar-color: var(--color-gray-3) transparent;
+  scrollbar-width: thin;
+}
 
-  --font-roboto: 'Roboto', sans-serif;
-
-  --text-small: 12px;
-  --text-small--font-weight: 400;
-  --text-medium: 14px;
-  --text-medium--font-weight: 400;
-  --text-large: 17px;
-  --text-large--font-weight: 400;
-  --text-extra-large: 21px;
-  --text-extra-large--font-weight: 600;
-
-  --color-black: var(--black-color);
-  --color-gray-1: var(--gray-1-color);
-  --color-gray-2: var(--gray-2-color);
-  --color-gray-3: var(--gray-3-color);
-  --color-gray-4: var(--gray-4-color);
-  --color-gray-5: var(--gray-5-color);
-  --color-gray-6: var(--gray-6-color);
-  --color-accent-1: var(--accent-1-color);
-  --color-accent-2: var(--accent-2-color);
-
-  --shadow-brand-1: var(--shadow-1);
-  --shadow-brand-2: var(--shadow-2);
+.drag-select-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
 }
