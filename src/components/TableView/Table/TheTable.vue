@@ -11,6 +11,7 @@ import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
 import { useActiveCell } from '@/composables/useActiveCell'
 import { useCellEditing } from '@/composables/useCellEditing'
 import { useColumnResize } from '@/composables/useColumnResize'
+import { useDragSelection } from '@/composables/useDragSelection'
 import { useKeyboardNavigation } from '@/composables/useKeyboardNavigation'
 import { useResizeRuler } from '@/composables/useResizeRuler'
 import { useRowResize } from '@/composables/useRowResize'
@@ -25,8 +26,11 @@ import TableHeaderRow from '@/components/TableView/Table/TableHeaderRow.vue'
 import TableRow from '@/components/TableView/Table/TableRow.vue'
 import TableRowResizer from '@/components/TableView/Table/TableRowResizer.vue'
 
-const { getActiveCell, setActiveCell } = useActiveCell()
-const { editingCellId, activateEditor, stopEditing } = useCellEditing()
+const sheetsStore = useSheetsStore()
+const sheetsDataStore = useSheetsDataStore()
+const sheetsDataRowsStore = useSheetsDataRowsStore()
+const sheetsDataColumnsStore = useSheetsDataColumnsStore()
+const sheetsDataCellsStore = useSheetsDataCellsStore()
 
 const tableContainerRef = useTemplateRef('table-container')
 const tableScroll = reactive({ left: 0, top: 0 })
@@ -35,18 +39,16 @@ useSheetScrollPosition(tableContainerRef)
 useScrollActiveCell(tableContainerRef)
 useKeyboardNavigation(tableContainerRef)
 
+const { getActiveCell, setActiveCell } = useActiveCell()
+const { editingCellId, activateEditor, stopEditing } = useCellEditing()
+
 const resizeRuler = useResizeRuler()
 const { isResizeRulerVisible, resizeRulerPosition } = resizeRuler
 
 const { resizingRowNumber, startRowResize } = useRowResize(resizeRuler, tableContainerRef)
 const { resizingColumnLetter, startColumnResize } = useColumnResize(resizeRuler, tableContainerRef)
 const { extendSelection, clearSelection, getSelectionRanges, toggleCellInSelection } = useSelection()
-
-const sheetsStore = useSheetsStore()
-const sheetsDataStore = useSheetsDataStore()
-const sheetsDataRowsStore = useSheetsDataRowsStore()
-const sheetsDataColumnsStore = useSheetsDataColumnsStore()
-const sheetsDataCellsStore = useSheetsDataCellsStore()
+const { isDragActive, isDragging, startDragSelection } = useDragSelection(() => sheetsStore.currentSheetId)
 
 const columnCount = computed(() => sheetsDataStore.currentSheetData?.columnOrder.length ?? 0)
 const rowCount = computed(() => sheetsDataStore.currentSheetData?.rowOrder.length ?? 0)
@@ -87,29 +89,46 @@ function onTableScroll(e: Event): void {
 }
 
 function handleCellMouseDown(cellId: string, event: MouseEvent): void {
-  if (!sheetsStore.currentSheetId)
+  const sheetId = sheetsStore.currentSheetId
+
+  if (!sheetId)
     return
 
   if (event.ctrlKey || event.metaKey) {
     if (event.shiftKey) {
-      extendSelection(sheetsStore.currentSheetId, cellId)
+      if (cellId !== activeCellId.value)
+        extendSelection(sheetId, cellId, activeCellId.value)
+
+      startDragSelection(cellId, event, false, activeCellId.value)
     }
     else {
-      toggleCellInSelection(sheetsStore.currentSheetId, cellId)
-      setActiveCell(sheetsStore.currentSheetId, cellId)
+      if (cellId !== activeCellId.value) {
+        toggleCellInSelection(sheetId, cellId)
+        setActiveCell(sheetId, cellId)
+      }
+
+      startDragSelection(cellId, event, true)
     }
 
     return
   }
 
   if (event.shiftKey) {
-    clearSelection(sheetsStore.currentSheetId)
-    extendSelection(sheetsStore.currentSheetId, cellId)
+    if (cellId !== activeCellId.value) {
+      clearSelection(sheetId)
+      extendSelection(sheetId, cellId)
+    }
+
+    startDragSelection(cellId, event, false, activeCellId.value)
+
+    return
   }
-  else {
-    clearSelection(sheetsStore.currentSheetId)
-    setActiveCell(sheetsStore.currentSheetId, cellId)
-  }
+
+  clearSelection(sheetId)
+  setActiveCell(sheetId, cellId)
+
+  if (!editingCellId.value)
+    startDragSelection(cellId, event)
 }
 
 function handleCellDblClick(cellId: string, event: MouseEvent): void {
@@ -140,6 +159,7 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
     ref="table-container"
     tabindex="0"
     class="scrollbar border-gray-3 overflow-auto border-t border-b outline-none relative"
+    :class="{ 'is-dragging': isDragging }"
     @scroll="onTableScroll"
   >
     <TableRowResizer
@@ -196,6 +216,7 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
 
       <SelectionOverlay
         v-for="(range, index) in selectionRanges"
+        v-show="!isDragActive || index !== selectionRanges.length - 1"
         :key="`${range.startId}-${range.endId}`"
         :table-container="tableContainerRef"
         :start-cell-id="range.startId"
@@ -205,3 +226,9 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.is-dragging :deep(.cell--fill-handle::after) {
+  display: none;
+}
+</style>

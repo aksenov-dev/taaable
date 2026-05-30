@@ -43,9 +43,9 @@ export function useSelection() {
     selections.value[sheetId] = replaceAll ? [normalized] : [...prev.slice(0, -1), normalized]
   }
 
-  function extendSelection(sheetId: string, newEndId: string): void {
+  function extendSelection(sheetId: string, newEndId: string, anchor?: string): void {
     const ranges = selections.value[sheetId]
-    const anchorId = ranges?.at(-1)?.startId ?? getActiveCell(sheetId)
+    const anchorId = anchor ?? ranges?.at(-1)?.startId ?? getActiveCell(sheetId)
     saveNormalized(sheetId, anchorId, newEndId)
   }
 
