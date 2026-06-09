@@ -19,6 +19,7 @@ const { icon, title, isActive = false, isMenuOpen = false, disabled = false } = 
       'pointer-events-none': disabled,
       'shadow-brand-1 bg-white dark:bg-black': isMenuOpen,
     }"
+    @mousedown.prevent
   >
     <component
       :is="icon"

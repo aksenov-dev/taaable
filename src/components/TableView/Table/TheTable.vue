@@ -3,10 +3,13 @@ import { computed, reactive, useTemplateRef, watch } from 'vue'
 
 import { CELL_SIZE } from '@/shared/constants'
 
+import { parseCellId } from '@/shared/utils'
+
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
 import { useSheetsDataCellsStore } from '@/stores/sheetsData/cells'
 import { useSheetsDataColumnsStore } from '@/stores/sheetsData/columns'
+import { useSheetsDataMergesStore } from '@/stores/sheetsData/merges'
 import { useSheetsDataRowsStore } from '@/stores/sheetsData/rows'
 import { useActiveCell } from '@/composables/useActiveCell'
 import { useCellEditing } from '@/composables/useCellEditing'
@@ -31,6 +34,7 @@ const sheetsDataStore = useSheetsDataStore()
 const sheetsDataRowsStore = useSheetsDataRowsStore()
 const sheetsDataColumnsStore = useSheetsDataColumnsStore()
 const sheetsDataCellsStore = useSheetsDataCellsStore()
+const mergesStore = useSheetsDataMergesStore()
 
 const tableContainerRef = useTemplateRef('table-container')
 const tableScroll = reactive({ left: 0, top: 0 })
@@ -53,6 +57,45 @@ const { isDragActive, isDragging, startDragSelection } = useDragSelection(() => 
 const columnCount = computed(() => sheetsDataStore.currentSheetData?.columnOrder.length ?? 0)
 const rowCount = computed(() => sheetsDataStore.currentSheetData?.rowOrder.length ?? 0)
 const activeCellId = computed(() => getActiveCell(sheetsStore.currentSheetId))
+const activeMerge = computed(() => mergesStore.anchorMerges[activeCellId.value])
+
+const activeMergeRowNumbers = computed(() => {
+  const { rowNumber } = parseCellId(activeCellId.value)
+  const merge = activeMerge.value
+
+  if (!merge || !sheetsDataStore.currentSheetData)
+    return new Set([rowNumber])
+
+  const rowOrder = sheetsDataStore.currentSheetData.rowOrder
+  const startIndex = rowOrder.indexOf(rowNumber)
+  const result = new Set<string>()
+
+  for (let i = 0; i < merge.rowSpan; i++) {
+    if (rowOrder[startIndex + i])
+      result.add(rowOrder[startIndex + i])
+  }
+
+  return result
+})
+
+const activeMergeColumnLetters = computed(() => {
+  const { columnLetter } = parseCellId(activeCellId.value)
+  const merge = activeMerge.value
+
+  if (!merge || !sheetsDataStore.currentSheetData)
+    return new Set([columnLetter])
+
+  const columnOrder = sheetsDataStore.currentSheetData.columnOrder
+  const startIndex = columnOrder.indexOf(columnLetter)
+  const result = new Set<string>()
+
+  for (let i = 0; i < merge.colSpan; i++) {
+    if (columnOrder[startIndex + i])
+      result.add(columnOrder[startIndex + i])
+  }
+
+  return result
+})
 
 const selectionRanges = computed(() => {
   return sheetsStore.currentSheetId ? getSelectionRanges(sheetsStore.currentSheetId) : []
@@ -193,7 +236,7 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
       <TableHeaderRow
         :column-order="sheetsDataStore.currentSheetData.columnOrder"
         :columns="sheetsDataStore.currentSheetData.columns"
-        :active-cell-id="activeCellId"
+        :active-merge-column-letters="activeMergeColumnLetters"
       />
 
       <TableRow
@@ -203,7 +246,10 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
         :row-number="rowNumber"
         :cells="sheetsDataStore.currentSheetData.cells"
         :active-cell-id="activeCellId"
+        :active-merge-row-numbers="activeMergeRowNumbers"
         :is-editing="editingCellId !== null"
+        :merge-covered-set="mergesStore.mergeCoveredSet"
+        :anchor-merges="mergesStore.anchorMerges"
         @cell-dblclick="handleCellDblClick"
         @cell-mousedown="handleCellMouseDown"
       />
@@ -222,6 +268,7 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
         :start-cell-id="range.startId"
         :end-cell-id="range.endId"
         :show-fill-handle="index === selectionRanges.length - 1"
+        :covered-to-anchor-map="mergesStore.coveredToAnchorMap"
       />
     </div>
   </div>

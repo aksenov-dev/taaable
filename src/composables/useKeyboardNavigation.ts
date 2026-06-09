@@ -1,13 +1,21 @@
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import type { Ref } from 'vue'
 
 import type { NavigationCtx, NavigationResult } from '@/shared/types'
 
-import { getCellId, parseCellId } from '@/shared/utils'
+import {
+  getCellId,
+  parseCellId,
+  resolveNavColContext,
+  resolveTabRowContext,
+  skipCoveredCols,
+  skipCoveredRows,
+} from '@/shared/utils'
 
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
 import { useSheetsDataCellsStore } from '@/stores/sheetsData/cells'
+import { useSheetsDataMergesStore } from '@/stores/sheetsData/merges'
 import { useActiveCell } from '@/composables/useActiveCell'
 import { useCellEditing } from '@/composables/useCellEditing'
 import { useSelection } from '@/composables/useSelection'
@@ -16,6 +24,10 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
   const sheetsStore = useSheetsStore()
   const sheetsDataStore = useSheetsDataStore()
   const sheetsDataCellsStore = useSheetsDataCellsStore()
+  const mergesStore = useSheetsDataMergesStore()
+
+  const tabRowContext = ref<string | null>(null)
+  const navColContext = ref<string | null>(null)
 
   const { getActiveCell, setActiveCell } = useActiveCell()
   const { editingCellId, activateEditor, stopEditing } = useCellEditing()
@@ -25,14 +37,11 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     hasSelection,
     getSelectionStart,
     getSelectionEnd,
-    getSelectionBounds,
     getSelectedCellIds,
-    getSelectionRangeCount,
   } = useSelection()
 
   function startEditingMode(cellId: string, initialInput?: string) {
     const cell = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement | null
-
     if (!cell)
       return
 
@@ -76,6 +85,8 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     vertical = false,
   ): NavigationResult {
     const cellIndex = getSelectedCellIds(sheetId, columnOrder, rowOrder, vertical)
+      .filter(id => !mergesStore.mergeCoveredSet.has(id))
+
     const nextIndex = (cellIndex.indexOf(currentCellId) + dir + cellIndex.length) % cellIndex.length
     const { columnLetter, rowNumber } = parseCellId(cellIndex[nextIndex])
 
@@ -83,15 +94,60 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
   }
 
   function handleArrowUp(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, columnIndex, rowIndex, rowOrder, shift, ctrl } = ctx
+    const { sheetId, currentCellId, columnIndex, columnOrder, rowIndex, rowOrder, shift, ctrl } = ctx
 
     if (!shift) {
       clearSelection(sheetId)
+      tabRowContext.value = null
 
-      return {
-        columnIndex,
-        rowIndex: ctrl ? 0 : Math.max(0, rowIndex - 1),
+      const effectiveColIndex = navColContext.value !== null
+        ? columnOrder.indexOf(navColContext.value)
+        : columnIndex
+
+      let newRowIndex = ctrl ? 0 : Math.max(0, rowIndex - 1)
+      const targetId = getCellId(columnOrder[effectiveColIndex], rowOrder[newRowIndex])
+
+      if (mergesStore.mergeCoveredSet.has(targetId)) {
+        const anchorId = mergesStore.coveredToAnchorMap[targetId]
+        const { columnLetter: anchorCol, rowNumber: anchorRow } = parseCellId(anchorId)
+
+        if (anchorId === currentCellId) {
+          newRowIndex = skipCoveredRows(
+            newRowIndex,
+            effectiveColIndex,
+            -1,
+            rowOrder,
+            columnOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+            currentCellId,
+          )
+
+          navColContext.value = resolveNavColContext(
+            effectiveColIndex,
+            newRowIndex,
+            columnOrder,
+            rowOrder,
+            mergesStore.coveredToAnchorMap,
+          )
+        }
+        else if (anchorCol !== columnOrder[effectiveColIndex]) {
+          navColContext.value = columnOrder[effectiveColIndex]
+
+          return {
+            columnIndex: columnOrder.indexOf(anchorCol),
+            rowIndex: rowOrder.indexOf(anchorRow),
+          }
+        }
+        else {
+          navColContext.value = null
+        }
       }
+      else {
+        navColContext.value = null
+      }
+
+      return { columnIndex: effectiveColIndex, rowIndex: newRowIndex }
     }
 
     event.preventDefault()
@@ -116,15 +172,70 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
   }
 
   function handleArrowDown(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, columnIndex, rowIndex, rowOrder, shift, ctrl } = ctx
+    const { sheetId, currentCellId, columnIndex, rowIndex, columnOrder, rowOrder, shift, ctrl } = ctx
 
     if (!shift) {
       clearSelection(sheetId)
+      tabRowContext.value = null
 
-      return {
-        columnIndex,
-        rowIndex: ctrl ? rowOrder.length - 1 : Math.min(rowOrder.length - 1, rowIndex + 1),
+      const effectiveColIndex = navColContext.value !== null
+        ? columnOrder.indexOf(navColContext.value)
+        : columnIndex
+
+      let newRowIndex = ctrl ? rowOrder.length - 1 : Math.min(rowOrder.length - 1, rowIndex + 1)
+      const targetId = getCellId(columnOrder[effectiveColIndex], rowOrder[newRowIndex])
+
+      if (mergesStore.mergeCoveredSet.has(targetId)) {
+        const anchorId = mergesStore.coveredToAnchorMap[targetId]
+        const { columnLetter: anchorCol, rowNumber: anchorRow } = parseCellId(anchorId)
+
+        if (anchorId === currentCellId) {
+          newRowIndex = skipCoveredRows(
+            newRowIndex,
+            effectiveColIndex,
+            1,
+            rowOrder,
+            columnOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+            currentCellId,
+          )
+
+          navColContext.value = resolveNavColContext(
+            effectiveColIndex,
+            newRowIndex,
+            columnOrder,
+            rowOrder,
+            mergesStore.coveredToAnchorMap,
+          )
+        }
+        else if (anchorCol !== columnOrder[effectiveColIndex]) {
+          navColContext.value = columnOrder[effectiveColIndex]
+
+          return {
+            columnIndex: columnOrder.indexOf(anchorCol),
+            rowIndex: rowOrder.indexOf(anchorRow),
+          }
+        }
+        else {
+          newRowIndex = skipCoveredRows(
+            newRowIndex,
+            effectiveColIndex,
+            1,
+            rowOrder,
+            columnOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+          )
+
+          navColContext.value = null
+        }
       }
+      else {
+        navColContext.value = null
+      }
+
+      return { columnIndex: effectiveColIndex, rowIndex: newRowIndex }
     }
 
     event.preventDefault()
@@ -152,15 +263,70 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
   }
 
   function handleArrowLeft(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, columnIndex, rowIndex, columnOrder, shift, ctrl } = ctx
+    const { sheetId, currentCellId, columnIndex, rowIndex, columnOrder, rowOrder, shift, ctrl } = ctx
 
     if (!shift) {
       clearSelection(sheetId)
+      navColContext.value = null
 
-      return {
-        columnIndex: ctrl ? 0 : Math.max(0, columnIndex - 1),
-        rowIndex,
+      const effectiveRowIndex = tabRowContext.value !== null
+        ? rowOrder.indexOf(tabRowContext.value)
+        : rowIndex
+
+      let newColIndex = ctrl ? 0 : Math.max(0, columnIndex - 1)
+      const targetId = getCellId(columnOrder[newColIndex], rowOrder[effectiveRowIndex])
+
+      if (mergesStore.mergeCoveredSet.has(targetId)) {
+        const anchorId = mergesStore.coveredToAnchorMap[targetId]
+        const { columnLetter: anchorCol, rowNumber: anchorRow } = parseCellId(anchorId)
+
+        if (anchorId === currentCellId) {
+          newColIndex = skipCoveredCols(
+            newColIndex,
+            effectiveRowIndex,
+            -1,
+            columnOrder,
+            rowOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+            currentCellId,
+          )
+
+          tabRowContext.value = resolveTabRowContext(
+            newColIndex,
+            effectiveRowIndex,
+            columnOrder,
+            rowOrder,
+            mergesStore.coveredToAnchorMap,
+          )
+        }
+        else if (anchorRow !== rowOrder[effectiveRowIndex]) {
+          tabRowContext.value = rowOrder[effectiveRowIndex]
+
+          return {
+            columnIndex: columnOrder.indexOf(anchorCol),
+            rowIndex: rowOrder.indexOf(anchorRow),
+          }
+        }
+        else {
+          newColIndex = skipCoveredCols(
+            newColIndex,
+            effectiveRowIndex,
+            -1,
+            columnOrder,
+            rowOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+          )
+
+          tabRowContext.value = null
+        }
       }
+      else {
+        tabRowContext.value = null
+      }
+
+      return { columnIndex: newColIndex, rowIndex: effectiveRowIndex }
     }
 
     event.preventDefault()
@@ -185,15 +351,70 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
   }
 
   function handleArrowRight(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
-    const { sheetId, columnIndex, rowIndex, columnOrder, shift, ctrl } = ctx
+    const { sheetId, currentCellId, columnIndex, rowIndex, columnOrder, rowOrder, shift, ctrl } = ctx
 
     if (!shift) {
       clearSelection(sheetId)
+      navColContext.value = null
 
-      return {
-        columnIndex: ctrl ? columnOrder.length - 1 : Math.min(columnOrder.length - 1, columnIndex + 1),
-        rowIndex,
+      const effectiveRowIndex = tabRowContext.value !== null
+        ? rowOrder.indexOf(tabRowContext.value)
+        : rowIndex
+
+      let newColIndex = ctrl ? columnOrder.length - 1 : Math.min(columnOrder.length - 1, columnIndex + 1)
+      const targetId = getCellId(columnOrder[newColIndex], rowOrder[effectiveRowIndex])
+
+      if (mergesStore.mergeCoveredSet.has(targetId)) {
+        const anchorId = mergesStore.coveredToAnchorMap[targetId]
+        const { columnLetter: anchorCol, rowNumber: anchorRow } = parseCellId(anchorId)
+
+        if (anchorId === currentCellId) {
+          newColIndex = skipCoveredCols(
+            newColIndex,
+            effectiveRowIndex,
+            1,
+            columnOrder,
+            rowOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+            currentCellId,
+          )
+
+          tabRowContext.value = resolveTabRowContext(
+            newColIndex,
+            effectiveRowIndex,
+            columnOrder,
+            rowOrder,
+            mergesStore.coveredToAnchorMap,
+          )
+        }
+        else if (anchorRow !== rowOrder[effectiveRowIndex]) {
+          tabRowContext.value = rowOrder[effectiveRowIndex]
+
+          return {
+            columnIndex: columnOrder.indexOf(anchorCol),
+            rowIndex: rowOrder.indexOf(anchorRow),
+          }
+        }
+        else {
+          newColIndex = skipCoveredCols(
+            newColIndex,
+            effectiveRowIndex,
+            1,
+            columnOrder,
+            rowOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+          )
+
+          tabRowContext.value = null
+        }
       }
+      else {
+        tabRowContext.value = null
+      }
+
+      return { columnIndex: newColIndex, rowIndex: effectiveRowIndex }
     }
 
     event.preventDefault()
@@ -227,35 +448,73 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     stopEditingMode()
 
     if (hasSelection(sheetId)) {
-      if (getSelectionRangeCount(sheetId) > 1)
+      const nonCovered = getSelectedCellIds(sheetId, columnOrder, rowOrder, false)
+        .filter(id => !mergesStore.mergeCoveredSet.has(id))
+
+      if (nonCovered.length > 1)
         return cycleSelection(currentCellId, sheetId, columnOrder, rowOrder, dir)
 
-      const bounds = getSelectionBounds(sheetId)
-
-      if (!bounds)
-        return null
-
-      const canMoveInRow = shift
-        ? columnIndex > bounds.minColumnIndex
-        : columnIndex < bounds.maxColumnIndex
-
-      const newColIndex = canMoveInRow
-        ? columnIndex + dir
-        : shift ? bounds.maxColumnIndex : bounds.minColumnIndex
-
-      const newRowIndex = canMoveInRow
-        ? rowIndex
-        : shift
-          ? rowIndex > bounds.minRowIndex ? rowIndex - 1 : bounds.maxRowIndex
-          : rowIndex < bounds.maxRowIndex ? rowIndex + 1 : bounds.minRowIndex
-
-      return { columnIndex: newColIndex, rowIndex: newRowIndex }
+      clearSelection(sheetId)
     }
 
-    return {
-      columnIndex: Math.max(0, Math.min(columnOrder.length - 1, columnIndex + dir)),
-      rowIndex,
+    const effectiveRowIndex = tabRowContext.value !== null
+      ? rowOrder.indexOf(tabRowContext.value)
+      : rowIndex
+
+    let newColIndex = Math.max(0, Math.min(columnOrder.length - 1, columnIndex + dir))
+    const targetId = getCellId(columnOrder[newColIndex], rowOrder[effectiveRowIndex])
+
+    if (mergesStore.mergeCoveredSet.has(targetId)) {
+      const anchorId = mergesStore.coveredToAnchorMap[targetId]
+      const { columnLetter: anchorCol, rowNumber: anchorRow } = parseCellId(anchorId)
+
+      if (anchorId === currentCellId) {
+        newColIndex = skipCoveredCols(
+          newColIndex,
+          effectiveRowIndex,
+          dir,
+          columnOrder,
+          rowOrder,
+          mergesStore.mergeCoveredSet,
+          mergesStore.coveredToAnchorMap,
+          currentCellId,
+        )
+
+        tabRowContext.value = resolveTabRowContext(
+          newColIndex,
+          effectiveRowIndex,
+          columnOrder,
+          rowOrder,
+          mergesStore.coveredToAnchorMap,
+        )
+      }
+      else if (anchorRow !== rowOrder[effectiveRowIndex]) {
+        tabRowContext.value = rowOrder[effectiveRowIndex]
+
+        return {
+          columnIndex: columnOrder.indexOf(anchorCol),
+          rowIndex: rowOrder.indexOf(anchorRow),
+        }
+      }
+      else {
+        newColIndex = skipCoveredCols(
+          newColIndex,
+          effectiveRowIndex,
+          dir,
+          columnOrder,
+          rowOrder,
+          mergesStore.mergeCoveredSet,
+          mergesStore.coveredToAnchorMap,
+        )
+
+        tabRowContext.value = null
+      }
     }
+    else {
+      tabRowContext.value = null
+    }
+
+    return { columnIndex: newColIndex, rowIndex: effectiveRowIndex }
   }
 
   function handleEnter(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
@@ -267,38 +526,77 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
       if (wasEditing)
         stopEditingMode()
 
-      if (getSelectionRangeCount(sheetId) > 1)
+      const nonCovered = getSelectedCellIds(sheetId, columnOrder, rowOrder, true)
+        .filter(id => !mergesStore.mergeCoveredSet.has(id))
+
+      if (nonCovered.length > 1)
         return cycleSelection(currentCellId, sheetId, columnOrder, rowOrder, dir, true)
 
-      const bounds = getSelectionBounds(sheetId)
-
-      if (!bounds)
-        return null
-
-      const canMoveInCol = shift
-        ? rowIndex > bounds.minRowIndex
-        : rowIndex < bounds.maxRowIndex
-
-      const newRowIndex = canMoveInCol
-        ? rowIndex + dir
-        : shift ? bounds.maxRowIndex : bounds.minRowIndex
-
-      const newColIndex = canMoveInCol
-        ? columnIndex
-        : shift
-          ? columnIndex > bounds.minColumnIndex ? columnIndex - 1 : bounds.maxColumnIndex
-          : columnIndex < bounds.maxColumnIndex ? columnIndex + 1 : bounds.minColumnIndex
-
-      return { columnIndex: newColIndex, rowIndex: newRowIndex }
+      clearSelection(sheetId)
     }
 
     if (wasEditing) {
       stopEditingMode()
+      tabRowContext.value = null
 
-      return {
-        columnIndex,
-        rowIndex: Math.min(rowOrder.length - 1, rowIndex + dir),
+      const effectiveColIndex = navColContext.value !== null
+        ? columnOrder.indexOf(navColContext.value)
+        : columnIndex
+
+      let newRowIndex = Math.min(rowOrder.length - 1, rowIndex + dir)
+      const targetId = getCellId(columnOrder[effectiveColIndex], rowOrder[newRowIndex])
+
+      if (mergesStore.mergeCoveredSet.has(targetId)) {
+        const anchorId = mergesStore.coveredToAnchorMap[targetId]
+        const { columnLetter: anchorCol, rowNumber: anchorRow } = parseCellId(anchorId)
+
+        if (anchorId === currentCellId) {
+          newRowIndex = skipCoveredRows(
+            newRowIndex,
+            effectiveColIndex,
+            dir,
+            rowOrder,
+            columnOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+            currentCellId,
+          )
+
+          navColContext.value = resolveNavColContext(
+            effectiveColIndex,
+            newRowIndex,
+            columnOrder,
+            rowOrder,
+            mergesStore.coveredToAnchorMap,
+          )
+        }
+        else if (anchorCol !== columnOrder[effectiveColIndex]) {
+          navColContext.value = columnOrder[effectiveColIndex]
+
+          return {
+            columnIndex: columnOrder.indexOf(anchorCol),
+            rowIndex: rowOrder.indexOf(anchorRow),
+          }
+        }
+        else {
+          newRowIndex = skipCoveredRows(
+            newRowIndex,
+            effectiveColIndex,
+            dir,
+            rowOrder,
+            columnOrder,
+            mergesStore.mergeCoveredSet,
+            mergesStore.coveredToAnchorMap,
+          )
+
+          navColContext.value = null
+        }
       }
+      else {
+        navColContext.value = null
+      }
+
+      return { columnIndex: effectiveColIndex, rowIndex: newRowIndex }
     }
 
     event.preventDefault()
@@ -410,11 +708,13 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     if (result) {
       event.preventDefault()
 
-      const newCol = columnOrder[result.columnIndex]
+      const newColumn = columnOrder[result.columnIndex]
       const newRow = rowOrder[result.rowIndex]
 
-      if (newCol && newRow)
-        setActiveCell(sheetId, getCellId(newCol, newRow))
+      if (newColumn && newRow) {
+        const cellId = getCellId(newColumn, newRow)
+        setActiveCell(sheetId, mergesStore.coveredToAnchorMap[cellId] ?? cellId)
+      }
     }
   }
 

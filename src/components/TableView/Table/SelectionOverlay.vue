@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 
-const { tableContainer, startCellId, endCellId, showFillHandle = true } = defineProps<{
+const { tableContainer, startCellId, endCellId, showFillHandle = true, coveredToAnchorMap } = defineProps<{
   tableContainer: HTMLElement | null
   startCellId: string | null
   endCellId: string | null
   showFillHandle?: boolean
+  coveredToAnchorMap: Record<string, string>
 }>()
 
 const overlayStyle = ref<Record<string, string> | null>(null)
@@ -16,8 +17,11 @@ watchEffect(() => {
     return
   }
 
-  const anchorEl = tableContainer.querySelector(`[data-cell-id="${startCellId}"]`)
-  const activeEl = tableContainer.querySelector(`[data-cell-id="${endCellId}"]`)
+  const resolvedStartId = coveredToAnchorMap[startCellId] ?? startCellId
+  const resolvedEndId = coveredToAnchorMap[endCellId] ?? endCellId
+
+  const anchorEl = tableContainer.querySelector(`[data-cell-id="${resolvedStartId}"]`)
+  const activeEl = tableContainer.querySelector(`[data-cell-id="${resolvedEndId}"]`)
 
   if (!anchorEl || !activeEl) {
     overlayStyle.value = null
