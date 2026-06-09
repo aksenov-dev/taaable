@@ -6,7 +6,6 @@ import {
   IconBold,
   IconBorderAll,
   IconColorFill,
-  IconGroup,
   IconItalic,
   IconMinus,
   IconPalette,
@@ -20,6 +19,7 @@ import {
   TextInput,
 } from '@/shared/ui'
 import ToolbarIconContainer from '@/components/TableView/Toolbar/ToolbarIconContainer.vue'
+import ToolbarMergeCells from '@/components/TableView/Toolbar/ToolbarMergeCells.vue'
 import ToolbarVerticalDivider from '@/components/TableView/Toolbar/ToolbarVerticalDivider.vue'
 </script>
 
@@ -45,7 +45,7 @@ import ToolbarVerticalDivider from '@/components/TableView/Toolbar/ToolbarVertic
 
     <ToolbarIconContainer :icon="IconColorFill" title="Цвет заливки" />
     <ToolbarIconContainer :icon="IconBorderAll" title="Границы" />
-    <ToolbarIconContainer :icon="IconGroup" title="Объединить ячейки" />
+    <ToolbarMergeCells />
 
     <ToolbarVerticalDivider />
 

@@ -11,6 +11,16 @@ import { createDoubleClickHandler } from './createDoubleClickHandler'
 import { formatTimestampToStringDate } from './formatTimestampToStringDate'
 import { handleEditableCellKeydown } from './handleEditableCellKeydown'
 import { measureCellContentWidth } from './measureCellContentWidth'
+import { fromMergeDto, generateMerge, mergesArrayToMergesData, mergesRecordToArray, toMergeDto } from './mergeFactory'
+import {
+  getMergeBounds,
+  isMergeFullyContained,
+  isMergeOverlapping,
+  resolveNavColContext,
+  resolveTabRowContext,
+  skipCoveredCols,
+  skipCoveredRows,
+} from './mergeUtils'
 import { numberToColumnLetter } from './numberToColumnLetter'
 import { placeCursorAtEnd } from './placeCursorAtEnd'
 import { createResizeMask, removeResizeMask } from './resizeMask'
@@ -57,4 +67,16 @@ export {
   parseCellId,
   fromCellDto,
   toCellDto,
+  fromMergeDto,
+  generateMerge,
+  mergesArrayToMergesData,
+  mergesRecordToArray,
+  resolveNavColContext,
+  resolveTabRowContext,
+  skipCoveredRows,
+  skipCoveredCols,
+  toMergeDto,
+  getMergeBounds,
+  isMergeOverlapping,
+  isMergeFullyContained,
 }

@@ -2,7 +2,7 @@ import { ref } from 'vue'
 
 import type { SelectionBounds, SelectionRange } from '@/shared/types'
 
-import { getCellId, parseCellId } from '@/shared/utils'
+import { getCellId, getMergeBounds, isMergeFullyContained, isMergeOverlapping, parseCellId } from '@/shared/utils'
 
 import { useSheetsStore } from '@/stores/sheets'
 import { useSheetsDataStore } from '@/stores/sheetsData'
@@ -32,7 +32,36 @@ export function useSelection() {
   function saveNormalized(sheetId: string, startId: string, endId: string, replaceAll = false): void {
     const columnOrder = sheetsDataStore.currentSheetData?.columnOrder ?? []
     const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
-    const bounds = rangeToIndexBounds({ startId, endId }, columnOrder, rowOrder)
+    const merges = sheetsDataStore.currentSheetData?.merges ?? {}
+
+    let bounds = rangeToIndexBounds({ startId, endId }, columnOrder, rowOrder)
+    let changed = true
+
+    while (changed) {
+      changed = false
+
+      for (const merge of Object.values(merges)) {
+        const mergeBounds = getMergeBounds(merge, columnOrder, rowOrder)
+
+        if (mergeBounds.minColumn === -1 || mergeBounds.minRow === -1)
+          continue
+
+        if (!isMergeOverlapping(mergeBounds, bounds))
+          continue
+
+        if (isMergeFullyContained(mergeBounds, bounds))
+          continue
+
+        bounds = {
+          minColumnIndex: Math.min(bounds.minColumnIndex, mergeBounds.minColumn),
+          maxColumnIndex: Math.max(bounds.maxColumnIndex, mergeBounds.maxColumn),
+          minRowIndex: Math.min(bounds.minRowIndex, mergeBounds.minRow),
+          maxRowIndex: Math.max(bounds.maxRowIndex, mergeBounds.maxRow),
+        }
+
+        changed = true
+      }
+    }
 
     const normalized = {
       startId: getCellId(columnOrder[bounds.minColumnIndex], rowOrder[bounds.minRowIndex]),
@@ -79,8 +108,8 @@ export function useSelection() {
 
   function getCurrentRangeContext() {
     const sheetId = sheetsStore.currentSheetId
-    const ranges = sheetId ? selections.value[sheetId] : null
 
+    const ranges = sheetId ? selections.value[sheetId] : null
     if (!ranges?.length)
       return null
 
@@ -92,7 +121,6 @@ export function useSelection() {
 
   function isInSelection(cellId: string): boolean {
     const ctx = getCurrentRangeContext()
-
     if (!ctx)
       return false
 
@@ -113,7 +141,6 @@ export function useSelection() {
 
   function isColumnInSelection(columnLetter: string): boolean {
     const ctx = getCurrentRangeContext()
-
     if (!ctx)
       return false
 
@@ -127,7 +154,6 @@ export function useSelection() {
 
   function isRowInSelection(rowNumber: string): boolean {
     const ctx = getCurrentRangeContext()
-
     if (!ctx)
       return false
 
@@ -141,7 +167,6 @@ export function useSelection() {
 
   function getSelectionBounds(sheetId: string): SelectionBounds | null {
     const range = selections.value[sheetId]?.at(-1)
-
     if (!range)
       return null
 
@@ -149,6 +174,51 @@ export function useSelection() {
     const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
 
     return rangeToIndexBounds(range, columnOrder, rowOrder)
+  }
+
+  function getContiguousSelectionBounds(sheetId: string): SelectionBounds | null {
+    const ranges = selections.value[sheetId]
+    if (!ranges?.length)
+      return null
+
+    const columnOrder = sheetsDataStore.currentSheetData?.columnOrder ?? []
+    const rowOrder = sheetsDataStore.currentSheetData?.rowOrder ?? []
+
+    if (ranges.length === 1)
+      return rangeToIndexBounds(ranges[0], columnOrder, rowOrder)
+
+    const covered = new Set<string>()
+    let minColumnIndex = Infinity
+    let maxColumnIndex = -Infinity
+    let minRowIndex = Infinity
+    let maxRowIndex = -Infinity
+
+    for (const range of ranges) {
+      const bounds = rangeToIndexBounds(range, columnOrder, rowOrder)
+
+      minColumnIndex = Math.min(minColumnIndex, bounds.minColumnIndex)
+      maxColumnIndex = Math.max(maxColumnIndex, bounds.maxColumnIndex)
+      minRowIndex = Math.min(minRowIndex, bounds.minRowIndex)
+      maxRowIndex = Math.max(maxRowIndex, bounds.maxRowIndex)
+
+      for (let column = bounds.minColumnIndex; column <= bounds.maxColumnIndex; column++) {
+        for (let row = bounds.minRowIndex; row <= bounds.maxRowIndex; row++) {
+          covered.add(`${column},${row}`)
+        }
+      }
+    }
+
+    const expectedCount = (maxColumnIndex - minColumnIndex + 1) * (maxRowIndex - minRowIndex + 1)
+
+    if (covered.size !== expectedCount)
+      return null
+
+    return {
+      minColumnIndex,
+      maxColumnIndex,
+      minRowIndex,
+      maxRowIndex,
+    }
   }
 
   function toggleCellInSelection(sheetId: string, cellId: string): void {
@@ -210,6 +280,7 @@ export function useSelection() {
     isColumnInSelection,
     isRowInSelection,
     getSelectionBounds,
+    getContiguousSelectionBounds,
     toggleCellInSelection,
     getSelectedCellIds,
   }

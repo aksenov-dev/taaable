@@ -6,17 +6,22 @@ import { getDB } from '@/db/database'
 
 import type { AppDBSchema } from './database'
 
-type DeleteSheetDataTransaction = IDBPTransaction<AppDBSchema, ['sheets', 'columns', 'rows', 'cells'], 'readwrite'>
+type DeleteSheetDataTransaction = IDBPTransaction<
+  AppDBSchema,
+  ['sheets', 'columns', 'rows', 'cells', 'merges'],
+  'readwrite'
+>
 
 export function createSheetDataStorage() {
   async function getSheetsDataByTableId(tableId: string): Promise<SheetDataDto[]> {
     const db = await getDB()
 
-    const tx = db.transaction(['sheets', 'columns', 'rows', 'cells'], 'readonly')
+    const tx = db.transaction(['sheets', 'columns', 'rows', 'cells', 'merges'], 'readonly')
     const sheetsStore = tx.objectStore('sheets')
     const columnsStore = tx.objectStore('columns')
     const rowsStore = tx.objectStore('rows')
     const cellsStore = tx.objectStore('cells')
+    const mergesStore = tx.objectStore('merges')
 
     const sheetsIndex = sheetsStore.index('byTableId')
     const sheetIds = await sheetsIndex.getAllKeys(tableId)
@@ -24,15 +29,17 @@ export function createSheetDataStorage() {
     const columnsIndex = columnsStore.index('bySheetId')
     const rowsIndex = rowsStore.index('bySheetId')
     const cellsIndex = cellsStore.index('bySheetId')
+    const mergesIndex = mergesStore.index('bySheetId')
 
     const sheetsDataPromises = sheetIds.map(async (sheetId) => {
-      const [columns, rows, cells] = await Promise.all([
+      const [columns, rows, cells, merges] = await Promise.all([
         columnsIndex.getAll(sheetId),
         rowsIndex.getAll(sheetId),
         cellsIndex.getAll(sheetId),
+        mergesIndex.getAll(sheetId),
       ])
 
-      return { sheetId, columns, rows, cells }
+      return { sheetId, columns, rows, cells, merges }
     })
 
     const sheetsData = await Promise.all(sheetsDataPromises)
@@ -59,25 +66,29 @@ export function createSheetDataStorage() {
     const columnsStore = tx.objectStore('columns')
     const rowsStore = tx.objectStore('rows')
     const cellsStore = tx.objectStore('cells')
+    const mergesStore = tx.objectStore('merges')
 
     const columnsIndex = columnsStore.index('bySheetId')
     const rowsIndex = rowsStore.index('bySheetId')
     const cellsIndex = cellsStore.index('bySheetId')
+    const mergesIndex = mergesStore.index('bySheetId')
 
-    const [columnIds, rowIds, cellIds] = await Promise.all([
+    const [columnIds, rowIds, cellIds, mergeIds] = await Promise.all([
       columnsIndex.getAllKeys(sheetId),
       rowsIndex.getAllKeys(sheetId),
       cellsIndex.getAllKeys(sheetId),
+      mergesIndex.getAllKeys(sheetId),
     ])
 
     await Promise.all(columnIds.map(id => columnsStore.delete(id)))
     await Promise.all(rowIds.map(id => rowsStore.delete(id)))
     await Promise.all(cellIds.map(id => cellsStore.delete(id)))
+    await Promise.all(mergeIds.map(id => mergesStore.delete(id)))
   }
 
   async function deleteSheetDataBySheetId(sheetId: string): Promise<void> {
     const db = await getDB()
-    const tx = db.transaction(['columns', 'rows', 'cells'], 'readwrite')
+    const tx = db.transaction(['columns', 'rows', 'cells', 'merges'], 'readwrite')
 
     await deleteSheetData(tx, sheetId)
 
@@ -86,7 +97,7 @@ export function createSheetDataStorage() {
 
   async function deleteSheetsDataByTableId(tableId: string): Promise<void> {
     const db = await getDB()
-    const tx = db.transaction(['sheets', 'columns', 'rows', 'cells'], 'readwrite')
+    const tx = db.transaction(['sheets', 'columns', 'rows', 'cells', 'merges'], 'readwrite')
 
     const sheetsStore = tx.objectStore('sheets')
     const sheetsIndex = sheetsStore.index('byTableId')

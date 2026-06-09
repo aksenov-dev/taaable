@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { Cell } from '@/shared/types'
 
-const { cell, isActive, isEditing, isInSelection } = defineProps<{
+const { cell, isActive, isEditing, isInSelection, colSpan = 1, rowSpan = 1 } = defineProps<{
   cell: Cell
   isActive: boolean
   isEditing: boolean
   isInSelection: boolean
+  colSpan?: number
+  rowSpan?: number
 }>()
 
 const emit = defineEmits<{
@@ -23,6 +25,10 @@ const emit = defineEmits<{
       'cell--active': isActive,
       'cell--fill-handle': isActive && !isEditing && !isInSelection,
       'cell--selected': isInSelection,
+    }"
+    :style="{
+      gridColumn: `span ${colSpan}`,
+      gridRow: `span ${rowSpan}`,
     }"
     @dblclick="event => emit('dblclick', event)"
     @mousedown="event => emit('mousedown', event)"

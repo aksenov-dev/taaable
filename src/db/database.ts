@@ -1,7 +1,7 @@
 import { openDB } from 'idb'
 import type { DBSchema, IDBPDatabase } from 'idb'
 
-import type { CellDto, ColumnDto, RowDto, SheetDto, TableDto } from '@/shared/types'
+import type { CellDto, ColumnDto, MergeDto, RowDto, SheetDto, TableDto } from '@/shared/types'
 
 interface MetaDB extends DBSchema {
   meta: {
@@ -59,46 +59,62 @@ interface CellDB extends DBSchema {
   }
 }
 
-export type AppDBSchema = MetaDB & TableDB & SheetDB & ColumnDB & RowDB & CellDB
+interface MergeDB extends DBSchema {
+  merges: {
+    key: MergeDto['mergeId']
+    value: MergeDto
+    indexes: {
+      bySheetId: SheetDto['sheetId']
+    }
+  }
+}
+
+export type AppDBSchema = MetaDB & TableDB & SheetDB & ColumnDB & RowDB & CellDB & MergeDB
 
 let dbPromise: Promise<IDBPDatabase<AppDBSchema>>
 
 export function getDB() {
-  if (!dbPromise) {
-    dbPromise = openDB('TaaableDB', 1, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains('meta')) {
-          db.createObjectStore('meta')
-        }
+  if (dbPromise)
+    return dbPromise
 
-        if (!db.objectStoreNames.contains('tables')) {
-          db.createObjectStore('tables', { keyPath: 'tableId' })
-        }
+  dbPromise = openDB('TaaableDB', 1, {
+    upgrade(db) {
+      if (!db.objectStoreNames.contains('meta')) {
+        db.createObjectStore('meta')
+      }
 
-        if (!db.objectStoreNames.contains('sheets')) {
-          const store = db.createObjectStore('sheets', { keyPath: 'sheetId' })
-          store.createIndex('byTableId', 'tableId')
-        }
+      if (!db.objectStoreNames.contains('tables')) {
+        db.createObjectStore('tables', { keyPath: 'tableId' })
+      }
 
-        if (!db.objectStoreNames.contains('columns')) {
-          const store = db.createObjectStore('columns', { keyPath: 'columnId' })
-          store.createIndex('bySheetId', 'sheetId')
-        }
+      if (!db.objectStoreNames.contains('sheets')) {
+        const store = db.createObjectStore('sheets', { keyPath: 'sheetId' })
+        store.createIndex('byTableId', 'tableId')
+      }
 
-        if (!db.objectStoreNames.contains('rows')) {
-          const store = db.createObjectStore('rows', { keyPath: 'rowId' })
-          store.createIndex('bySheetId', 'sheetId')
-        }
+      if (!db.objectStoreNames.contains('columns')) {
+        const store = db.createObjectStore('columns', { keyPath: 'columnId' })
+        store.createIndex('bySheetId', 'sheetId')
+      }
 
-        if (!db.objectStoreNames.contains('cells')) {
-          const store = db.createObjectStore('cells', { keyPath: ['sheetId', 'columnId', 'rowId'] })
-          store.createIndex('bySheetId', 'sheetId')
-          store.createIndex('byColumnId', 'columnId')
-          store.createIndex('byRowId', 'rowId')
-        }
-      },
-    })
-  }
+      if (!db.objectStoreNames.contains('rows')) {
+        const store = db.createObjectStore('rows', { keyPath: 'rowId' })
+        store.createIndex('bySheetId', 'sheetId')
+      }
+
+      if (!db.objectStoreNames.contains('cells')) {
+        const store = db.createObjectStore('cells', { keyPath: ['sheetId', 'columnId', 'rowId'] })
+        store.createIndex('bySheetId', 'sheetId')
+        store.createIndex('byColumnId', 'columnId')
+        store.createIndex('byRowId', 'rowId')
+      }
+
+      if (!db.objectStoreNames.contains('merges')) {
+        const store = db.createObjectStore('merges', { keyPath: 'mergeId' })
+        store.createIndex('bySheetId', 'sheetId')
+      }
+    },
+  })
 
   return dbPromise
 }

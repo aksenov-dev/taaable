@@ -1,23 +1,17 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-
-import type { Cell, ColumnsData } from '@/shared/types'
-
-import { parseCellId } from '@/shared/utils'
+import type { ColumnsData } from '@/shared/types'
 
 import { useSelection } from '@/composables/useSelection'
 
 import TableHeaderColumnCell from '@/components/TableView/Table/TableHeaderColumnCell.vue'
 
-const { columnOrder, columns, activeCellId } = defineProps<{
+const { columnOrder, columns, activeMergeColumnLetters } = defineProps<{
   columnOrder: ColumnsData['columnOrder']
   columns: ColumnsData['columns']
-  activeCellId: Cell['cellId']
+  activeMergeColumnLetters: Set<string>
 }>()
 
 const { isColumnInSelection } = useSelection()
-
-const activeColumnLetter = computed(() => parseCellId(activeCellId).columnLetter)
 </script>
 
 <template>
@@ -31,6 +25,6 @@ const activeColumnLetter = computed(() => parseCellId(activeCellId).columnLetter
     :key="columnLetter"
     :column-letter="columnLetter"
     :column="columns[columnLetter]"
-    :is-active="activeColumnLetter === columnLetter || isColumnInSelection(columnLetter)"
+    :is-active="activeMergeColumnLetters.has(columnLetter) || isColumnInSelection(columnLetter)"
   />
 </template>

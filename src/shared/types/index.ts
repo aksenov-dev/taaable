@@ -3,6 +3,7 @@ import type { CellEditorPosition } from './cellEditor'
 import type { CellStyle } from './cellStyle'
 import type { Column, ColumnDto, ColumnsData } from './column'
 import type { NavigationCtx, NavigationResult } from './keyboardNavigation'
+import type { Merge, MergeBounds, MergeDto, MergesData } from './merge'
 import type { Row, RowDto, RowsData } from './row'
 import type { SelectionBounds, SelectionRange } from './selection'
 import type { MainSortVariant, MainViewVariant, Settings } from './settings'
@@ -35,6 +36,10 @@ export type {
   CellEditorPosition,
   SelectionBounds,
   SelectionRange,
+  Merge,
+  MergeBounds,
+  MergesData,
+  MergeDto,
   NavigationCtx,
   NavigationResult,
 }
