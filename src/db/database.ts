@@ -71,13 +71,14 @@ interface MergeDB extends DBSchema {
 
 export type AppDBSchema = MetaDB & TableDB & SheetDB & ColumnDB & RowDB & CellDB & MergeDB
 
+const DB_VERSION = 2
 let dbPromise: Promise<IDBPDatabase<AppDBSchema>>
 
 export function getDB() {
   if (dbPromise)
     return dbPromise
 
-  dbPromise = openDB('TaaableDB', 1, {
+  dbPromise = openDB('TaaableDB', DB_VERSION, {
     upgrade(db) {
       if (!db.objectStoreNames.contains('meta')) {
         db.createObjectStore('meta')
