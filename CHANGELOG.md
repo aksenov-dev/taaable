@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-06-09
+
+### Added
+- Merge cells: combine selection into one cell, merge by rows, merge by columns
+- Navigate through merged cells with arrow keys preserving original column/row context
+- Tab and Enter cycle through anchor cells within merged selections
+- Selection restored after unmerge to highlight previously merged range
+
+### Changed
+- Non-factory merge utilities extracted into separate mergeUtils.ts module
+
 ## [1.2.0] - 2026-05-30
 
 ### Added
