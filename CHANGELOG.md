@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-06-09
+
+### Changed
+- IndexedDB versioning introduced
+
 ## [1.3.0] - 2026-06-09
 
 ### Added
@@ -13,7 +18,7 @@ All notable changes to this project will be documented in this file.
 - Selection restored after unmerge to highlight previously merged range
 
 ### Changed
-- Non-factory merge utilities extracted into separate mergeUtils.ts module
+- Non-factory merge utilities extracted into separate mergeUtils module
 
 ## [1.2.0] - 2026-05-30
 
