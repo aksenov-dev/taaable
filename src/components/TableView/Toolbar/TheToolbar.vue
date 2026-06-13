@@ -3,15 +3,12 @@ import {
   IconAlignCenter,
   IconAlignLeft,
   IconAlignRight,
-  IconBold,
   IconBorderAll,
   IconColorFill,
-  IconItalic,
   IconMinus,
   IconPalette,
   IconPlus,
   IconRedo,
-  IconStrike,
   IconUndo,
   IconVerticalAlignBottom,
   IconVerticalAlignCenter,
@@ -20,6 +17,7 @@ import {
 } from '@/shared/ui'
 import ToolbarIconContainer from '@/components/TableView/Toolbar/ToolbarIconContainer.vue'
 import ToolbarMergeCells from '@/components/TableView/Toolbar/ToolbarMergeCells.vue'
+import ToolbarTextFormat from '@/components/TableView/Toolbar/ToolbarTextFormat.vue'
 import ToolbarVerticalDivider from '@/components/TableView/Toolbar/ToolbarVerticalDivider.vue'
 </script>
 
@@ -36,9 +34,7 @@ import ToolbarVerticalDivider from '@/components/TableView/Toolbar/ToolbarVertic
 
     <ToolbarVerticalDivider />
 
-    <ToolbarIconContainer :icon="IconBold" title="Полужирный" />
-    <ToolbarIconContainer :icon="IconItalic" title="Курсив" />
-    <ToolbarIconContainer :icon="IconStrike" title="Зачеркнутый" />
+    <ToolbarTextFormat />
     <ToolbarIconContainer :icon="IconPalette" title="Цвет текста" />
 
     <ToolbarVerticalDivider />

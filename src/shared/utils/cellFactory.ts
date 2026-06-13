@@ -49,7 +49,7 @@ export function toCellDto(cell: Cell): CellDto {
 
   return {
     ...rest,
-    ...(Object.keys(style).length > 0 ? { style } : {}),
+    ...(Object.keys(style).length > 0 ? { style: { ...style } } : {}),
   }
 }
 

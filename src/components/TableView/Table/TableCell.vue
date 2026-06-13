@@ -25,6 +25,9 @@ const emit = defineEmits<{
       'cell--active': isActive,
       'cell--fill-handle': isActive && !isEditing && !isInSelection,
       'cell--selected': isInSelection,
+      'font-bold': cell.style.bold,
+      'italic': cell.style.italic,
+      'line-through': cell.style.strikethrough,
     }"
     :style="{
       gridColumn: `span ${colSpan}`,
