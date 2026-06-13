@@ -647,7 +647,7 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     return null
   }
 
-  async function handleKeydown(event: KeyboardEvent) {
+  async function handleKeydown(event: KeyboardEvent): Promise<void> {
     if (!sheetsStore.currentSheetId)
       return
 
