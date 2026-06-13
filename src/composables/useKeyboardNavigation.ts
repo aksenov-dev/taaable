@@ -1,7 +1,7 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import type { Ref } from 'vue'
 
-import type { NavigationCtx, NavigationResult } from '@/shared/types'
+import type { NavigationCtx, NavigationResult, TextFormatKey } from '@/shared/types'
 
 import {
   getCellId,
@@ -625,6 +625,16 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
     return null
   }
 
+  async function handleStyleToggle(event: KeyboardEvent, ctx: NavigationCtx, key: TextFormatKey): Promise<void> {
+    if (!ctx.ctrl) {
+      handleDefault(event, ctx)
+      return
+    }
+
+    event.preventDefault()
+    await sheetsDataCellsStore.toggleSelectionStyle(key)
+  }
+
   function handleDefault(event: KeyboardEvent, ctx: NavigationCtx): NavigationResult {
     if (editingCellId.value)
       return null
@@ -699,6 +709,15 @@ export function useKeyboardNavigation(containerRef: Ref<HTMLDivElement | null>) 
         return
       case 'Delete': case 'Backspace':
         await handleDeleteBackspace(event, ctx)
+        return
+      case 'b':
+        await handleStyleToggle(event, ctx, 'bold')
+        return
+      case 'i':
+        await handleStyleToggle(event, ctx, 'italic')
+        return
+      case 's':
+        await handleStyleToggle(event, ctx, 'strikethrough')
         return
       default:
         handleDefault(event, ctx)

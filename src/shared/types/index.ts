@@ -1,6 +1,6 @@
 import type { Cell, CellDto, CellsData } from './cell'
 import type { CellEditorPosition } from './cellEditor'
-import type { CellStyle } from './cellStyle'
+import type { CellStyle, TextFormatKey } from './cellStyle'
 import type { Column, ColumnDto, ColumnsData } from './column'
 import type { NavigationCtx, NavigationResult } from './keyboardNavigation'
 import type { Merge, MergeBounds, MergeDto, MergesData } from './merge'
@@ -33,6 +33,7 @@ export type {
   CellsData,
   CellDto,
   CellStyle,
+  TextFormatKey,
   CellEditorPosition,
   SelectionBounds,
   SelectionRange,
