@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-06-14
+
+### Added
+- Bold, italic and strikethrough cell formatting via toolbar buttons
+- Keyboard shortcuts: Ctrl/⌘+B (bold), Ctrl/⌘+I (italic), Ctrl/⌘+S (strikethrough)
+- Formatting applied simultaneously to all selected cells in a range
+
 ## [1.3.1] - 2026-06-09
 
 ### Changed
