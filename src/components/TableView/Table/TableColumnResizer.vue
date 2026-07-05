@@ -28,7 +28,7 @@ const style = computed(() => ({ left: `${rulerVisible ? position : column.offset
 <template>
   <div
     class="group absolute z-4 w-2.25 -translate-x-1.25"
-    :class="[rulerVisible ? 'h-full' : 'h-6']"
+    :class="[rulerVisible ? 'h-screen' : 'h-6']"
     :style="style"
   >
     <div

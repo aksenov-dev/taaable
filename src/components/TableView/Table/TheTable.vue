@@ -205,28 +205,31 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
     :class="{ 'is-dragging': isDragging }"
     @scroll="onTableScroll"
   >
-    <TableRowResizer
-      v-for="rowNumber in sheetsDataStore.currentSheetData.rowOrder.slice(0, -1)"
-      :key="rowNumber"
-      :row-number="rowNumber"
-      :row="sheetsDataStore.currentSheetData.rows[rowNumber]"
-      :position="resizeRulerPosition"
-      :table-scroll-left="tableScroll.left"
-      :ruler-visible="isResizeRulerVisible && rowNumber === resizingRowNumber"
-      @mousedown="startRowResize"
-      @dblclick="sheetsDataRowsStore.resetRowAutoHeight"
-    />
+    <div class="sticky left-0 z-5 w-0 overflow-visible">
+      <TableRowResizer
+        v-for="rowNumber in sheetsDataStore.currentSheetData.rowOrder.slice(0, -1)"
+        :key="rowNumber"
+        :row-number="rowNumber"
+        :row="sheetsDataStore.currentSheetData.rows[rowNumber]"
+        :position="resizeRulerPosition"
+        :ruler-visible="isResizeRulerVisible && rowNumber === resizingRowNumber"
+        @mousedown="startRowResize"
+        @dblclick="sheetsDataRowsStore.resetRowAutoHeight"
+      />
+    </div>
 
-    <TableColumnResizer
-      v-for="columnLetter in sheetsDataStore.currentSheetData.columnOrder.slice(0, -1)"
-      :key="columnLetter"
-      :column-letter="columnLetter"
-      :column="sheetsDataStore.currentSheetData.columns[columnLetter]"
-      :position="resizeRulerPosition"
-      :ruler-visible="isResizeRulerVisible && columnLetter === resizingColumnLetter"
-      @mousedown="startColumnResize"
-      @dblclick="sheetsDataColumnsStore.fitColumnWidthToContent"
-    />
+    <div class="sticky top-0 z-4 h-0 overflow-visible">
+      <TableColumnResizer
+        v-for="columnLetter in sheetsDataStore.currentSheetData.columnOrder.slice(0, -1)"
+        :key="columnLetter"
+        :column-letter="columnLetter"
+        :column="sheetsDataStore.currentSheetData.columns[columnLetter]"
+        :position="resizeRulerPosition"
+        :ruler-visible="isResizeRulerVisible && columnLetter === resizingColumnLetter"
+        @mousedown="startColumnResize"
+        @dblclick="sheetsDataColumnsStore.fitColumnWidthToContent"
+      />
+    </div>
 
     <div
       role="grid"
