@@ -20,6 +20,7 @@ import { useResizeRuler } from '@/composables/useResizeRuler'
 import { useRowResize } from '@/composables/useRowResize'
 import { useScrollActiveCell } from '@/composables/useScrollActiveCell'
 import { useSelection } from '@/composables/useSelection'
+import { useSelectionOverlayStyles } from '@/composables/useSelectionOverlayStyles'
 import { useSheetScrollPosition } from '@/composables/useSheetScrollPosition'
 
 import SelectionOverlay from '@/components/TableView/Table/SelectionOverlay.vue'
@@ -124,6 +125,18 @@ const gridTemplateColumns = computed(() => {
 
   return `${header} ${columnOrder.map(order => `${columns[order].width}px`).join(' ')}`
 })
+
+const coveredToAnchorMap = computed(() => mergesStore.coveredToAnchorMap)
+const rowHeightsKey = computed(() => sheetsDataRowsStore.rowHeightsKey)
+
+const { overlayStyles } = useSelectionOverlayStyles(
+  tableContainerRef,
+  selectionRanges,
+  gridTemplateColumns,
+  gridTemplateRows,
+  coveredToAnchorMap,
+  rowHeightsKey,
+)
 
 function onTableScroll(e: Event): void {
   const target = e.target as HTMLElement
@@ -267,11 +280,8 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
         v-for="(range, index) in selectionRanges"
         v-show="!isDragActive || index !== selectionRanges.length - 1"
         :key="`${range.startId}-${range.endId}`"
-        :table-container="tableContainerRef"
-        :start-cell-id="range.startId"
-        :end-cell-id="range.endId"
+        :overlay-style="overlayStyles[index] ?? null"
         :show-fill-handle="index === selectionRanges.length - 1"
-        :covered-to-anchor-map="mergesStore.coveredToAnchorMap"
       />
     </div>
   </div>

@@ -76,7 +76,7 @@ onMounted(async () => {
   <div
     ref="editorRef"
     contenteditable
-    class="font-roboto text-small outline-accent-1 absolute z-1 cursor-default justify-start rounded-xs
+    class="font-roboto text-small outline-accent-1 absolute z-3 cursor-default justify-start rounded-xs
     bg-white p-1 leading-3.75 text-black outline-2 -outline-offset-1 shadow-brand-2 focus:cursor-text
     dark:bg-black dark:text-white"
     :style="style"
