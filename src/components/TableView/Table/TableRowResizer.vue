@@ -5,11 +5,10 @@ import type { Row } from '@/shared/types'
 
 import { createDoubleClickHandler } from '@/shared/utils'
 
-const { rowNumber, row, position, tableScrollLeft, rulerVisible } = defineProps<{
+const { rowNumber, row, position, rulerVisible } = defineProps<{
   rowNumber: string
   row: Row
   position: number
-  tableScrollLeft: number
   rulerVisible: boolean
 }>()
 
@@ -23,16 +22,13 @@ const onResizerMousedown = createDoubleClickHandler(
   () => emit('mousedown', rowNumber, row.height, row.offsetTop),
 )
 
-const style = computed(() => ({
-  top: `${rulerVisible ? position : row.offsetTop}px`,
-  left: `${tableScrollLeft}px`,
-}))
+const style = computed(() => ({ top: `${rulerVisible ? position : row.offsetTop}px` }))
 </script>
 
 <template>
   <div
     class="group absolute z-5 h-2.25 -translate-y-1.25"
-    :class="[rulerVisible ? 'w-full' : 'w-11']"
+    :class="[rulerVisible ? 'w-screen' : 'w-11']"
     :style="style"
   >
     <div

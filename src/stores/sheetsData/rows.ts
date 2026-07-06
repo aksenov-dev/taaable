@@ -1,4 +1,4 @@
-import { nextTick } from 'vue'
+import { computed, nextTick } from 'vue'
 import { defineStore } from 'pinia'
 
 import { CELL_SIZE } from '@/shared/constants'
@@ -13,6 +13,14 @@ export const useSheetsDataRowsStore = defineStore('sheetsDataRows', () => {
   const sheetsStore = useSheetsStore()
   const sheetsDataStore = useSheetsDataStore()
   const rowStorage = createRowStorage()
+
+  const rowHeightsKey = computed(() => {
+    const currentSheetData = sheetsDataStore.currentSheetData
+    if (!currentSheetData)
+      return ''
+
+    return currentSheetData.rowOrder.map(r => `${currentSheetData.rows[r].height}`).join(',')
+  })
 
   function calculateRowsOffsets(sheetId: string): void {
     const sheetData = sheetsDataStore.getSheetDataById(sheetId)
@@ -79,6 +87,7 @@ export const useSheetsDataRowsStore = defineStore('sheetsDataRows', () => {
   }
 
   return {
+    rowHeightsKey,
     calculateRowsOffsets,
     setRowHeight,
     updateRowHeight,

@@ -20,6 +20,7 @@ import { useResizeRuler } from '@/composables/useResizeRuler'
 import { useRowResize } from '@/composables/useRowResize'
 import { useScrollActiveCell } from '@/composables/useScrollActiveCell'
 import { useSelection } from '@/composables/useSelection'
+import { useSelectionOverlayStyles } from '@/composables/useSelectionOverlayStyles'
 import { useSheetScrollPosition } from '@/composables/useSheetScrollPosition'
 
 import SelectionOverlay from '@/components/TableView/Table/SelectionOverlay.vue'
@@ -125,6 +126,18 @@ const gridTemplateColumns = computed(() => {
   return `${header} ${columnOrder.map(order => `${columns[order].width}px`).join(' ')}`
 })
 
+const coveredToAnchorMap = computed(() => mergesStore.coveredToAnchorMap)
+const rowHeightsKey = computed(() => sheetsDataRowsStore.rowHeightsKey)
+
+const { overlayStyles } = useSelectionOverlayStyles(
+  tableContainerRef,
+  selectionRanges,
+  gridTemplateColumns,
+  gridTemplateRows,
+  coveredToAnchorMap,
+  rowHeightsKey,
+)
+
 function onTableScroll(e: Event): void {
   const target = e.target as HTMLElement
   tableScroll.left = target.scrollLeft
@@ -205,28 +218,31 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
     :class="{ 'is-dragging': isDragging }"
     @scroll="onTableScroll"
   >
-    <TableRowResizer
-      v-for="rowNumber in sheetsDataStore.currentSheetData.rowOrder.slice(0, -1)"
-      :key="rowNumber"
-      :row-number="rowNumber"
-      :row="sheetsDataStore.currentSheetData.rows[rowNumber]"
-      :position="resizeRulerPosition"
-      :table-scroll-left="tableScroll.left"
-      :ruler-visible="isResizeRulerVisible && rowNumber === resizingRowNumber"
-      @mousedown="startRowResize"
-      @dblclick="sheetsDataRowsStore.resetRowAutoHeight"
-    />
+    <div class="sticky left-0 z-5 w-0 overflow-visible">
+      <TableRowResizer
+        v-for="rowNumber in sheetsDataStore.currentSheetData.rowOrder.slice(0, -1)"
+        :key="rowNumber"
+        :row-number="rowNumber"
+        :row="sheetsDataStore.currentSheetData.rows[rowNumber]"
+        :position="resizeRulerPosition"
+        :ruler-visible="isResizeRulerVisible && rowNumber === resizingRowNumber"
+        @mousedown="startRowResize"
+        @dblclick="sheetsDataRowsStore.resetRowAutoHeight"
+      />
+    </div>
 
-    <TableColumnResizer
-      v-for="columnLetter in sheetsDataStore.currentSheetData.columnOrder.slice(0, -1)"
-      :key="columnLetter"
-      :column-letter="columnLetter"
-      :column="sheetsDataStore.currentSheetData.columns[columnLetter]"
-      :position="resizeRulerPosition"
-      :ruler-visible="isResizeRulerVisible && columnLetter === resizingColumnLetter"
-      @mousedown="startColumnResize"
-      @dblclick="sheetsDataColumnsStore.fitColumnWidthToContent"
-    />
+    <div class="sticky top-0 z-4 h-0 overflow-visible">
+      <TableColumnResizer
+        v-for="columnLetter in sheetsDataStore.currentSheetData.columnOrder.slice(0, -1)"
+        :key="columnLetter"
+        :column-letter="columnLetter"
+        :column="sheetsDataStore.currentSheetData.columns[columnLetter]"
+        :position="resizeRulerPosition"
+        :ruler-visible="isResizeRulerVisible && columnLetter === resizingColumnLetter"
+        @mousedown="startColumnResize"
+        @dblclick="sheetsDataColumnsStore.fitColumnWidthToContent"
+      />
+    </div>
 
     <div
       role="grid"
@@ -264,11 +280,8 @@ watch([tableContainerRef, () => sheetsStore.currentSheetId], () => {
         v-for="(range, index) in selectionRanges"
         v-show="!isDragActive || index !== selectionRanges.length - 1"
         :key="`${range.startId}-${range.endId}`"
-        :table-container="tableContainerRef"
-        :start-cell-id="range.startId"
-        :end-cell-id="range.endId"
+        :overlay-style="overlayStyles[index] ?? null"
         :show-fill-handle="index === selectionRanges.length - 1"
-        :covered-to-anchor-map="mergesStore.coveredToAnchorMap"
       />
     </div>
   </div>

@@ -51,7 +51,11 @@ export const useSheetsStore = defineStore('sheets', () => {
       currentSheetId.value = activeSheetId || sheets.value[0].sheetId
 
       await sheetsDataStore.getSheetsData()
-      await goToSheet(tableStore.currentTable.tableId, currentSheetId.value)
+
+      await router.replace({
+        name: 'Table',
+        params: { tableId: tableStore.currentTable.tableId, sheetId: currentSheetId.value },
+      })
     }
     catch (error) {
       console.error('Ошибка при загрузке листов таблицы из IndexedDB:', error)
