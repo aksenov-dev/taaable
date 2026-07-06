@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-07-06
+
+### Fixed
+- Selection overlay not updating after column/row resize or cell content change
+- Column and row resizers losing position after scroll
+- Browser history entry added on initial sheet load
+
 ## [1.4.0] - 2026-06-14
 
 ### Added
