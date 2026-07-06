@@ -1,6 +1,6 @@
 # Taaable
 
-![Version](https://img.shields.io/badge/version-1.4.0-blue)
+![Version](https://img.shields.io/badge/version-1.4.1-blue)
 
 > **Taaable** is a single-page application (SPA) similar to Google Sheets, built with Vue 3 (Composition API) and TypeScript.
 
